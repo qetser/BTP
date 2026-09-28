@@ -15,9 +15,9 @@ This is the Codex adaptation of the supplied Grand Setup v2 for the Chandrayaan-
 | Supplied scaffold | This repository | Status |
 | --- | --- | --- |
 | `CLAUDE.md` | Local `AGENTS.md` plus `codex.md` | Present, ignored by Git as requested |
-| `.claude/skills` | `.agents/skills/{plan,commit,verify}` | Present, tracked |
-| `.claude/settings.json` hooks | `.codex/hooks.json` | Session-start reminder present; requires project and hook trust |
-| `.claude/agents` | `.codex/agents` | Narrow planner and reviewer definitions present |
+| `.claude/skills` | Local `.agents/skills/{plan,commit,verify}` | Present, ignored by Git |
+| `.claude/settings.json` hooks | Local `.codex/hooks.json` | Present, ignored by Git; requires project and hook trust |
+| `.claude/agents` | Local `.codex/agents` | Present, ignored by Git |
 | `tasks/todo.md` / `task_plan.md` | `tasks/task_plan.md` | One current-task file |
 | Four living files | `project.md`, `improvements.md`, `updates.md`, `error-maintainer.md` | Present, tracked |
 
@@ -32,7 +32,7 @@ The supplied setup's TypeScript skill package does not apply to this Python-orie
 3. Work in small units. Add source-backed research to `tasks/findings.md`; add implementation decisions and outcomes to `tasks/progress.md`.
 4. Verify actual outputs. Use the `verify` skill for code and data work. Do not claim a test or source check that did not run.
 5. After a meaningful change, update `updates.md` in the same logical unit. Record resolved, non-routine errors in `error-maintainer.md`. Capture recurring patterns in `tasks/lessons.md` and proposed process changes in `improvements.md`.
-6. Commit only intended files. `data/`, `AGENTS.md`, and `codex.md` stay untracked. The local Git commit-message hook rejects Claude/Codex co-author trailers.
+6. Commit only intended files. `data/`, `AGENTS.md`, `codex.md`, `.agents/skills`, and `.codex` stay untracked. The local Git commit-message hook rejects Claude/Codex co-author trailers.
 
 ## Onboarding facts and unanswered choices
 
@@ -50,11 +50,11 @@ Do not fill these gaps with invented answers. Record each decision in `project.m
 - [x] Git repository and `main` exist; raw data are ignored.
 - [x] Project charter, task plan, findings, progress, lessons, improvements, updates, and error registry exist.
 - [x] Research-digest prompt and M1–M3 observation checklist exist; no autonomous schedule or telemetry is enabled.
-- [x] Plan, commit, and verify skills exist in Codex's repository skill path.
+- [x] Plan, commit, and verify skills exist locally in Codex's repository skill path and are ignored by Git.
 - [x] Local `AGENTS.md` and `codex.md` are ignored and carry the no-co-author rule.
 - [x] A Git commit-message hook protects the co-author rule in this checkout.
 - [ ] In a fresh Codex session, inspect and trust the project hook with `/hooks`; this cannot be tested as active from the current session.
 - [ ] Obtain official calibrated IIRS products and product guide for M2.
 - [ ] Set any research schedule, observation metrics, or cross-model review only after specifying cadence and success criteria.
 
-To enable the Git hook in another checkout, run `git config --local core.hooksPath .githooks`. To recreate local instructions, copy the instructions in this file into local `AGENTS.md` and `codex.md`; both names remain ignored.
+To enable the Git hook in another checkout, run `git config --local core.hooksPath .githooks`. The ignored instruction, skill, and Codex configuration files exist only in this checkout; recreate them locally in a fresh clone using this setup and the repository's project files. Do not add them to Git.

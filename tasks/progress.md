@@ -1,5 +1,10 @@
 # Progress
 
+## 2026-09-28 — Local tooling removed from Git
+
+- Kept `.agents/skills` and `.codex` on disk while removing them from Git tracking.
+- Added ignore rules and corrected the setup guide to show these are local-only files.
+
 ## 2026-09-28 — Codex setup
 
 - Adapted the supplied project workflow to Codex's local instruction, skill, hook, and custom-agent locations.

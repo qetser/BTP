@@ -2,6 +2,18 @@
 
 Meaningful project changes are recorded newest first. Entries describe the change and evidence; the Git history supplies the exact commit hash.
 
+## 2026-09-28 — Keep agent tooling local
+
+**Phase:** Project workflow setup
+**Type:** Configuration
+
+- Removed `.agents/skills` and `.codex` from Git tracking while preserving their local files.
+- Added ignore rules and updated the setup guide and Git scope lesson.
+
+**Why:** The project's agent tooling should remain specific to this checkout, as requested.
+
+**Impact:** Fresh clones will need to recreate local skills and Codex configuration if wanted.
+
 ## 2026-09-28 — Codex project setup
 
 **Phase:** Project workflow setup
