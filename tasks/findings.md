@@ -33,3 +33,11 @@
 - Applying the PDS4 unit prefixes produces comparable fixed-grid median ranges across the two paired scenes. This supports the unit labels provisionally; no independent calibration reference was used.
 - The saturation-table XML declares µW, while the SIS describes Level 1 radiance generally in mW. On valid bands the former interpretation flags nearly every positive pixel at or above threshold, and the latter flags none. Treat the saturation-unit gate as failed and do not use either as a pixel mask. See the M1 module findings for the exact counts and method.
 - M2 remains blocked. E3G2 has no valid 4–5 µm bands, and the current pair does not support a validated thermal correction or 3 µm reflectance result.
+
+## 2026-09-28 — Literature review identifies E1G2 as the next pilot target
+
+- A targeted review found that Verma et al. (2022) used E1G2 IIRS radiance strips and the 2.5–5 µm range for thermal correction. The local official validity workbook marks E1G2 bands 226–248 (4504.1–4874.9 nm) valid. This gives a concrete mode and wavelength range for scene acquisition.
+- Gou et al. (2026) report that the 4504–4875 nm interval gives a more stable temperature estimate than the 2566–2937 nm interval. Their sensitivity example reports a 14.39% reflectance difference at 3156 nm for a 4 K temperature difference. Temperature and uncertainty checks must therefore remain explicit in M2.
+- Chauhan et al. (2025) describe IIRS Level-2 processing to thermally corrected reflectance through 3.3 µm, standard geometry correction, empirical-line adjustment, and comparison with same-region M³ data. Bose et al. (2024) describe photometric correction over 0.8–2.0 µm and comparison with M³; that work does not validate thermal correction at 3 µm.
+- The published method and official mode table identify E1G2 as a candidate acquisition path. They do not resolve the saturation-table unit conflict, establish the fill value, or validate a correction on the active cubes. The next gate is to acquire and inspect an E1G2 raw/calibrated pair, then verify its units, mode mask, saturation rules, geometry, and footprint.
+- An initial source-backed matrix is in [`docs/gap_matrix.md`](../docs/gap_matrix.md). Search scope and limitations are recorded in [`m1-literature/notes.md`](../results/phase-1/m1-literature/notes.md).

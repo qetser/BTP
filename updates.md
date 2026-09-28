@@ -2,6 +2,21 @@
 
 Meaningful project changes are recorded newest first. Entries describe the change and evidence; the Git history supplies the exact commit hash.
 
+## 2026-09-28 — Set the next IIRS thermal pilot target from literature
+
+**Phase:** Phase 1, M1 acquisition and gap analysis
+
+**Type:** Literature review and processing plan
+
+- Reviewed IIRS thermal, reflectance, photometric, and hydration papers from 2021 through 2026, plus the official PRADAN FAQ and mode-validity workbook.
+- Identified E1G2 as the next thermal pilot mode. The 2022 study used E1G2, and the local official workbook marks bands 226–248 valid from 4504.1 to 4874.9 nm.
+- Recorded the 2026 finding that reflectance near 3156 nm is sensitive to temperature uncertainty. M2 must propagate that uncertainty.
+- Added an initial cited gap matrix, M1 literature records, README literature notes, and an updated Mermaid flow. No new data or corrected reflectance was produced.
+
+**Why:** The current E3G2 strips lack valid longwave channels for the documented thermal method. Literature and mode metadata provide a concrete acquisition target.
+
+**Impact:** E1G2 is a candidate mode, not a validated correction. The saturation-unit conflict, per-pixel masks, scene acquisition, and independent coverage remain open.
+
 ## 2026-09-28 — Explain the pilot scan in the README
 
 **Phase:** Phase 1, M1 product inventory

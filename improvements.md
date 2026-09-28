@@ -19,10 +19,10 @@ Status: `[ ]` open, `[~]` in progress, `[x]` implemented, `[!]` needs a project 
 
 **Source:** Official IIRS `E3G2` band-validity workbook
 **Category:** Data quality
-**Status:** `[ ]`
+**Status:** `[~]`
 
-**What:** Select a pilot with valid long-wavelength bands or validate another thermal correction method before 3 µm analysis.
-**Why:** The current `E3G2` pilots have no valid 4–5 µm bands under the official mode mask.
+**What:** Acquire and validate a paired `E1G2` pilot with valid long-wavelength bands, or validate another thermal correction method before 3 µm analysis.
+**Why:** The current `E3G2` pilots have no valid 4–5 µm bands. Published IIRS thermal work used `E1G2`, and the official workbook marks bands 226–248 (4504.1–4874.9 nm) valid in that mode.
 **Tradeoff:** Additional acquisition or method validation is needed.
 **Effort:** Medium.
 

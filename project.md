@@ -33,7 +33,7 @@ The proposed transfer study is only interpretable if raw detector counts become 
 1. **Invalid reflectance** — Raw counts and thermal emission can masquerade as absorption. Mitigation: official calibrated products, published correction chain, and spectral validation.
 2. **Weak or leaking labels** — Geologic polygons are coarse and neighboring pixels correlate. Mitigation: reviewed labels, boundary exclusion, orbit/province splits.
 3. **Insufficient coverage** — Two current strips do not test polar feasibility or independent generalization. Mitigation: expand geographically distinct IIRS scenes before claims.
-4. **Mode-limited thermal evidence** — The active `E3G2` strips lack valid 4–5 µm bands under the official mask. Mitigation: select a suitable exposure mode or validate another thermal method before 3 µm interpretation.
+4. **Mode-limited thermal evidence** — The active `E3G2` strips lack valid 4–5 µm bands under the official mask. Published IIRS thermal work used `E1G2`, whose official mask includes valid 4504.1–4874.9 nm bands. Mitigation: acquire and validate a matched `E1G2` pair before 3 µm interpretation.
 
 ## Version 1 definition
 
@@ -51,6 +51,7 @@ Version 1 is M1–M3: a verified scene manifest; an analysis-ready reflectance p
 
 | Date | Change | Reason |
 | --- | --- | --- |
+| 2026-09-28 | Added literature-backed E1G2 acquisition target and temperature-uncertainty gate | Published thermal work and the official mode table identify valid 4.5–4.9 µm bands in E1G2 |
 | 2026-09-28 | Reviewed official IIRS SIS and mode validity | Identify the `E3G2` thermal-correction constraint |
 | 2026-09-28 | Updated active pilot to two raw/calibrated pairs and recorded the guide access gate | Keep the charter aligned with the verified local inventory |
 | 2026-09-28 | Initial charter for M1–M3 | Adapted the supplied setup to the existing IIRS repo |

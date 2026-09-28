@@ -1,5 +1,14 @@
 # Progress
 
+## 2026-09-28 — Review IIRS thermal and reflectance literature
+
+- Reviewed primary IIRS papers from 2022, 2024, 2025, and 2026, the official PRADAN FAQ, and a public IIRS processing implementation.
+- The 2022 thermal paper used E1G2. The official workbook confirms E1G2 bands 226–248 span 4504.1–4874.9 nm, so E1G2 is now the preferred mode for the thermal pilot.
+- A 2026 sensitivity paper reports that a 4 K temperature difference can cause a 14.39% reflectance difference at 3156 nm. This makes temperature uncertainty a required M2 output.
+- Created an initial cited gap matrix and documented the targeted review under `results/phase-1/m1-literature/`.
+- A public map of PRADAN exposed the FAQ and contacts pages but no product listing. The FAQ describes raw and calibrated products and directs users to the product guide. The authenticated browse/data-table path is still needed to select a scene.
+- Next: acquire a matched E1G2 raw/calibrated pair from PRADAN, inspect its geometry and footprint, and resolve the saturation-table unit and per-pixel mask before reflectance processing.
+
 ## 2026-09-28 — Scan calibrated pilot radiance cubes
 
 - Scanned every pixel in all 256 bands of the `m65` and `d18` calibrated cubes. Saved exact per-band finite, zero, negative, positive, and candidate saturation-threshold counts plus sampled quantiles in `results/phase-1/m1-inventory/metrics/pilot_radiance_quality_by_band.csv`; saved the plot alongside it.
