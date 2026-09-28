@@ -5,6 +5,8 @@
 - Do not make a metric plot for archive counts or dimensions unless those values are deliberately analyzed as a quality result. Inventory evidence is currently recorded as text.
 - The two active calibrated counterparts are paired, and the official SIS has been checked. M1 cannot pass until unit scales, cube fill and pixel-level masks are validated and independent coverage is selected. The separate user guide remains to be inspected if required.
 - Generate the validity artifacts with `uv run --no-project --with xlrd python scripts/plot_iirs_band_validity.py` from the repository root. The command reads the ignored ZIP and writes the tracked CSV and SVG.
+- Generate the two browse previews with `uv run --no-project --with pillow python scripts/build_iirs_strip_previews.py`. The source PNGs are under ignored `data/extracted/calibrated_*/browse/calibrated/20200208/`; the preview script uses all browse rows in four ordered sections and resizes both axes proportionally. The original files remain ignored.
+- Source browse SHA-256: `m65` `c2197bf71ddc55d5661bec6719f5e23dd5708558be97640ea36349c56a2dd3da`; `d18` `c1bcdab322f7a46aa13f99a29b7f81c0ef7a580514349fb4f48e65cf15be148c`. Both source PNGs match the MD5 in their PDS4 browse labels.
 - The reproducible manifest command is `python3 scripts/build_iirs_manifest.py` from the repository root.
 - The generated CSV is small enough to track. Raw ZIP archives and cubes remain ignored under `data/`.
 

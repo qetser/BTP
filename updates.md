@@ -2,6 +2,19 @@
 
 Meaningful project changes are recorded newest first. Entries describe the change and evidence; the Git history supplies the exact commit hash.
 
+## 2026-09-28 — Display active IIRS strips in README
+
+**Phase:** Phase 1, M1 product inventory
+
+**Type:** Research visualization and documentation
+
+- Verified both calibrated-product browse PNGs against their PDS4 labels.
+- Added two reproducible four-part strip previews and embedded them in the README with source, order, and scientific limits.
+
+**Why:** Readers can identify the actual pilot observations without mistaking browse display values for calibrated radiance or reflectance.
+
+**Impact:** No numerical calibration, reflectance, or model result changed.
+
 ## 2026-09-28 — Show M1 findings and validity figure in README
 
 **Phase:** Phase 1, M1 communication

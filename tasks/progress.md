@@ -1,5 +1,11 @@
 # Progress
 
+## 2026-09-28 — Display the two active pilot strips
+
+- Verified the official calibrated-product browse PNGs against their PDS4 MD5 values.
+- Generated full-coverage, four-part preview figures for `m65` and `d18`, and embedded both in the README with source and interpretation limits.
+- Kept the original browse files and scene archives ignored; only the derived figures and generation script are tracked.
+
 ## 2026-09-28 — Official IIRS archive inspected
 
 - Received `data/pradan/iir.zip`, verified all ZIP entries, and recorded SHA-256 `5afe64c3efe445e6d0334e8a374756ecab45698494dcee0d19616bf5dcb80720`. The archive contains the 149-page SIS V17, LUTs, saturation tables, solar flux, and band-validity workbook. The separate user guide is absent.

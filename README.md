@@ -15,6 +15,16 @@ The repository currently contains four selected scene ZIP archives under ignored
 | 2020-02-08 00:57, `m65` | 10,925 × 250 × 256 | 31.4°S–1.5°S | ZIP and extracted; raw plus calibrated |
 | 2020-02-08 12:45, `d18` | 10,927 × 250 × 256 | 31.6°S–1.7°S | ZIP and extracted; raw plus calibrated |
 
+### Pilot strip browse images
+
+These previews show the two observations selected for analysis. Each uses the official PNG from its calibrated product's `browse/calibrated/` directory. The source label calls it a **count-calibrated, subsampled browse image**. Its checksum matches the label. The spectral analysis will use the corresponding calibrated `.qub` radiance cube after the M2 quality gate, not pixel values from these display images.
+
+| `m65` observation, 00:57 UTC | `d18` observation, 12:45 UTC |
+| --- | --- |
+| ![Four consecutive sections of the m65 IIRS browse strip, showing lunar terrain and craters.](results/phase-1/m1-inventory/figures/calibrated_browse_m65_four_part_preview.png) | ![Four consecutive sections of the d18 IIRS browse strip, showing lunar terrain and craters.](results/phase-1/m1-inventory/figures/calibrated_browse_d18_four_part_preview.png) |
+
+**Figure: complete browse coverage of the two pilot strips.** Each narrow column shows one consecutive quarter of the original strip, with rows increasing downward and columns ordered left to right. Both axes were resized together within each quarter to preserve shape; the printed row ranges refer to the browse PNG, not the 10,925/10,927-line radiance cubes. These are visual orientation aids, not georeferenced maps, reflectance images, or mineral detections. The [preview generation script](scripts/build_iirs_strip_previews.py) and [M1 notes](results/phase-1/m1-inventory/notes.md) record how to reproduce them.
+
 The labels list 256 band centers from **712.3 to 5009.7 nm** for the active pilot files. ISRO describes the nominal instrument range as approximately 0.8–5.0 µm; use each product's actual band centers and widths. Raw labels specify `UnsignedLSB2` detector counts. Calibrated labels specify `IEEE754LSBSingle` values, with units that must be read per product: `mW/cm**2/sr/µm` for the `m65` pilot and `µW/cm**2/sr/µm` for the `d18` pilot. The PDS4 XML label remains authoritative for type, axes, wavelength, units, size, and checksum. Both active pilot footprints are low latitude and are **not polar**. The previous four-scene raw inventory is retained as historical evidence in the M1 results directory.
 
 ### What the official IIRS archive established

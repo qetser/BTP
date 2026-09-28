@@ -62,3 +62,8 @@
 - SIS V17 section 4.2.2 describes dark subtraction, LUT correction, destriping, and post-processing before storing Level 1 radiance. Section 4.2.3 and Appendix L describe thermal and photometric correction as Level 2 work. This confirms the active calibrated cubes are not corrected reflectance.
 - Both pilots are `E3G2` at 10 ms. The official workbook marks bands 7–28, 35–68, and 76–146 valid for `E3G2`. Bands 147 onward, including 4–5 µm, are invalid or low confidence for this mode. The full [CSV](metrics/band_validity_by_mode.csv) and [figure](figures/band_validity_by_mode.svg) preserve the source flags by mode.
 - SIS V17 section 4.2.2 uses `mW/cm²/sr/µm` as the general radiance unit. The active `d18` XML and `E3G2` saturation-table XML use `µW/cm²/sr/µm`; the active `m65` XML uses `mW/cm²/sr/µm`. These source declarations need numerical checks before any unit conversion is accepted. The workbook's mode mask is not a per-pixel saturation mask.
+
+## Pilot strip browse previews
+
+- The two calibrated-product browse PNGs pass the MD5 values declared in their PDS4 browse labels. Their dimensions are 175 × 7647 (`m65`) and 175 × 7649 (`d18`) pixels.
+- The labels describe the PNGs as count-calibrated subsampled browse images. The [four-part `m65` preview](figures/calibrated_browse_m65_four_part_preview.png) and [four-part `d18` preview](figures/calibrated_browse_d18_four_part_preview.png) show the full browse strips for visual orientation. They do not establish radiance scale, surface reflectance, georegistration, or scientific labels.
