@@ -33,7 +33,7 @@ The project is deliberately staged. Each stage must pass its scientific gate bef
 
 This is the current phase.
 
-**M1, acquisition and inventory** establishes exactly what each IIRS product contains. We parse the PDS4 labels, verify dimensions, byte counts, archive and extracted checksums, wavelengths, geometry, footprints, and processing levels. We also identify the official IIRS product guide and the calibrated counterpart for each raw scene. The output is a versioned manifest, a data dictionary, a scene-coverage report, and a gap list. The current four scenes are not enough for a polar or independent generalization claim, so additional tracks and provinces must be selected before the final split is frozen.
+**M1, acquisition and inventory** establishes exactly what each IIRS product contains. We parse the PDS4 labels, verify dimensions, byte counts, archive and extracted checksums, wavelengths, geometry, footprints, and processing levels. The active two-scene pilot has verified raw/calibrated pairs and a provisional data dictionary. The official IIRS product guide, a scene-coverage report, and a gap list remain open. These two low-latitude scenes are not enough for a polar or independent generalization claim, so additional tracks and provinces must be selected before the final split is frozen.
 
 **M2, calibration and preprocessing** converts an official calibrated product, or a documented raw-to-calibrated chain, into analysis-ready reflectance. It includes invalid and saturated-pixel masks, thermal-emission correction beyond approximately 2.5 µm, solar normalization, and lunar photometric correction. A pilot scene is validated first using representative spectra, quality fractions, correction residuals, and cross-instrument comparisons. Large-scale processing starts only after the pilot quality gate passes.
 
@@ -79,7 +79,7 @@ Every phase and module has a concise record under [`results/`](results/). Each m
 1. Retain the original ZIP archives and XML labels as immutable inputs. Record SHA-256 for each ZIP and verify each extracted `.qub` against the label's MD5 and byte count.
 2. Read the extracted `data/extracted/*/data/{raw,calibrated}/.../*.xml` label before opening a cube. The active pilot raw products are `(bands=256, lines=10925 or 10927, samples=250)` little-endian unsigned 16-bit; the calibrated products are IEEE 32-bit floating point. Stream or memory-map large cubes; do not load the whole archive into memory for a quick look.
 3. Keep raw counts, calibrated radiance, corrected reflectance, masks, and model-ready tiles in distinct directories. Store wavelengths, units, coordinate convention, source product IDs, correction versions, and split IDs with every derived artifact.
-4. Split by orbital track and geologic province before fitting normalization, selecting thresholds, or tuning models. Four nearby low-latitude strips are insufficient for a defensible independent transfer benchmark; acquire more distinct scenes before claiming generalization.
+4. Split by orbital track and geologic province before fitting normalization, selecting thresholds, or tuning models. The two low-latitude pilot strips are insufficient for a defensible independent transfer benchmark; acquire more distinct scenes before claiming generalization.
 
 ## Primary sources
 

@@ -15,7 +15,7 @@
 - Raw files are 16-bit unsigned detector-count cubes. Calibrated files are 32-bit IEEE floating-point cubes and are approximately twice the raw cube size.
 - Both pairs preserve the same 256 band centers from 712.3 to 5009.7 nm.
 - Calibrated units differ between the two products. This must be handled explicitly in M2 and must not be normalized by filename or detector suffix.
-- The calibrated product is radiance-like according to its unit string. It is not yet documented here as corrected reflectance, so reflectance and thermal correction work remains open.
+- Both calibrated XML `File/comment` fields explicitly call the cube a radiance spectral image. The official guide is still needed for calibration conventions, masks, and unit validation. Reflectance and thermal correction work remains open.
 
 ## Evidence
 

@@ -1,5 +1,12 @@
 # Progress
 
+## 2026-09-28 — M1 pilot dictionary and guide access check
+
+- Corrected the M1 summary to reflect completed extraction, integrity checks, and XML pairing.
+- Added a provisional data dictionary from the four active PDS4 labels. Both calibrated labels call their cubes radiance spectral images; their declared units differ by a factor of 1000 in prefix.
+- Confirmed the official `iir.zip` guide/SIS is listed by the PRADAN IIRS FAQ, while its `Other Downloads` page redirects unauthenticated requests to ISSDC sign-in. No guide-based calibration, fill, saturation, or band-validity claim was made.
+- Next work: obtain the guide through authorized access, validate the unit conventions and representative values, then select independent scenes. M2 correction remains gated.
+
 ## 2026-09-28 — Local tooling removed from Git
 
 - Kept `.agents/skills` and `.codex` on disk while removing them from Git tracking.

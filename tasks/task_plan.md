@@ -20,10 +20,10 @@ Every phase and module produces a concise record under `results/<phase>/<module>
 
 - [x] Parse every PDS4 label into a versioned manifest.
 - [x] Verify archive and extracted cube checksums and dimensions.
-- [ ] Obtain IIRS product guide and document calibrated product units and correction lineage. Two pilot counterparts are now verified from XML; official guide interpretation remains open.
+- [ ] Obtain the authenticated IIRS product guide/SIS and validate the two pilot products' unit conventions, fill/saturation rules, band validity, and correction lineage. Label-based pairing and a provisional data dictionary are complete.
 - [ ] Select additional independent scenes and record the split design.
 
-**Status:** in progress. The initial raw inventory passed for the previous four scenes. Next concrete unit: extract and compare the two selected raw/calibrated pairs, then record product lineage and units in `results/phase-1/m1-inventory/`.
+**Status:** in progress. The active two-pair inventory and metadata lineage passed. Next concrete unit: obtain the official guide through PRADAN access, resolve the calibrated-unit discrepancy, then select independent scenes and freeze the acquisition plan.
 
 ## Phase 2 — M2 calibrated reflectance
 
@@ -72,4 +72,4 @@ Every phase and module produces a concise record under `results/<phase>/<module>
 
 ## Review
 
-Setup is complete. Scientific implementation has not started; see `tasks/progress.md` for the handoff.
+Setup and the local M1 pilot inventory are complete. M1 scientific documentation and coverage gates remain open; see `tasks/progress.md` for the handoff.

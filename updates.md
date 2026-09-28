@@ -2,6 +2,20 @@
 
 Meaningful project changes are recorded newest first. Entries describe the change and evidence; the Git history supplies the exact commit hash.
 
+## 2026-09-28 — Record pilot radiance dictionary and M1 gate
+
+**Phase:** Phase 1, M1 product documentation
+
+**Type:** Research evidence and status correction
+
+- Added a provisional label-based data dictionary and corrected stale M1 status text after the active two-pair XML comparison.
+- Recorded the calibrated labels' radiance description and different unit prefixes.
+- Checked PRADAN guide access: the documented `Other Downloads` page requires sign-in, so guide-specific calibration and mask rules remain unverified.
+
+**Why:** The M2 pilot needs explicit product semantics and a clear unit gate before numerical processing.
+
+**Impact:** No reflectance product, scientific metric, or model result was created. M1 remains open for guide interpretation and independent coverage.
+
 ## 2026-09-28 — Extract and pair the M2 pilot products
 
 **Phase:** Phase 1, M1 product lineage

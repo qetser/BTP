@@ -4,7 +4,7 @@
 - Each active label describes a 256-band cube with band centers from approximately 712.3 to 5009.7 nm.
 - The two active pilot footprints are low latitude, approximately 31.6 degrees south to 1.5 degrees south. None is polar.
 - Raw detector counts are not calibrated radiance or reflectance. The calibrated products have product-specific radiance units and are not yet validated as corrected reflectance.
-- Checksums, complete label field coverage, calibrated product pairing, and independent scene selection remain open.
+- Cube checksums and metadata pairing are complete. Official guide interpretation, complete label field coverage, and independent scene selection remain open.
 
 ## Integrity run
 
@@ -20,7 +20,7 @@
 
 - The [PRADAN IIRS FAQ](https://pradan.issdc.gov.in/ch2/faq.xhtml) confirms that IIRS has separate raw and calibrated products, that the data folder distinguishes raw and calibrated products, and that the IIRS archive and product guide are under `Other Downloads` → `iir`.
 - The historical four-scene local ZIPs contained only `data/raw`, `browse/raw`, and raw miscellaneous files. The active extraction contains both `data/raw` and `data/calibrated` products.
-- The product guide and calibrated product pairing therefore remain an acquisition task, not a completed M1 result.
+- The official product guide remains an acquisition task. The two active pilot pairs are verified from their XML labels below.
 
 ## Supplied PRADAN download list
 
@@ -48,4 +48,10 @@
 - The selected `m65` and `d18` pairs have identical observation times, job IDs, orbit numbers, dimensions, and wavelength tables between raw and calibrated labels.
 - Raw products are `UnsignedLSB2` detector counts. Calibrated products are `IEEE754LSBSingle` floating-point values.
 - The calibrated `m65` label declares `mW/cm**2/sr/µm`; the calibrated `d18` label declares `µW/cm**2/sr/µm`. Units must be carried per product into M2.
-- These labels establish a raw-to-calibrated pair, but they do not by themselves prove that the values are corrected reflectance. Thermal and photometric validation remains open.
+- Both calibrated XML `File/comment` fields describe a radiance spectral image. These labels establish radiance product identity, but not the calibration algorithm or corrected reflectance. Thermal and photometric validation remains open.
+
+## Guide access and unit gate
+
+- The [PRADAN IIRS FAQ](https://pradan.issdc.gov.in/ch2/faq.xhtml) directs users to `Other Downloads` → `iir.zip` for the archive/SIS and user guide. An unauthenticated request to the [download page](https://pradan.issdc.gov.in/ch2/protected/miscDownloads.xhtml) redirected to ISSDC sign-in on 2026-09-28; the guide was not acquired.
+- The calibrated labels' `mW` and `µW` unit prefixes differ by 1000. Their numeric scales and official conversion conventions have not been checked. Pooling or converting these cubes for M2 is blocked pending that check.
+- The provisional [data dictionary](data_dictionary.md) lists what the local labels establish and which mask and calibration fields remain unknown.

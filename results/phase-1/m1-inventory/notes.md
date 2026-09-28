@@ -1,9 +1,9 @@
 # M1 inventory notes
 
 - Keep the raw archives immutable and untracked.
-- The first executable task is a manifest and integrity script. Its output should be versioned as a small CSV or JSON file under `results/` or `manifests/`, with an exception log for missing metadata.
+- The manifest and integrity script has run on the four active products. Its output is versioned as a small CSV under `results/`.
 - Do not make a metric plot for archive counts or dimensions unless those values are deliberately analyzed as a quality result. Inventory evidence is currently recorded as text.
-- M1 cannot pass until the official IIRS product guide and calibrated counterparts are identified.
+- The two active calibrated counterparts are paired. M1 cannot pass until the official IIRS product guide is checked and independent coverage is selected.
 - The reproducible manifest command is `python3 scripts/build_iirs_manifest.py` from the repository root.
 - The generated CSV is small enough to track. Raw ZIP archives and cubes remain ignored under `data/`.
 
@@ -21,4 +21,4 @@ The supplied PRADAN script must not be used for the current raw scenes. Its ten 
 
 The latest two-file script was checked with HTTP HEAD requests only. The first URL is the already-downloaded 2020 raw scene. The second is an unrelated 2019 raw scene. Do not run the script for M2 calibration; it contains no calibrated product.
 
-The expanded 30-file script was also checked with HTTP HEAD requests only. It includes 12 complete `nri` plus `nci` pairs. The selected pilot now contains the complete `20200208T1245274109_d_img_d18` pair and the complete `20200208T0057589143_d_img_m65` pair. Both pairs passed ZIP integrity checks and are ready for extraction and XML comparison.
+The expanded 30-file script was also checked with HTTP HEAD requests only. It includes 12 complete `nri` plus `nci` pairs. The selected pilot now contains the complete `20200208T1245274109_d_img_d18` pair and the complete `20200208T0057589143_d_img_m65` pair. Both pairs passed ZIP and extracted-cube integrity checks and XML comparison.

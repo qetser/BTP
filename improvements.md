@@ -8,10 +8,10 @@ Status: `[ ]` open, `[~]` in progress, `[x]` implemented, `[!]` needs a project 
 
 **Source:** Initial IIRS inventory
 **Category:** Data quality
-**Status:** `[ ]`
+**Status:** `[~]`
 
-**What:** Pair each raw scene with its official calibrated product and document units, versions, and checksums.
-**Why:** The current cubes are detector counts, so mineral and hydration features cannot be interpreted directly.
+**What:** Complete the official calibration guide review and validate the differing unit conventions for the two paired pilot scenes.
+**Why:** The active pilot now contains raw counts and calibrated radiance products, but their unit conventions and mask rules have not been validated for reflectance processing.
 **Tradeoff:** Requires more acquisition and validation before modeling.
 **Effort:** Medium.
 

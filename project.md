@@ -9,7 +9,7 @@ A research pipeline to measure whether Earth-pretrained hyperspectral models can
 
 ## Why it exists
 
-The proposed transfer study is only interpretable if raw detector counts become validated reflectance and the comparison uses geographically independent evaluation. The four currently available local strips are raw, low-to-mid-latitude scenes. See the [research README](README.md) and [scientific plan](docs/m1_m3_plan.md).
+The proposed transfer study is only interpretable if raw detector counts become validated reflectance and the comparison uses geographically independent evaluation. The active pilot has two low-latitude strips, each with raw and calibrated radiance products. See the [research README](README.md) and [scientific plan](docs/m1_m3_plan.md).
 
 ## Who uses it
 
@@ -22,7 +22,7 @@ The proposed transfer study is only interpretable if raw detector counts become 
 
 | Layer | Current choice | Reason | Status |
 | --- | --- | --- | --- |
-| Source data | Chandrayaan-2 IIRS PDS4 products | Primary instrument for the question | Four raw archives local |
+| Source data | Chandrayaan-2 IIRS PDS4 products | Primary instrument for the question | Two local raw/calibrated pairs |
 | Comparison data | M³ L2, USGS geologic map and spectral library | Cross-check and weak contextual labels | Not yet acquired |
 | Processing language | Python | Suitable for chunked scientific I/O and reproducible analysis | Proposed; packages not selected |
 | Model framework | Undecided | Select after baseline task and compute budget are fixed | Open |
@@ -32,7 +32,7 @@ The proposed transfer study is only interpretable if raw detector counts become 
 
 1. **Invalid reflectance** — Raw counts and thermal emission can masquerade as absorption. Mitigation: official calibrated products, published correction chain, and spectral validation.
 2. **Weak or leaking labels** — Geologic polygons are coarse and neighboring pixels correlate. Mitigation: reviewed labels, boundary exclusion, orbit/province splits.
-3. **Insufficient coverage** — Four current strips do not test polar feasibility or independent generalization. Mitigation: expand geographically distinct IIRS scenes before claims.
+3. **Insufficient coverage** — Two current strips do not test polar feasibility or independent generalization. Mitigation: expand geographically distinct IIRS scenes before claims.
 
 ## Version 1 definition
 
@@ -50,4 +50,5 @@ Version 1 is M1–M3: a verified scene manifest; an analysis-ready reflectance p
 
 | Date | Change | Reason |
 | --- | --- | --- |
+| 2026-09-28 | Updated active pilot to two raw/calibrated pairs and recorded the guide access gate | Keep the charter aligned with the verified local inventory |
 | 2026-09-28 | Initial charter for M1–M3 | Adapted the supplied setup to the existing IIRS repo |
