@@ -10,8 +10,8 @@
 
 **Main observation:** The 2022 thermal-correction study uses E1G2 and 2.5–5 µm. The local official workbook marks E1G2 bands 226–248 (4504.1–4874.9 nm) valid. A 2026 study reports strong reflectance sensitivity to temperature error. E1G2 is therefore a supported acquisition target, but not yet a validated correction.
 
-**Limitations:** The review does not resolve the saturation-table unit conflict, confirm cube fill rules, identify an exact downloadable E1G2 product, or validate a thermal correction on local data. Some full texts are not openly available. The paper-index search had weak coverage for this specialized planetary-science literature, so publisher and official pages were also searched.
+**Limitations:** The review does not resolve the saturation-table unit conflict, confirm cube fill rules, identify an exact downloadable E1G2 product, or validate a thermal correction on local data. A live read-only check of the public PRADAN browse route redirected to sign-in; the scene table is not publicly visible. Some full texts are not openly available. The paper-index search had weak coverage for this specialized planetary-science literature, so publisher and official pages were also searched.
 
-**Next gate:** Acquire and verify a matched E1G2 raw/calibrated pair. Resolve unit and mask rules before correction. Compare corrected temperature and reflectance with the published method and independent references.
+**Next gate:** Use authorized PRADAN access to select and acquire a matched E1G2 raw/calibrated pair. Verify its labels, mode, units, validity, checksums, and footprint. Resolve unit and mask rules before correction. Compare corrected temperature and reflectance with the published method and independent references.
 
 See the [initial gap matrix](../../../docs/gap_matrix.md) and detailed [findings](findings.md).

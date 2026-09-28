@@ -74,10 +74,15 @@ flowchart LR
     J --> N[E3G2 has no valid 4–5 µm bands]
     R[2022 IIRS thermal study used E1G2] --> S[Official workbook marks bands 226–248 valid at 4504.1–4874.9 nm]
     T[2026 study shows reflectance sensitivity to temperature error] --> U[Carry temperature uncertainty into M2]
-    S --> V[Acquire and verify a matched E1G2 scene]
+    S --> V[Select a matched E1G2 raw and calibrated pair]
+    V --> P[PRADAN browse requires account sign-in]
+    P -->|Authorized access| Q[Inspect product labels and footprint]
+    P -->|No public table| ACQGATE[Acquisition gate remains open]
+    Q -->|Pair and geometry pass| CHK[Verify units, masks, mode, and checksums]
+    Q -->|Pair or geometry fails| ACQGATE
     M --> W[Resolve threshold units and per-pixel masks]
     N --> X[Do not use the current E3G2 strips for longwave temperature retrieval]
-    V --> Y[Run the thermal pilot after unit and mask checks pass]
+    CHK --> Y[Run the thermal pilot after unit and mask checks pass]
     W --> Y
     U --> Y
     Y --> Z[Compare spectra and temperature with independent references]
@@ -96,7 +101,7 @@ The scan did not produce reflectance or a saturation mask. The current E3G2 prod
 | [Bose et al. (2024), Advances in Space Research](https://doi.org/10.1016/j.asr.2023.12.019) | Studies IIRS photometric correction over 0.8–2.0 µm and compares the derived reflectance with M³. | Informs the shortwave photometric step. It does not validate thermal correction near 3 µm. |
 | [Chauhan et al. (2021), Current Science](https://doi.org/10.18520/cs/v121/i3/391-401) | Reports a physics-based thermal correction using co-located temperature measurements. | A possible independent comparison. It does not show that E3G2 alone supports longwave temperature fitting. |
 
-The immediate next step is to acquire and verify one matched E1G2 raw/calibrated pair. Then resolve saturation units and pixel masks before the thermal pilot. The [initial gap matrix](docs/gap_matrix.md), [literature findings](results/phase-1/m1-literature/findings.md), and [M1 task plan](tasks/task_plan.md) track this work. The matrix is an initial targeted review, not a systematic review or a novelty claim.
+The live [PRADAN Browse and Download route](https://pradan.issdc.gov.in/ch2/protected/payload.xhtml) redirects to account sign-in; its scene table and IIRS filters are not public. The next step is to use authorized PRADAN access to select an E1G2 observation with both raw and calibrated products, then verify the XML pair, mode, units, validity, and footprint. No scene was downloaded in this check. After acquisition, resolve saturation units and pixel masks before running the thermal pilot. The [initial gap matrix](docs/gap_matrix.md), [literature findings](results/phase-1/m1-literature/findings.md), and [M1 task plan](tasks/task_plan.md) track this work. The matrix is an initial targeted review, not a systematic review or a novelty claim.
 
 ## Scientific scope and constraints
 

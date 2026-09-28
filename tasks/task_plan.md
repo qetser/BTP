@@ -25,14 +25,15 @@ Every phase and module produces a concise record under `results/<phase>/<module>
 - [ ] Select additional independent scenes and record the split design.
 - [~] Build the cited M1 literature gap matrix and use it to guide acquisition and processing choices.
 
-**Status:** in progress. The active two-pair inventory, metadata lineage, SIS review, full cube scan, and targeted literature review are recorded. Radiance unit prefixes are provisionally supported by comparable sampled medians, but saturation-table units and pixel masks remain unresolved. Published IIRS thermal work uses E1G2, and the local official workbook marks bands 226–248 (4504.1–4874.9 nm) valid in that mode. Next: acquire and verify a paired E1G2 scene, resolve the saturation convention, and select independent coverage before M2 or M3.
+**Status:** in progress. The active two-pair inventory, metadata lineage, SIS review, full cube scan, and targeted literature review are recorded. Radiance unit prefixes are provisionally supported by comparable sampled medians, but saturation-table units and pixel masks remain unresolved. Published IIRS thermal work uses E1G2, and the local official workbook marks bands 226–248 (4504.1–4874.9 nm) valid in that mode. The public PRADAN browse route redirects to sign-in and exposes no scene table. Next: select a paired E1G2 scene using authorized PRADAN access, verify product labels and footprint, resolve the saturation convention, and select independent coverage before M2 or M3.
 
 **Current M1 quality unit:**
 
 1. [x] Scan both calibrated cubes and save per-band finite, zero, negative, and candidate saturation-threshold counts with a figure. Keep zero-value and threshold flags distinct from confirmed fill or saturation.
 2. [~] Compare representative valid-band radiance distributions after applying only the PDS4 unit prefixes. The cross-scene scales are provisionally comparable. Saturation-table unit comparison failed: interpreting its values as µW flags nearly all positive pixels; interpreting them as mW flags none. Resolve against authoritative documentation before assigning masks.
 3. [x] Review published IIRS thermal methods and official mode validity. Prioritize E1G2 because the published thermal study used it and the official workbook marks bands 226–248 valid across 4504.1–4874.9 nm. This is mode selection evidence, not validation of the correction or mask.
-4. Select and verify a paired E1G2 scene, resolve saturation units and pixel masks, then freeze nonoverlapping track/province coverage. Do not begin 3 µm reflectance processing or M3 scoring until the applicable quality gates pass.
+4. [ ] Select and verify a paired E1G2 scene through authenticated PRADAN access. The public route was checked on 2026-09-28 and redirects to sign-in; no scene listing is exposed.
+5. Resolve saturation units and pixel masks, then freeze nonoverlapping track/province coverage. Do not begin 3 µm reflectance processing or M3 scoring until the applicable quality gates pass.
 
 ## Phase 2 — M2 calibrated reflectance
 

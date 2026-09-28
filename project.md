@@ -22,7 +22,7 @@ The proposed transfer study is only interpretable if raw detector counts become 
 
 | Layer | Current choice | Reason | Status |
 | --- | --- | --- | --- |
-| Source data | Chandrayaan-2 IIRS PDS4 products | Primary instrument for the question | Two local raw/calibrated pairs |
+| Source data | Chandrayaan-2 IIRS PDS4 products | Primary instrument for the question | Two local raw/calibrated pairs; E1G2 selection awaits authenticated PRADAN access |
 | Comparison data | M³ L2, USGS geologic map and spectral library | Cross-check and weak contextual labels | Not yet acquired |
 | Processing language | Python | Suitable for chunked scientific I/O and reproducible analysis | Proposed; packages not selected |
 | Model framework | Undecided | Select after baseline task and compute budget are fixed | Open |
@@ -52,6 +52,7 @@ Version 1 is M1–M3: a verified scene manifest; an analysis-ready reflectance p
 | Date | Change | Reason |
 | --- | --- | --- |
 | 2026-09-28 | Added literature-backed E1G2 acquisition target and temperature-uncertainty gate | Published thermal work and the official mode table identify valid 4.5–4.9 µm bands in E1G2 |
+| 2026-09-28 | Confirmed the PRADAN scene table requires sign-in and updated the acquisition flow | The public Browse and Download route redirects to account authentication |
 | 2026-09-28 | Reviewed official IIRS SIS and mode validity | Identify the `E3G2` thermal-correction constraint |
 | 2026-09-28 | Updated active pilot to two raw/calibrated pairs and recorded the guide access gate | Keep the charter aligned with the verified local inventory |
 | 2026-09-28 | Initial charter for M1–M3 | Adapted the supplied setup to the existing IIRS repo |

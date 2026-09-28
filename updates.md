@@ -2,6 +2,20 @@
 
 Meaningful project changes are recorded newest first. Entries describe the change and evidence; the Git history supplies the exact commit hash.
 
+## 2026-09-28 — Verify PRADAN scene-table access gate
+
+**Phase:** Phase 1, M1 acquisition and gap analysis
+
+**Type:** Live archive access check and workflow update
+
+- Opened the official public Browse and Download route in a read-only browser session. It redirected to account sign-in; no scene table or IIRS filters were visible.
+- Submitted no credentials and downloaded no data. Stopped the browser session after recording the result.
+- Updated the README LR diagram, task plan, findings, and literature module records to show the authenticated acquisition gate and the required pair checks.
+
+**Why:** E1G2 is the literature-backed thermal-pilot target, but selecting an actual observation requires access to the protected scene table.
+
+**Impact:** E1G2 remains a candidate mode, not an acquired or validated scene. The next action is to use authorized PRADAN access to select a matched raw/calibrated pair and inspect labels, validity, units, checksums, and footprint. Existing saturation, mask, and independent-coverage gates remain open.
+
 ## 2026-09-28 — Set the next IIRS thermal pilot target from literature
 
 **Phase:** Phase 1, M1 acquisition and gap analysis
