@@ -1,0 +1,6 @@
+#!/bin/sh
+
+if grep -Eiq '^[[:space:]]*Co-Authored-By:.*(Claude|Codex)' "$1"; then
+    printf '%s\n' 'Commit rejected: Claude/Codex co-author attribution is not allowed.' >&2
+    exit 1
+fi
