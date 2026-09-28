@@ -2,6 +2,19 @@
 
 Meaningful project changes are recorded newest first. Entries describe the change and evidence; the Git history supplies the exact commit hash.
 
+## 2026-09-28 — Show M1 findings and validity figure in README
+
+**Phase:** Phase 1, M1 communication
+
+**Type:** Documentation
+
+- Added the official archive findings and embedded the saved band-validity SVG in the README with a caption, source CSV, and generation script.
+- Clarified that the four scene archives and the separate official `iir.zip` are all local and integrity checked.
+
+**Why:** Readers need to see the mode limitation and unresolved calibration gate alongside the pilot status.
+
+**Impact:** No data, scientific metric, or model result changed.
+
 ## 2026-09-28 — Inspect official IIRS archive and validity
 
 **Phase:** Phase 1, M1 product documentation

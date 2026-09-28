@@ -8,7 +8,7 @@ The complete execution roadmap is described below. The repository is currently w
 
 ## Current state (28 September 2026)
 
-The repository currently contains four selected IIRS ZIP archives under ignored `data/pradan/`: two raw products and their two calibrated products for 2020-02-08. The archives are downloaded, ZIP-integrity checked, extracted, and XML-paired. Physical calibration validation, an analysis-ready reflectance dataset, labels, trained models, and measured baseline scores do not exist yet. The earlier four-scene raw inventory remains as a historical manifest in the M1 results directory, but those old products were removed from `data/` before this pilot selection.
+The repository currently contains four selected scene ZIP archives under ignored `data/pradan/`: two raw products and their two calibrated products for 2020-02-08. The official IIRS `iir.zip` archive is also local. All five ZIP files pass integrity checks; the scene products are extracted and XML-paired. Physical calibration validation, an analysis-ready reflectance dataset, labels, trained models, and measured baseline scores do not exist yet. The earlier four-scene raw inventory remains as a historical manifest in the M1 results directory, but those old products were removed from `data/` before this pilot selection.
 
 | Active pilot observation (UTC, archive suffix) | Raw and calibrated cube, lines × samples × bands | Approximate latitude range from label corners | Local state |
 | --- | ---: | ---: | --- |
@@ -17,7 +17,15 @@ The repository currently contains four selected IIRS ZIP archives under ignored 
 
 The labels list 256 band centers from **712.3 to 5009.7 nm** for the active pilot files. ISRO describes the nominal instrument range as approximately 0.8–5.0 µm; use each product's actual band centers and widths. Raw labels specify `UnsignedLSB2` detector counts. Calibrated labels specify `IEEE754LSBSingle` values, with units that must be read per product: `mW/cm**2/sr/µm` for the `m65` pilot and `µW/cm**2/sr/µm` for the `d18` pilot. The PDS4 XML label remains authoritative for type, axes, wavelength, units, size, and checksum. Both active pilot footprints are low latitude and are **not polar**. The previous four-scene raw inventory is retained as historical evidence in the M1 results directory.
 
-The official `iir.zip` archive is now local. Its SIS identifies calibrated products as Level 1 radiance and gives mode-specific band validity. Both pilots use `E3G2`, for which the official list has no valid 4–5 µm bands. See the [M1 data dictionary](results/phase-1/m1-inventory/data_dictionary.md) and [validity figure](results/phase-1/m1-inventory/figures/band_validity_by_mode.svg). Numeric unit-scale and pixel-mask checks remain open.
+### What the official IIRS archive established
+
+The supplied `iir.zip` passed ZIP integrity checks. Its March 2026 SIS (V17) describes calibrated Level 1 **radiance** produced by dark subtraction, lookup-table correction, destriping, and later radiance adjustments. Thermal and photometric correction belong to the separate Level 2 reflectance process. The ZIP also contains lookup tables, saturation tables, solar flux, and a band-validity workbook; the separate IIRS user guide PDF is not included. The archive SHA-256 and product details are in the [M1 data dictionary](results/phase-1/m1-inventory/data_dictionary.md).
+
+![Official IIRS band validity across E1G2, E2G2, E3G2, and E4G2 modes. Green bands are valid; gray bands are invalid or low confidence.](results/phase-1/m1-inventory/figures/band_validity_by_mode.svg)
+
+**Figure: IIRS band validity by exposure and gain mode.** The horizontal axis is band number 1–256. Green marks bands tagged `VALID` in the official workbook; gray includes low-response, order-sorting-filter, and saturation regions. Both active scenes use `E3G2`, whose valid bands are 7–28, 35–68, and 76–146. Band 146 is centered at 3155.9 nm, so these pilots have no valid 4–5 µm bands for a thermal fit using that region. The [source values](results/phase-1/m1-inventory/metrics/band_validity_by_mode.csv) and [generation script](scripts/plot_iirs_band_validity.py) reproduce the figure. This is instrument metadata, not a reflectance or model result.
+
+The two calibrated XML labels declare different radiance units (`mW/cm²/sr/µm` and `µW/cm²/sr/µm`). Numerical unit-scale and pixel-mask checks remain open before M2 correction or 3 µm interpretation.
 
 ## Scientific scope and constraints
 
