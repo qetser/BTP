@@ -45,7 +45,7 @@ def main():
 
     CSV.parent.mkdir(parents=True, exist_ok=True)
     with CSV.open("w", newline="") as handle:
-        writer = csv.DictWriter(handle, fieldnames=rows[0].keys())
+        writer = csv.DictWriter(handle, fieldnames=rows[0].keys(), lineterminator="\n")
         writer.writeheader()
         writer.writerows(rows)
 
