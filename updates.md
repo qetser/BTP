@@ -2,6 +2,35 @@
 
 Meaningful project changes are recorded newest first. Entries describe the change and evidence; the Git history supplies the exact commit hash.
 
+## 2026-09-28 — Verify the raw label for an E1G2 candidate
+
+**Phase:** Phase 1, M1 acquisition and gap analysis
+
+**Type:** Product acquisition and label verification
+
+- Selected the matching 2026-02-27 raw/calibrated product IDs from the PRADAN-generated list. Downloaded only the raw NRI ZIP, not the bulk selection.
+- ZIP CRC passed. The raw PDS4 label confirms `exposure=e1`, `gain=g2`, and start time `2026-02-27T12:39:53.8758Z`.
+- The request for the matching calibrated NCI ZIP returned HTTP 302 to sign-in; it was not saved.
+- Updated the README flow and M1 records with the confirmed raw-mode evidence and the remaining calibrated-pair gate.
+
+**Why:** Filename suffixes do not encode exposure/gain. The XML label is needed to verify E1G2.
+
+**Impact:** This is a verified raw E1G2 candidate only. Do not use it for thermal correction until its calibrated counterpart and data quality are checked.
+
+## 2026-09-28 — Incorporate supplied IIRS User Guide text
+
+**Phase:** Phase 1, M1 product documentation
+
+**Type:** Documentation review
+
+- Recorded the user-supplied V6 guide definitions for raw `nri`, calibrated `nci`, timestamp, station suffix, and apparent-reflectance conversion.
+- Updated the acquisition records to make clear that `d18` is a station ID and does not identify exposure/gain. The product XML is required to verify E1G2.
+- Kept saturation-table unit and fill-mask interpretation unresolved because the supplied guide sections do not answer those questions.
+
+**Why:** Interpret filenames and product levels correctly without treating the station suffix as a mode identifier.
+
+**Impact:** The guide supports the XML-based E1G2 check on the selected raw candidate. It does not close the calibrated-pair, mask, or thermal-correction gates.
+
 ## 2026-09-28 — Verify PRADAN scene-table access gate
 
 **Phase:** Phase 1, M1 acquisition and gap analysis

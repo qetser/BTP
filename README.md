@@ -8,12 +8,14 @@ The complete execution roadmap is described below. The repository is currently w
 
 ## Current state (28 September 2026)
 
-The repository currently contains four selected scene ZIP archives under ignored `data/pradan/`: two raw products and their two calibrated products for 2020-02-08. The official IIRS `iir.zip` archive is also local. All five ZIP files pass integrity checks; the scene products are extracted and XML-paired. A first numerical radiance scan now supports the product unit prefixes provisionally, but the saturation-table units and pixel masks remain unresolved. Physical calibration, an analysis-ready reflectance dataset, reviewed labels, trained models, and measured baseline scores do not exist yet. The earlier four-scene raw inventory remains as a historical manifest in the M1 results directory, but those old products were removed from `data/` before this pilot selection.
+The repository contains the original two raw/calibrated pairs for 2020-02-08 and the official IIRS `iir.zip` archive under ignored `data/pradan/`. A new raw candidate from 2026-02-27 was added after its label confirmed E1G2; its matching calibrated product is listed in PRADAN, but that download redirected to sign-in and is not yet local. The original five ZIP files pass integrity checks; their scene products are extracted and XML-paired. A first numerical radiance scan supports their product unit prefixes provisionally, but saturation-table units and pixel masks remain unresolved. Physical calibration, an analysis-ready reflectance dataset, reviewed labels, trained models, and measured baseline scores do not exist yet. The earlier four-scene raw inventory remains as a historical manifest in the M1 results directory, but those old products were removed from `data/` before this pilot selection.
 
 | Active pilot observation (UTC, archive suffix) | Raw and calibrated cube, lines × samples × bands | Approximate latitude range from label corners | Local state |
 | --- | ---: | ---: | --- |
 | 2020-02-08 00:57, `m65` | 10,925 × 250 × 256 | 31.4°S–1.5°S | ZIP and extracted; raw plus calibrated |
 | 2020-02-08 12:45, `d18` | 10,927 × 250 × 256 | 31.6°S–1.7°S | ZIP and extracted; raw plus calibrated |
+
+**E1G2 acquisition check:** The PRADAN selection script listed the matching products `ch2_iir_nri_20260227T1239538758_d_img_d18.zip` and `ch2_iir_nci_20260227T1239538758_d_img_d18.zip`. The raw ZIP was downloaded and passed its CRC check. Its XML label confirms acquisition start `2026-02-27T12:39:53.8758Z`, exposure `e1`, and gain `g2`. The calibrated request redirected to sign-in, so no calibrated label has been checked and the pair is not yet verified. See the [E1G2 acquisition record](results/phase-1/m1-e1g2-scene/summary.md).
 
 ### Pilot strip browse images
 
@@ -29,7 +31,7 @@ The labels list 256 band centers from **712.3 to 5009.7 nm** for the active pilo
 
 ### What the official IIRS archive established
 
-The supplied `iir.zip` passed ZIP integrity checks. Its March 2026 SIS (V17) describes calibrated Level 1 **radiance** produced by dark subtraction, lookup-table correction, destriping, and later radiance adjustments. Thermal and photometric correction belong to the separate Level 2 reflectance process. The ZIP also contains lookup tables, saturation tables, solar flux, and a band-validity workbook; the separate IIRS user guide PDF is not included. The archive SHA-256 and product details are in the [M1 data dictionary](results/phase-1/m1-inventory/data_dictionary.md).
+The supplied `iir.zip` passed ZIP integrity checks. Its March 2026 SIS (V17) describes calibrated Level 1 **radiance** produced by dark subtraction, lookup-table correction, destriping, and later radiance adjustments. Thermal and photometric correction belong to the separate Level 2 reflectance process. The ZIP also contains lookup tables, saturation tables, solar flux, and a band-validity workbook; the separate guide PDF is not inside it, but the user supplied V6 guide text for review. That guide clarifies filename fields and an apparent-reflectance formula, but does not resolve the saturation-table units or fill mask. The archive SHA-256 and product details are in the [M1 data dictionary](results/phase-1/m1-inventory/data_dictionary.md).
 
 ![Official IIRS band validity across E1G2, E2G2, E3G2, and E4G2 modes. Green bands are valid; gray bands are invalid or low confidence.](results/phase-1/m1-inventory/figures/band_validity_by_mode.svg)
 
@@ -74,12 +76,17 @@ flowchart LR
     J --> N[E3G2 has no valid 4–5 µm bands]
     R[2022 IIRS thermal study used E1G2] --> S[Official workbook marks bands 226–248 valid at 4504.1–4874.9 nm]
     T[2026 study shows reflectance sensitivity to temperature error] --> U[Carry temperature uncertainty into M2]
-    S --> V[Select a matched E1G2 raw and calibrated pair]
-    V --> P[PRADAN browse requires account sign-in]
-    P -->|Authorized access| Q[Inspect product labels and footprint]
-    P -->|No public table| ACQGATE[Acquisition gate remains open]
-    Q -->|Pair and geometry pass| CHK[Verify units, masks, mode, and checksums]
-    Q -->|Pair or geometry fails| ACQGATE
+    S --> V[Select an E1G2 raw and calibrated candidate]
+    V --> P[Select products in authenticated PRADAN table]
+    P --> Q[Same timestamp pair listed: 20260227T1239538758]
+    Q --> RC[Download raw ZIP and inspect its XML label]
+    RC -->|Exposure e1, gain g2; CRC passes| CAND[Raw E1G2 candidate verified]
+    CAND --> CAL[Request matching calibrated NCI ZIP]
+    CAL -->|302 sign-in redirect| ACQGATE[Calibrated label and pair verification remain open]
+    CAL -->|ZIP retrieved| CXML[Inspect calibrated XML and pair fields]
+    CXML --> CHK
+    ACQGATE --> REFRESH[Renew PRADAN session and retrieve only matching NCI]
+    REFRESH --> CHK[Verify pair metadata, units, masks, and checksums]
     M --> W[Resolve threshold units and per-pixel masks]
     N --> X[Do not use the current E3G2 strips for longwave temperature retrieval]
     CHK --> Y[Run the thermal pilot after unit and mask checks pass]
@@ -119,7 +126,7 @@ The project is deliberately staged. Each stage must pass its scientific gate bef
 
 This is the current phase.
 
-**M1, acquisition and inventory** establishes exactly what each IIRS product contains. We parse the PDS4 labels, verify dimensions, byte counts, archive and extracted checksums, wavelengths, geometry, footprints, and processing levels. The active two-scene pilot has verified raw/calibrated pairs, the official archive/SIS, a data dictionary, and an initial literature gap matrix. Numeric unit and mask validation, the separate user guide, a scene-coverage report, and a matched E1G2 pair remain open. These two low-latitude scenes are not enough for a polar or independent generalization claim, so additional tracks and provinces must be selected before the final split is frozen.
+**M1, acquisition and inventory** establishes exactly what each IIRS product contains. We parse the PDS4 labels, verify dimensions, byte counts, archive and extracted checksums, wavelengths, geometry, footprints, and processing levels. The active two-scene pilot has verified raw/calibrated pairs, the official archive/SIS, a data dictionary, and an initial literature gap matrix. A new raw label confirms an E1G2 candidate, but its calibrated counterpart and footprint remain unchecked. Numeric unit and mask validation, a scene-coverage report, and independent tracks remain open. These two low-latitude pilot pairs are not enough for a polar or independent generalization claim, so additional tracks and provinces must be selected before the final split is frozen.
 
 **M2, calibration and preprocessing** converts an official calibrated product, or a documented raw-to-calibrated chain, into analysis-ready reflectance. It includes invalid and saturated-pixel masks, thermal-emission correction beyond approximately 2.5 µm, solar normalization, and lunar photometric correction. A pilot scene is validated first using representative spectra, quality fractions, correction residuals, and cross-instrument comparisons. Large-scale processing starts only after the pilot quality gate passes.
 

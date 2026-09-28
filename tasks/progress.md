@@ -1,5 +1,18 @@
 # Progress
 
+## 2026-09-28 — Inspect candidate E1G2 raw product label
+
+- Selected the matching 2026-02-27 raw and calibrated product IDs from the PRADAN-generated list without running the bulk downloader.
+- Downloaded only the raw NRI ZIP to ignored `data/pradan/e1g2_candidate_20260227T1239538758/`. Its ZIP CRC passed. The XML label confirms start time `2026-02-27T12:39:53.8758Z`, exposure `e1`, and gain `g2`.
+- Requested the matching calibrated NCI ZIP. PRADAN returned HTTP 302 to sign-in, so the calibrated file was not saved and the pair is not yet verified.
+- Next: regenerate a PRADAN script selecting only the calibrated product after refreshing the session, then validate its XML, pair fields, units, footprint, and archive checksum.
+
+## 2026-09-28 — Read supplied IIRS PDS4 User Guide text
+
+- Reviewed the user-supplied V6 guide text. It defines raw `nri` and calibrated `nci` products, confirms that the filename timestamp is the observation start time, and defines `d18` as a station ID, not an exposure/gain mode.
+- The guide gives a Level 1 radiance to apparent-reflectance formula and warns users about longwave thermal emission. It does not identify the selected scene's exposure/gain or resolve the saturation-table units and fill mask.
+- This supports checking the product XML for `exposure=e1` and `gain=g2`; the selected candidate raw label passes that check.
+
 ## 2026-09-28 — Review IIRS thermal and reflectance literature
 
 - Reviewed primary IIRS papers from 2022, 2024, 2025, and 2026, the official PRADAN FAQ, and a public IIRS processing implementation.

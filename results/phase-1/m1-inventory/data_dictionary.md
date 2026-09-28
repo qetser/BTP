@@ -25,4 +25,4 @@
 
 ## Next gate
 
-Validate representative calibrated values against each label's unit and the `E3G2` saturation table, then establish pixel-level invalid and saturation masks. The current `E3G2` validity list ends at 3155.9 nm, so a pilot relying on valid 4–5 µm radiance for thermal fitting needs a different exposure mode or a separately validated method. Acquire the separate user guide PDF if it adds required conversion or fill details.
+Validate representative calibrated values against each label's unit and the `E3G2` saturation table, then establish pixel-level invalid and saturation masks. The current `E3G2` validity list ends at 3155.9 nm, so a pilot relying on valid 4–5 µm radiance for thermal fitting needs a different exposure mode or a separately validated method. The supplied V6 user-guide text documents apparent-reflectance conversion but does not resolve saturation units or fill details.
