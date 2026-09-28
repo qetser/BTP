@@ -25,14 +25,14 @@ Every phase and module produces a concise record under `results/<phase>/<module>
 - [ ] Select additional independent scenes and record the split design.
 - [~] Build the cited M1 literature gap matrix and use it to guide acquisition and processing choices.
 
-**Status:** in progress. The active two-pair inventory, metadata lineage, SIS review, full cube scan, and targeted literature review are recorded. Radiance unit prefixes are provisionally supported by comparable sampled medians, but saturation-table units and pixel masks remain unresolved. Published IIRS thermal work uses E1G2, and the local official workbook marks bands 226–248 (4504.1–4874.9 nm) valid in that mode. A PRADAN-selected raw candidate from 2026-02-27 passed ZIP CRC validation; its XML confirms exposure e1 and gain g2. The matching calibrated ZIP request redirected to sign-in, so pair verification remains open. Next: renew PRADAN access and retrieve only the matching NCI product, inspect its label and footprint, resolve the saturation convention, and select independent coverage before M2 or M3.
+**Status:** in progress. The active 2020 two-pair inventory, metadata lineage, SIS review, full cube scan, and targeted literature review are recorded. A matched 2026-02-27 E1G2 raw/calibrated pair is now verified by label identity, ZIP CRC, and embedded cube MD5. Its calibrated label declares `µW/cm**2/sr/µm`, but numerical radiance scale, geometry, saturation-table units, and pixel masks remain unresolved. The official workbook marks E1G2 bands 226–248 (4504.1–4874.9 nm) valid. Next: validate representative E1G2 radiance values and footprint, resolve saturation and fill masks, and select independent coverage before M2 or M3.
 
 **Current M1 quality unit:**
 
 1. [x] Scan both calibrated cubes and save per-band finite, zero, negative, and candidate saturation-threshold counts with a figure. Keep zero-value and threshold flags distinct from confirmed fill or saturation.
 2. [~] Compare representative valid-band radiance distributions after applying only the PDS4 unit prefixes. The cross-scene scales are provisionally comparable. Saturation-table unit comparison failed: interpreting its values as µW flags nearly all positive pixels; interpreting them as mW flags none. Resolve against authoritative documentation before assigning masks.
 3. [x] Review published IIRS thermal methods and official mode validity. Prioritize E1G2 because the published thermal study used it and the official workbook marks bands 226–248 valid across 4504.1–4874.9 nm. This is mode selection evidence, not validation of the correction or mask.
-4. [~] Verify the 2026-02-27 E1G2 candidate pair. The raw ZIP and label passed CRC and mode checks; the matching calibrated download returned HTTP 302 and is not yet local. Retrieve only that NCI product, then confirm the pair, units, checksum, and footprint.
+4. [x] Verify the 2026-02-27 E1G2 raw/calibrated pair. Labels match on observation time, job ID, orbit, mode, dimensions, and wavelengths; both ZIP CRC and embedded QUB MD5 checks pass. The calibrated unit scale and footprint still need validation.
 5. Resolve saturation units and pixel masks, then freeze nonoverlapping track/province coverage. Do not begin 3 µm reflectance processing or M3 scoring until the applicable quality gates pass.
 
 ## Phase 2 — M2 calibrated reflectance

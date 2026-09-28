@@ -2,6 +2,21 @@
 
 Meaningful project changes are recorded newest first. Entries describe the change and evidence; the Git history supplies the exact commit hash.
 
+## 2026-09-28 — Verify the matched E1G2 raw/calibrated pair
+
+**Phase:** Phase 1, M1 acquisition and inventory
+
+**Type:** Product acquisition, integrity checks, and documentation
+
+- Downloaded only the matching calibrated NCI product for the previously verified raw E1G2 candidate.
+- Both ZIP CRC checks passed. Raw and calibrated XML labels match on timestamp, job ID, orbit, mode, dimensions, and wavelengths. Both QUB streams match their PDS4 MD5 declarations.
+- Recorded calibrated radiance units as labeled (`µW/cm**2/sr/µm`), with numerical unit validation still open. Geometry, saturation/fill masks, and independent coverage remain open.
+- Extracted the official calibrated browse PNG and added it to the README with clear interpretation limits. Updated the Mermaid LR flow to show the completed pair checks and remaining M1 gates.
+
+**Why:** The thermal pilot needs a matched radiance product in a mode with valid longwave bands. XML and checksum checks establish product identity and integrity before scientific processing.
+
+**Impact:** An E1G2 pair is now available locally and passes archive/cube integrity checks. No reflectance, thermal correction, or metric was computed. M2 remains gated by unit, geometry, and mask validation.
+
 ## 2026-09-28 — Verify the raw label for an E1G2 candidate
 
 **Phase:** Phase 1, M1 acquisition and gap analysis

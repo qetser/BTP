@@ -1,9 +1,9 @@
 # E1G2 candidate acquisition notes
 
 - Check date: 2026-09-28.
-- Candidate selected from user-provided PRADAN download-script paths. Only the matching raw ZIP was downloaded during the first request.
-- The raw archive was written to ignored path `data/pradan/e1g2_candidate_20260227T1239538758/ch2_iir_nri_20260227T1239538758_d_img_d18.zip`.
-- Inspection opened the ZIP archive and parsed its data/raw PDS4 XML label in memory. No image cube was extracted for analysis.
-- The separate request for `ch2_iir_nci_20260227T1239538758_d_img_d18.zip` returned HTTP 302 to PRADAN sign-in. The attempted response body was not saved.
-- Do not reuse session cookies from chat. Renew the account session and select only the calibrated counterpart for the next transfer.
-- No metric was computed, so no CSV/JSON metric or figure was created.
+- Candidate selected from user-provided PRADAN download-script paths. Raw product: `ch2_iir_nri_20260227T1239538758_d_img_d18.zip`; calibrated counterpart: `ch2_iir_nci_20260227T1239538758_d_img_d18.zip`.
+- Both archives are stored under ignored `data/pradan/e1g2_candidate_20260227T1239538758/`. Only these two ZIPs were downloaded from the bulk selection.
+- Both ZIP CRC checks passed. XML labels were read in place. Each QUB was streamed from its ZIP and its actual MD5 matched the PDS4 label. Cube files were not extracted to disk.
+- The first calibrated request with the earlier session returned HTTP 302. A refreshed PRADAN session later allowed the single calibrated product transfer.
+- Extracted only the official calibrated browse PNG to `figures/20260227_e1g2_calibrated_browse.png`; the guide describes it as a subsampled band 40 browse image. It is for visual orientation, not spectral interpretation.
+- No metric was computed. The PNG is a source browse figure, not a plotted metric, so no CSV/JSON metric artifact was created.

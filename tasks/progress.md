@@ -1,5 +1,14 @@
 # Progress
 
+## 2026-09-28 — Verify the matched E1G2 raw/calibrated pair
+
+- Refreshed PRADAN access and downloaded only `ch2_iir_nci_20260227T1239538758_d_img_d18.zip`, alongside the previously acquired matching raw NRI ZIP. Other files from the bulk selection were not downloaded.
+- Both ZIP archives passed CRC checks. The raw and calibrated PDS4 labels match on observation start/stop, job ID, imaging orbit 29042, dumping orbit 29043, exposure e1, gain g2, 12,210 × 250 × 256 axes, and all band centers.
+- Streamed each QUB directly from its ZIP. Both actual MD5 values match the values in their PDS4 labels. No cube was extracted to disk.
+- The calibrated label declares `µW/cm**2/sr/µm`. This scale has not been validated against numeric samples or independent references. Geometry, saturation units, and pixel masks remain open.
+- Extracted and reviewed the official calibrated browse PNG, then embedded it in the README with a limitation caption.
+- Updated the M1 acquisition record, README LR flow, and project status. No reflectance, correction, or metric was produced.
+
 ## 2026-09-28 — Inspect candidate E1G2 raw product label
 
 - Selected the matching 2026-02-27 raw and calibrated product IDs from the PRADAN-generated list without running the bulk downloader.

@@ -7,7 +7,7 @@
 - **Alternative temperature evidence:** Chauhan et al. (2021) report physics-based thermal correction using co-located temperature measurements. This is a possible independent reference path, but it does not establish that an E3G2-only spectrum can support the longwave temperature retrieval.
 - **Implementation reference:** The public CH2IIRS repository says its thermal and phase tools follow the 2022 and 2025 papers. Its code must be audited for units, mode validity, masks, assumptions, and license before any reuse.
 - **Local validity check:** In `band_validity_by_mode.csv`, all E1G2 bands from 226 through 248 are flagged valid, with centers from 4504.1 through 4874.9 nm. E3G2 marks these channels invalid. This is instrument metadata, not a per-pixel quality mask.
-- **Decision:** Prioritize an E1G2 pair for the thermal pilot. Keep the saturation-unit conflict and pixel mask unresolved. Do not start 3 µm reflectance processing until unit, mask, and correction validation pass.
+- **Decision:** The matched 2026-02-27 E1G2 pair has now been acquired and verified by XML identity and checksums. It is a candidate thermal pilot, not a validated correction. Keep numerical units, the saturation-unit conflict, geometry, and pixel masks unresolved; do not start 3 µm reflectance processing until those and correction checks pass.
 
 ## Sources
 

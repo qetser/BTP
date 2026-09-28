@@ -26,6 +26,8 @@ Status: `[ ]` open, `[~]` in progress, `[x]` implemented, `[!]` needs a project 
 **Tradeoff:** Additional acquisition or method validation is needed.
 **Effort:** Medium.
 
+**Update (2026-09-28):** A matched 2026-02-27 E1G2 raw/calibrated pair has been acquired and passes label identity, ZIP CRC, and embedded QUB MD5 checks. This closes the acquisition portion only. Radiance scale, geometry, saturation/fill masks, correction quality, and independent coverage remain open.
+
 ### 2026-09-28 — Independent evaluation coverage
 
 **Source:** M1–M3 research review
