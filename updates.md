@@ -2,6 +2,20 @@
 
 Meaningful project changes are recorded newest first. Entries describe the change and evidence; the Git history supplies the exact commit hash.
 
+## 2026-09-28 — Explain the pilot scan in the README
+
+**Phase:** Phase 1, M1 product inventory
+
+**Type:** Research communication
+
+- Added the calibrated cube scan results and a three-panel quality figure to the README.
+- Explained which counts are exact, how sampled quantiles were computed, and why the saturation comparison does not define a pixel mask.
+- Added a left-to-right Mermaid flow from paired products and official references through the scan outputs and remaining M1 gates.
+
+**Why:** Readers need a clear account of the evidence and the gates that still block reflectance work.
+
+**Impact:** No scientific data or result changed. The README now reports the provisional unit-scale finding and the unresolved saturation-unit conflict.
+
 ## 2026-09-28 — Scan calibrated pilot radiance cubes
 
 **Phase:** Phase 1, M1 product inventory

@@ -8,7 +8,7 @@ The complete execution roadmap is described below. The repository is currently w
 
 ## Current state (28 September 2026)
 
-The repository currently contains four selected scene ZIP archives under ignored `data/pradan/`: two raw products and their two calibrated products for 2020-02-08. The official IIRS `iir.zip` archive is also local. All five ZIP files pass integrity checks; the scene products are extracted and XML-paired. Physical calibration validation, an analysis-ready reflectance dataset, labels, trained models, and measured baseline scores do not exist yet. The earlier four-scene raw inventory remains as a historical manifest in the M1 results directory, but those old products were removed from `data/` before this pilot selection.
+The repository currently contains four selected scene ZIP archives under ignored `data/pradan/`: two raw products and their two calibrated products for 2020-02-08. The official IIRS `iir.zip` archive is also local. All five ZIP files pass integrity checks; the scene products are extracted and XML-paired. A first numerical radiance scan now supports the product unit prefixes provisionally, but the saturation-table units and pixel masks remain unresolved. Physical calibration, an analysis-ready reflectance dataset, reviewed labels, trained models, and measured baseline scores do not exist yet. The earlier four-scene raw inventory remains as a historical manifest in the M1 results directory, but those old products were removed from `data/` before this pilot selection.
 
 | Active pilot observation (UTC, archive suffix) | Raw and calibrated cube, lines × samples × bands | Approximate latitude range from label corners | Local state |
 | --- | ---: | ---: | --- |
@@ -35,7 +35,50 @@ The supplied `iir.zip` passed ZIP integrity checks. Its March 2026 SIS (V17) des
 
 **Figure: IIRS band validity by exposure and gain mode.** The horizontal axis is band number 1–256. Green marks bands tagged `VALID` in the official workbook; gray includes low-response, order-sorting-filter, and saturation regions. Both active scenes use `E3G2`, whose valid bands are 7–28, 35–68, and 76–146. Band 146 is centered at 3155.9 nm, so these pilots have no valid 4–5 µm bands for a thermal fit using that region. The [source values](results/phase-1/m1-inventory/metrics/band_validity_by_mode.csv) and [generation script](scripts/plot_iirs_band_validity.py) reproduce the figure. This is instrument metadata, not a reflectance or model result.
 
-The two calibrated XML labels declare different radiance units (`mW/cm²/sr/µm` and `µW/cm²/sr/µm`). Numerical unit-scale and pixel-mask checks remain open before M2 correction or 3 µm interpretation.
+### Pilot radiance quality scan
+
+We scanned every value in both calibrated cubes across all 256 bands. The scan counted finite, zero, negative, and positive values exactly. It also compared the official E3G2 saturation thresholds under two unit interpretations. Positive-pixel quantiles use a fixed grid that samples every 32nd line and every fifth sample.
+
+| Calibrated scene | Pixels per band | Valid E3G2 bands | Exact zeros across valid band-pixels | Negative values across valid band-pixels | Sampled median range after declared unit conversion (mW/cm²/sr/µm) |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| `m65` | 2,731,250 | 127 | 2,809 | 26 | 0.115–1.547 |
+| `d18` | 2,731,750 | 127 | 3,059 | 26 | 0.104–1.199 |
+
+All cube values were finite. The zero and negative counts are summed across valid bands, so they are band-pixel counts, not counts of unique pixels. The scan does not establish that zero or negative values mean fill or saturation. The comparable sampled median ranges support the `mW` unit in the `m65` label and the `µW` unit in the `d18` label as a plausible conversion. This comparison does not independently validate radiometric calibration.
+
+The saturation-table XML declares its threshold values in `µW/cm²/sr/µm`. The SIS describes Level 1 radiance generally in `mW/cm²/sr/µm`. Comparing the values as `µW` flags nearly all positive pixels at or above the thresholds. Comparing them as `mW` flags none. This conflict leaves the saturation unit and per-pixel mask unresolved. The table comparisons are candidates, not masks.
+
+![Three-panel scan of exact zero and nonfinite fractions, candidate saturation-threshold comparisons, and sampled positive-pixel radiance medians for the m65 and d18 calibrated cubes.](results/phase-1/m1-inventory/figures/pilot_radiance_quality_by_band.png)
+
+**Figure: calibrated pilot radiance quality by band.** The top panel shows exact zeros and nonfinite values. The middle panel compares the two saturation-table unit interpretations. The bottom panel shows fixed-grid medians only on officially valid E3G2 bands. The figure reports Level 1 radiance quality checks. It does not show reflectance, confirmed saturation, or a mineral result. The [machine-readable values](results/phase-1/m1-inventory/metrics/pilot_radiance_quality_by_band.csv), [analysis script](scripts/analyze_iirs_radiance_pilot.py), and [M1 findings](results/phase-1/m1-inventory/findings.md) provide the method and limits.
+
+### What the pilot scan did
+
+```mermaid
+flowchart LR
+    A[Two raw and calibrated scene pairs] --> B[Check PDS4 labels and pair identity]
+    C[Official iir.zip, SIS, validity workbook, and saturation table] --> D[Read E3G2 band flags and candidate thresholds]
+    B --> E[Memory-map both calibrated radiance cubes]
+    D --> F[Keep only official valid bands for quality summaries]
+    E --> G[Count finite, zero, negative, and positive values per band]
+    E --> H[Sample every 32nd line and every fifth sample]
+    H --> I[Apply each product's declared radiance unit]
+    G --> J[Save per-band CSV and quality figure]
+    F --> G
+    I --> J
+    D --> K[Compare saturation thresholds as µW and as mW]
+    E --> K
+    K --> J
+    J --> L[Unit prefixes are provisionally supported by similar sampled scales]
+    J --> M[Saturation unit and pixel masks remain unresolved]
+    J --> N[E3G2 has no valid 4–5 µm bands]
+    M --> O[M2 reflectance and 3 µm analysis stay blocked]
+    N --> O
+    O --> P[Resolve the saturation convention and obtain thermal-capable data or validate another method]
+    P --> Q[Select nonoverlapping tracks before M2 and M3]
+```
+
+The scan did not produce reflectance or a saturation mask. M2 remains blocked until the saturation and thermal-correction gates pass. M3 also needs more nonoverlapping observations and reviewed labels before a geographic split can be frozen. See the full [M1 results](results/phase-1/m1-inventory/summary.md) and [task plan](tasks/task_plan.md).
 
 ## Scientific scope and constraints
 
