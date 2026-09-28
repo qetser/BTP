@@ -1,0 +1,59 @@
+# M1–M3 implementation plan
+
+**Status:** planning, based on the local archive inventory and the primary sources in the [README](../README.md). This plan covers a first defensible experimental release, not the later foundation-model stages.
+
+## Objective and decision gate
+
+Produce an auditable IIRS reflectance corpus, a limited but credible label set, and baseline results on held-out orbital tracks/provinces. Begin M4 only when (1) raw-to-reflectance quality is demonstrated, (2) test observations are geographically independent of training, and (3) at least one physical and one learned baseline can be evaluated without label or preprocessing leakage.
+
+## M1 — acquisition, inventory, and gap analysis
+
+| Step | Work | Output / pass criterion |
+| --- | --- | --- |
+| 1. Product inventory | Parse every ZIP's PDS4 XML; capture product ID, processing level, dimensions, data type, wavelengths and widths, byte size, checksum, footprint, solar incidence, acquisition time, and browse image. Verify the extracted `.qub` byte count and checksum. | `manifests/iirs_inventory.csv` and an exception log. No silent missing fields or checksum failures. |
+| 2. Documentation and product pair | Download ISRO's `iir.zip` product guide/SIS from PRADAN and identify the corresponding **calibrated** product for each raw scene. Determine whether that product is radiance or a higher-level reflectance product from its label and guide, not its filename. | One-page data dictionary with units, fill/saturation values, calibration level, and exact raw→calibrated lineage. |
+| 3. Sampling design | Add IIRS scenes across multiple nonadjacent tracks, mare/highland provinces, illumination conditions, acquisition times, and—if the later polar question remains in scope—polar coverage. Use footprint maps to prevent overlap across splits. | Scene-selection table and fixed `train/val/test` track/province assignment. The current four scenes alone do not satisfy this gate. |
+| 4. Comparators and labels | Acquire overlapping [M³ L2 reflectance](https://pds.nasa.gov/ds-view/pds/viewProfile.jsp?dsid=CH1-ORB-L-M3-4-L2-REFLECTANCE-V1.0), [USGS geologic-unit polygons](https://astrogeology.usgs.gov/search/map/Moon/Geology/Unified_Geologic_Map_of_the_Moon_GIS_v2/), and suitable mineral spectra from [USGS Spectral Library v7](https://www.usgs.gov/labs/spectroscopy-lab/usgs-spectral-library). Register coordinate systems and wavelength response before comparison. | Provenance manifest for every reference and an overlap/quality report. Polygon labels are tagged as weak labels. |
+| 5. Gap matrix | Record for each target task the available IIRS scenes, comparable M³ coverage, label source, coverage and resolution mismatch, and related method/paper. Verify novelty claims separately before publication; this initial plan does not establish a literature-wide absence claim. | `docs/gap_matrix.md` with citations, known limitations, and unresolved acquisition gaps. |
+
+**Practical order:** run steps 1–2 on the existing files first; expand the scene collection only after the XML/guide interpretation is sound. Document PRADAN access details without putting credentials or session files in the repo. Retain original archives as immutable inputs.
+
+## M2 — calibration, correction, and analysis-ready patches
+
+1. **Decode and verify.** Read PDS4 axes and `UnsignedLSB2` type, compare `.qub` size/MD5 with its XML, and inspect per-band histograms, line profiles, browse orientation, fill values, saturation, dropped lines, striping, and spatial registration. Use chunked I/O. Reject corrupt products before correction.
+2. **Establish the radiance source.** Prefer an official calibrated IIRS product as the radiance starting point. If reproducing counts-to-radiance from raw, implement only from the ISRO guide/calibration files and verify against an official calibrated counterpart. A raw-count cube must not be relabeled as radiance.
+3. **Geometry and masks.** Use the supplied geometry products or validated orbital geometry to obtain per-pixel location and illumination/viewing angles. Build explicit per-pixel/per-band masks for invalid, saturated, low-signal, and poorly calibrated measurements. Keep both the source and reason for each mask.
+4. **Reflectance and thermal component.** Convert calibrated radiance to apparent reflectance using wavelength-matched solar irradiance and incidence geometry. For the long-wavelength region, estimate and subtract thermal radiance using the published IIRS method before computing 3 µm reflectance. Compare temperature estimates and residual spectra against source-paper examples and/or an official L2 scene. Preserve pre/post correction spectra.
+5. **Lunar photometry.** Apply the validated lunar photometric model from the IIRS literature, with documented reference geometry and error bounds. Do not use terrestrial atmospheric correction. Cross-check overlapping M³ spectral shapes only after accounting for resolution, acquisition geometry, and wavelength-response differences.
+6. **Patch export.** Create reflectance tiles with wavelength centers/widths, valid-band mask, spatial footprint, acquisition/orbit ID, correction version, split ID, and uncertainty/quality flags. Compute normalization statistics on training tracks only.
+
+**M2 quality gate:** confirm numerical units; check sample spectra against expected broad absorption behavior; map residual striping; quantify invalid-pixel fractions by band and scene; compare overlapping M³/official L2 spectra with plots and summary errors. A 3 µm band-depth product is blocked until the thermal-correction residual and signal-to-noise checks pass. Learned denoising is an optional controlled ablation after this gate, never a substitute for physical calibration.
+
+## M3 — baselines and evaluation
+
+| Baseline | Input and method | Valid comparison |
+| --- | --- | --- |
+| Mineral spectral parameters | Continuum removal and diagnostic 1 and 2 µm band position/depth, plus spectral angle or matched spectra against wavelength-convolved mineral references. | Qualitative spectral maps; macro-F1/balanced accuracy only on reviewed class labels. Do not equate a geologic map unit with a pure mineral. |
+| Hydration index | Continuum-interpolated 3 µm absorption depth on **thermally corrected, sufficiently illuminated** pixels, with propagated mask and uncertainty. | Compare spectral profiles and spatial patterns with M³ where matched; report no water-ice accuracy without independent ice labels. |
+| Unsupervised clustering | PCA or other fixed feature reduction followed by k-means, with `k` selected on training/validation scenes; assess stability across seeds and tracks. | Cluster maps and stability. If class scores are shown, align clusters to classes using training labels only, then score on test. |
+| From-scratch learned model | A small spectral-spatial CNN trained from random weights, with spatially blocked patch sampling, class weighting, and documented hyperparameters/seeds. | Same reviewed labels, test tracks, masks, and metrics as the supervised classical baseline. Report mean and spread over several seeds. |
+
+**Evaluation protocol:** freeze the orbit/province split before label cleaning or model tuning. Exclude geologic-unit boundaries at a margin appropriate to the coarse map scale, review representative spectra, and keep uncertain labels separate. Report class support, confusion matrix, macro-F1, balanced accuracy, and per-class IoU for actual segmentation labels. Bootstrap uncertainty by **track or region**, not by individual pixel. Include scene-level failure examples and correction/label sensitivity analyses. A model result is only comparable to another when both use the same corrected input version, split, label version, and valid-pixel mask.
+
+## Suggested sequence and milestones
+
+| Window | Milestone | Exit condition |
+| --- | --- | --- |
+| Weeks 1–2 | M1 inventory, guide, calibrated counterparts, sampling design | Verified manifest and fixed acquisition list |
+| Weeks 3–5 | M2 calibrated reflectance pipeline on one pilot strip, then all selected strips | Quality report and reproducible patch dataset |
+| Weeks 6–7 | M3 physical baselines, labels, clustering, from-scratch CNN | Held-out scoreboard with class support and uncertainty |
+| Week 8 | Reproduce results from clean inputs, write limitations and M4 handoff | Saved configurations, manifests, figures, and pass/fail gate record |
+
+These are planning estimates; PRADAN availability, calibrated-product access, and label quality may change the order or duration.
+
+## Open decisions to resolve from evidence
+
+- **Polar extension:** locate suitable polar IIRS strips and measure whether indirectly illuminated shadowed pixels have enough signal for 3 µm spectroscopy. If not, limit IIRS hydration mapping to sunlit terrain and keep polar ice inference as a separate multi-instrument question. [M³ polar study](https://pmc.ncbi.nlm.nih.gov/articles/PMC6130389/).
+- **Calibration authority:** determine exactly what the PRADAN calibrated product contains and whether a public IIRS reflectance product or reproducible calibration coefficients are available. [PRADAN FAQ](https://pradan.issdc.gov.in/ch2/faq.xhtml); [IIRS L2 processing paper](https://onlinelibrary.wiley.com/doi/abs/10.1111/maps.70037).
+- **Ground truth:** choose a small reviewed mineral-class task that the available references can support. Treat the [USGS 1:5M map](https://astrogeology.usgs.gov/search/map/Moon/Geology/Unified_Geologic_Map_of_the_Moon_GIS_v2/) as geologic context and weak labels, not a per-pixel abundance map.
+
