@@ -6,14 +6,14 @@ For tasks, deliverables, and pass criteria, see [the M1–M3 implementation plan
 
 ## Current state (28 September 2026)
 
-The repository currently contains four downloaded IIRS ZIP archives in `data/`. One archive is also extracted. There is **no calibration code, analysis-ready reflectance dataset, label set, trained model, or measured baseline score yet**. The PDS4 labels describe the cubes as `Raw`, with `UnsignedLSB2` detector **counts**, not physical radiance or reflectance. Do not use the `.qub` values directly for mineral or 3 µm band-depth interpretation.
+The repository currently contains four downloaded IIRS ZIP archives in `data/`, and all four are extracted. There is **no calibration code, analysis-ready reflectance dataset, label set, trained model, or measured baseline score yet**. The PDS4 labels describe the cubes as `Raw`, with `UnsignedLSB2` detector **counts**, not physical radiance or reflectance. Do not use the `.qub` values directly for mineral or 3 µm band-depth interpretation.
 
 | Observation (UTC, archive suffix) | Raw cube, lines × samples × bands | Approximate latitude range from label corners | Local state |
 | --- | ---: | ---: | --- |
 | 2020-02-05 17:56, `d18` | 10,872 × 250 × 256 | 30.8°S–0.9°S | ZIP and extracted |
-| 2020-02-05 23:49, `m65` | 10,850 × 250 × 256 | 30.9°S–1.0°S | ZIP |
-| 2021-11-22 03:54, `hw1` | 6,864 × 250 × 256 | 15.8°S–2.8°N | ZIP |
-| 2023-11-30 00:02, `d18` | 10,255 × 250 × 256 | 5.0°S–23.3°N | ZIP |
+| 2020-02-05 23:49, `m65` | 10,850 × 250 × 256 | 30.9°S–1.0°S | ZIP and extracted |
+| 2021-11-22 03:54, `hw1` | 6,864 × 250 × 256 | 15.8°S–2.8°N | ZIP and extracted |
+| 2023-11-30 00:02, `d18` | 10,255 × 250 × 256 | 5.0°S–23.3°N | ZIP and extracted |
 
 The labels list 256 band centers from **712.3 to 5009.7 nm** for these files. ISRO describes the nominal instrument range as approximately 0.8–5.0 µm; use each product's actual band centers and widths. The extracted example has 1,391,616,000 bytes, matching `256 × 10,872 × 250 × 2`. Its ENVI header specifies band-sequential layout, but the PDS4 XML label remains the authoritative source for type, axes, wavelength, size, and checksum. The four current footprints are **not polar**.
 
