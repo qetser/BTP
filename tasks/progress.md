@@ -1,5 +1,12 @@
 # Progress
 
+## 2026-09-28 — Scan calibrated pilot radiance cubes
+
+- Scanned every pixel in all 256 bands of the `m65` and `d18` calibrated cubes. Saved exact per-band finite, zero, negative, positive, and candidate saturation-threshold counts plus sampled quantiles in `results/phase-1/m1-inventory/metrics/pilot_radiance_quality_by_band.csv`; saved the plot alongside it.
+- After applying each PDS4 unit prefix, sampled median ranges are comparable between the scenes. This supports the declared scale provisionally but does not independently validate radiometric calibration.
+- Recorded a failed saturation-unit gate: the saturation XML's µW interpretation flags nearly all positive pixels, while the SIS's general mW interpretation flags none. No saturation mask was created, and zero values remain unclassified.
+- Next: obtain authoritative clarification of the table units and pixel validity, identify a thermal-capable observation or validate another thermal method, then select nonoverlapping tracks before M2/M3.
+
 ## 2026-09-28 — Display the two active pilot strips
 
 - Verified the official calibrated-product browse PNGs against their PDS4 MD5 values.

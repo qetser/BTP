@@ -2,6 +2,21 @@
 
 Meaningful project changes are recorded newest first. Entries describe the change and evidence; the Git history supplies the exact commit hash.
 
+## 2026-09-28 — Scan calibrated pilot radiance cubes
+
+**Phase:** Phase 1, M1 product inventory
+
+**Type:** Research evidence and quality figure
+
+- Added a reproducible scan of every pixel in the two calibrated pilot cubes, preserving per-band counts and fixed-grid positive-pixel quantiles in CSV and a PNG figure.
+- Recorded provisionally comparable radiance scales after applying the product unit prefixes.
+- Found that the saturation table's declared µW unit and the SIS's general mW unit produce opposite candidate-mask outcomes. Marked the saturation gate unresolved and kept the candidate counts separate from confirmed masks.
+- Updated the M1 summary, findings, data dictionary, task plan, and progress log. E3G2's lack of valid 4–5 µm bands and the unresolved masks continue to block reflectance correction.
+
+**Why:** Establish data-quality evidence for the active cubes before any M2 correction.
+
+**Impact:** No reflectance, saturation mask, label, or model metric was created. The active task remains M1 until the threshold convention, thermal method, and independent coverage are resolved.
+
 ## 2026-09-28 — Display active IIRS strips in README
 
 **Phase:** Phase 1, M1 product inventory

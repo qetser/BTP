@@ -63,6 +63,15 @@
 - Both pilots are `E3G2` at 10 ms. The official workbook marks bands 7–28, 35–68, and 76–146 valid for `E3G2`. Bands 147 onward, including 4–5 µm, are invalid or low confidence for this mode. The full [CSV](metrics/band_validity_by_mode.csv) and [figure](figures/band_validity_by_mode.svg) preserve the source flags by mode.
 - SIS V17 section 4.2.2 uses `mW/cm²/sr/µm` as the general radiance unit. The active `d18` XML and `E3G2` saturation-table XML use `µW/cm²/sr/µm`; the active `m65` XML uses `mW/cm²/sr/µm`. These source declarations need numerical checks before any unit conversion is accepted. The workbook's mode mask is not a per-pixel saturation mask.
 
+## 2026-09-28 radiance cube quality scan
+
+- Run command: `uv run --no-project --with numpy --with matplotlib python scripts/analyze_iirs_radiance_pilot.py`.
+- The scan covered all 256 bands and all pixels in each calibrated cube: 2,731,250 pixels in `m65` and 2,731,750 in `d18`. All values were finite. On the 127 officially valid `E3G2` bands, aggregate exact zeros were 2,809 (`m65`) and 3,059 (`d18`); negative values were 26 in each cube. These counts are summed across bands, so they are not unique-pixel counts. Neither zero nor negative is assigned a fill meaning.
+- After applying the unit prefixes in the PDS4 labels, fixed-grid positive-pixel median values on valid bands span 0.115–1.547 mW/cm²/sr/µm (`m65`) and 0.104–1.199 mW/cm²/sr/µm (`d18`). Their comparable scale supports, but does not independently prove, the labels' `mW` versus `µW` prefixes.
+- The official E3G2 saturation CSV's label declares µW/cm²/sr/µm, while the SIS describes Level 1 radiance generally in mW/cm²/sr/µm. Comparing table values as µW flags nearly all positive pixels at or above threshold across valid bands; comparing them as mW flags none. This disagreement fails the saturation-unit gate. These counts are candidate comparisons only and must not be used as a pixel mask.
+- The full per-band values, including invalid bands for audit, are in [`pilot_radiance_quality_by_band.csv`](metrics/pilot_radiance_quality_by_band.csv), with a plot in [`pilot_radiance_quality_by_band.png`](figures/pilot_radiance_quality_by_band.png). Quantiles use every 32nd line and every 5th sample; counts are exact.
+- Gate result: radiance prefixes are provisionally supported by cross-scene scale, but numerical radiance validation is incomplete; fill and pixel saturation masks are unresolved. M2 correction remains blocked. The 3.16–5.01 µm segment is not valid for these E3G2 products, including the 4–5 µm region required by the current thermal plan.
+
 ## Pilot strip browse previews
 
 - The two calibrated-product browse PNGs pass the MD5 values declared in their PDS4 browse labels. Their dimensions are 175 × 7647 (`m65`) and 175 × 7649 (`d18`) pixels.

@@ -24,7 +24,13 @@ Every phase and module produces a concise record under `results/<phase>/<module>
 - [ ] Validate the two pilot cubes' numerical unit scales, fill and per-pixel saturation rules, and a correction path that respects `E3G2` band validity.
 - [ ] Select additional independent scenes and record the split design.
 
-**Status:** in progress. The active two-pair inventory, metadata lineage, and SIS review passed. Next concrete unit: validate units and masks with representative cube values, and select a suitable exposure mode for thermal correction before freezing the independent acquisition plan.
+**Status:** in progress. The active two-pair inventory, metadata lineage, SIS review, and full cube scan are recorded. Radiance unit prefixes are provisionally supported by comparable sampled medians, but the saturation-table unit and pixel masks failed validation. Next: resolve the saturation convention from the user guide or ISRO, obtain a thermal-capable mode or validate another thermal method, and select independent coverage before M2 or M3.
+
+**Current M1 quality unit:**
+
+1. [x] Scan both calibrated cubes and save per-band finite, zero, negative, and candidate saturation-threshold counts with a figure. Keep zero-value and threshold flags distinct from confirmed fill or saturation.
+2. [~] Compare representative valid-band radiance distributions after applying only the PDS4 unit prefixes. The cross-scene scales are provisionally comparable. Saturation-table unit comparison failed: interpreting its values as µW flags nearly all positive pixels; interpreting them as mW flags none. Resolve against authoritative documentation before assigning masks.
+3. Select candidate nonoverlapping tracks with a mode that supports the required thermal method. Do not begin the 3 µm reflectance pilot or M3 scoring until these checks pass.
 
 ## Phase 2 — M2 calibrated reflectance
 
