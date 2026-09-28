@@ -8,14 +8,14 @@ The complete execution roadmap is described below. The repository is currently w
 
 ## Current state (28 September 2026)
 
-The repository contains two raw/calibrated pairs from 2020-02-08, a verified raw/calibrated E1G2 pair from 2026-02-27, and the official IIRS `iir.zip` archive under ignored `data/pradan/`. All seven ZIP archives pass integrity checks. The new pair's XML labels match on observation time, job ID, orbit, mode, dimensions, and wavelengths; both embedded cube MD5 values match their labels. The calibrated label declares radiance units, but its numeric scale, geometry, saturation units, and pixel masks remain unvalidated. The earlier 2020 radiance scan supports those products' unit prefixes provisionally. Physical calibration, an analysis-ready reflectance dataset, reviewed labels, trained models, and measured baseline scores do not exist yet. The earlier four-scene raw inventory remains as a historical manifest in the M1 results directory, but those old products were removed from `data/` before this pilot selection.
+The repository contains two raw/calibrated pairs from 2020-02-08, a verified raw/calibrated E1G2 pair from 2026-02-27, and the official IIRS `iir.zip` archive under ignored `data/pradan/`. All seven ZIP archives pass integrity checks. The new pair's labels match on identity and both embedded cube MD5 values match. Its calibrated values agree closely with the official LUT after the SIS unit conversion, supporting the numeric scale internally. This is not independent calibration validation. Saturation and fill semantics, per-pixel masks, and full-resolution geometry remain open. The earlier 2020 radiance scan supports those products' unit prefixes provisionally. Physical calibration, an analysis-ready reflectance dataset, reviewed labels, trained models, and measured baseline scores do not exist yet. The earlier four-scene raw inventory remains as a historical manifest in the M1 results directory, but those old products were removed from `data/` before this pilot selection.
 
 | Initial 2020 pilot observation (UTC, archive suffix) | Raw and calibrated cube, lines × samples × bands | Approximate latitude range from label corners | Local state |
 | --- | ---: | ---: | --- |
 | 2020-02-08 00:57, `m65` | 10,925 × 250 × 256 | 31.4°S–1.5°S | ZIP and extracted; raw plus calibrated |
 | 2020-02-08 12:45, `d18` | 10,927 × 250 × 256 | 31.6°S–1.7°S | ZIP and extracted; raw plus calibrated |
 
-**E1G2 pair verified:** PRADAN provided `ch2_iir_nri_20260227T1239538758_d_img_d18.zip` and `ch2_iir_nci_20260227T1239538758_d_img_d18.zip`. Both labels confirm exposure `e1`, gain `g2`, the same observation time, job ID, orbit, dimensions, and wavelengths. ZIP CRC and embedded QUB MD5 checks pass. The calibrated label declares `µW/cm**2/sr/µm`; numerical unit validation and geometry/mask checks remain open. See the [E1G2 acquisition record](results/phase-1/m1-e1g2-scene/summary.md).
+**E1G2 pair verified:** PRADAN provided `ch2_iir_nri_20260227T1239538758_d_img_d18.zip` and `ch2_iir_nci_20260227T1239538758_d_img_d18.zip`. Both labels confirm exposure `e1`, gain `g2`, the same observation time, job ID, orbit, dimensions, and wavelengths. ZIP CRC and embedded QUB MD5 checks pass. The calibrated label declares `µW/cm**2/sr/µm`. A fixed-grid comparison with the official LUT supports the numeric scale internally. Independent radiometric validation, geometry, and mask checks remain open. See the [E1G2 acquisition record](results/phase-1/m1-e1g2-scene/summary.md).
 
 ![Official calibrated browse image for the 2026-02-27 E1G2 IIRS strip, showing lunar surface texture along the observation track.](results/phase-1/m1-e1g2-scene/figures/20260227_e1g2_calibrated_browse.png)
 
@@ -29,7 +29,7 @@ These previews show the two observations selected for analysis. Each uses the of
 | --- | --- |
 | ![Four consecutive sections of the m65 IIRS browse strip, showing lunar terrain and craters.](results/phase-1/m1-inventory/figures/calibrated_browse_m65_four_part_preview.png) | ![Four consecutive sections of the d18 IIRS browse strip, showing lunar terrain and craters.](results/phase-1/m1-inventory/figures/calibrated_browse_d18_four_part_preview.png) |
 
-**Figure: complete browse coverage of the two pilot strips.** Each narrow column shows one consecutive quarter of the original strip, with rows increasing downward and columns ordered left to right. Both axes were resized together within each quarter to preserve shape; the printed row ranges refer to the browse PNG, not the 10,925/10,927-line radiance cubes. These are visual orientation aids, not georeferenced maps, reflectance images, or mineral detections. The [preview generation script](scripts/build_iirs_strip_previews.py) and [M1 notes](results/phase-1/m1-inventory/notes.md) record how to reproduce them.
+**Figure: complete browse coverage of the two 2020 E3G2 pilot strips.** Each narrow column shows one consecutive quarter of the original strip, with rows increasing downward and columns ordered left to right. Both axes were resized together within each quarter to preserve shape; the printed row ranges refer to the browse PNG, not the 10,925/10,927-line radiance cubes. These are visual orientation aids, not georeferenced maps, reflectance images, or mineral detections. The [preview generation script](scripts/build_iirs_strip_previews.py) and [M1 notes](results/phase-1/m1-inventory/notes.md) record how to reproduce them.
 
 The labels list 256 band centers from **712.3 to 5009.7 nm** for the active pilot files. ISRO describes the nominal instrument range as approximately 0.8–5.0 µm; use each product's actual band centers and widths. Raw labels specify `UnsignedLSB2` detector counts. Calibrated labels specify `IEEE754LSBSingle` values, with units that must be read per product: `mW/cm**2/sr/µm` for the `m65` pilot and `µW/cm**2/sr/µm` for the `d18` pilot. The PDS4 XML label remains authoritative for type, axes, wavelength, units, size, and checksum. Both active pilot footprints are low latitude and are **not polar**. The previous four-scene raw inventory is retained as historical evidence in the M1 results directory.
 
@@ -57,6 +57,20 @@ The saturation-table XML declares its threshold values in `µW/cm²/sr/µm`. The
 ![Three-panel scan of exact zero and nonfinite fractions, candidate saturation-threshold comparisons, and sampled positive-pixel radiance medians for the m65 and d18 calibrated cubes.](results/phase-1/m1-inventory/figures/pilot_radiance_quality_by_band.png)
 
 **Figure: calibrated pilot radiance quality by band.** The top panel shows exact zeros and nonfinite values. The middle panel compares the two saturation-table unit interpretations. The bottom panel shows fixed-grid medians only on officially valid E3G2 bands. The figure reports Level 1 radiance quality checks. It does not show reflectance, confirmed saturation, or a mineral result. The [machine-readable values](results/phase-1/m1-inventory/metrics/pilot_radiance_quality_by_band.csv), [analysis script](scripts/analyze_iirs_radiance_pilot.py), and [M1 findings](results/phase-1/m1-inventory/findings.md) provide the method and limits.
+
+### E1G2 radiance and footprint audit
+
+The full 2026 E1G2 cube scan found finite values throughout the 781,440,000-value cube. The officially valid 222 bands have 4,829 exact zeros and 42,081 negative band-pixels; neither is classified as fill. Fixed-grid sampled positive medians range from 118.218 to 1,305.46 µW/cm²/sr/µm.
+
+The official E1G2 lookup table (LUT) provides an internal radiance-scale check. The SIS says its LUT formula yields mW/cm²/sr/µm, while the product label declares µW/cm²/sr/µm. On a fixed grid, after converting the product values from µW to mW, the median calibrated/LUT ratio is **1.00375** and median per-band correlation is **0.922**. For valid bands 226–248, the median ratio is 0.9952 and median correlation is 0.899. This supports internal consistency, but it is not independent radiometric validation.
+
+The calibrated label and saturation-table XML both declare µW/cm²/sr/µm. Yet applying the table thresholds as labeled puts **676,834,500 of 677,655,000 values (99.878921%)** on valid bands at or above threshold. If the threshold values are interpreted as mW, only 12 values exceed after unit conversion. No paired raw counts reach the table's `dynamic_range` field on valid bands. The saturation-table semantics remain unresolved, and none of these comparisons defines a mask.
+
+The calibrated geometry table supplies 1,476 sparse points across 246 scan lines, spanning about 5.47°W–3.50°W and 6.53°S–26.86°N. It confirms a low-latitude strip, not a full-resolution pixel footprint. The reproducible [per-band CSV](results/phase-1/m1-e1g2-scene/metrics/e1g2_radiance_by_band.csv) and [analysis script](scripts/analyze_iirs_e1g2_scene.py) preserve exact counts and sampled quantiles.
+
+![E1G2 calibrated radiance medians, calibrated-to-LUT consistency by band, and the sparse geolocation grid.](results/phase-1/m1-e1g2-scene/figures/e1g2_radiance_and_footprint.png)
+
+**Figure: E1G2 radiance, LUT comparison, and geometry audit.** Left: sampled positive median radiance and threshold as labeled in the official table. Center: median calibrated/LUT ratio by valid band after unit conversion. Right: sparse geometry points colored by scan line. The threshold conflict does not provide a saturation mask. Geometry is coarse, not a full-resolution footprint. No reflectance or thermal correction was computed.
 
 ### What the pilot scan did
 
@@ -89,17 +103,26 @@ flowchart LR
     CAL -->|First request: 302 sign-in| ACQGATE[Renew authenticated session]
     ACQGATE --> REFRESH[Retrieve only matching NCI ZIP]
     REFRESH --> CXML[Check calibrated XML and cube MD5]
-    CXML -->|Same pair and mode; checksums pass| CHK[Validate units, geometry, masks, and coverage]
+    CXML -->|Same pair and mode; checksums pass| SCAN[Stream calibrated and raw cubes; scan all bands]
+    SCAN --> LUT[Apply official band-major gain and offset tables]
+    LUT -->|Median ratio 1.00375; median band correlation 0.922| SCALE[Internal radiance scale consistency supported]
+    SCALE --> INDEP[Independent radiometric validation remains open]
+    SCAN -->|99.8789% meet labeled threshold; 12 under mW interpretation| MASKGATE[Mask gate unresolved: threshold meaning and fill rules]
+    SCAN --> GEO[Inspect sparse geometry grid]
+    GEO -->|5.47°W–3.50°W; 6.53°S–26.86°N| COVER[Low-latitude strip; full-resolution footprint still open]
+    MASKGATE --> CHK[Resolve threshold semantics and pixel validity]
+    COVER --> CHK
+    INDEP --> CHK
     M --> W[Resolve threshold units and per-pixel masks]
     N --> X[Do not use the current E3G2 strips for longwave temperature retrieval]
-    CHK --> Y[Run the thermal pilot after unit and mask checks pass]
+    CHK --> Y[Run thermal pilot only after units, geometry, and masks pass]
     W --> Y
     U --> Y
     Y --> Z[Compare spectra and temperature with independent references]
     Z --> AA[Select nonoverlapping tracks and reviewed labels for M3]
 ```
 
-The original E3G2 scan did not produce reflectance or a saturation mask, and those products remain unsuitable for thermal fitting that requires 4–5 µm. A matched E1G2 pair is now acquired and verified. The official workbook marks bands 226–248, centered from 4504.1 to 4874.9 nm, valid in E1G2. This supplies longwave channels for a pilot, but does not resolve saturation units, per-pixel masks, or validate a thermal correction.
+The original E3G2 scan did not produce reflectance or a saturation mask, and those products remain unsuitable for thermal fitting that requires 4–5 µm. The matched E1G2 pair passes identity and checksum checks, and its LUT comparison supports the numeric radiance scale internally. The saturation threshold and raw dynamic-range checks remain in conflict, so no mask is assigned. Obtain authoritative threshold and fill rules, validate the full-resolution geometry, and seek independent radiometric validation before thermal correction. The published Verma et al. method uses the extended IIRS spectrum for surface-temperature retrieval and thermal-emission removal, so E1G2 remains a candidate mode rather than an approved processing input ([paper](https://doi.org/10.1016/j.icarus.2022.115075)).
 
 ### What IIRS papers tell us to do next
 
@@ -111,7 +134,7 @@ The original E3G2 scan did not produce reflectance or a saturation mask, and tho
 | [Bose et al. (2024), Advances in Space Research](https://doi.org/10.1016/j.asr.2023.12.019) | Studies IIRS photometric correction over 0.8–2.0 µm and compares the derived reflectance with M³. | Informs the shortwave photometric step. It does not validate thermal correction near 3 µm. |
 | [Chauhan et al. (2021), Current Science](https://doi.org/10.18520/cs/v121/i3/391-401) | Reports a physics-based thermal correction using co-located temperature measurements. | A possible independent comparison. It does not show that E3G2 alone supports longwave temperature fitting. |
 
-The live [PRADAN Browse and Download route](https://pradan.issdc.gov.in/ch2/protected/payload.xhtml) redirects unauthenticated visitors to sign-in; the scene table and IIRS filters require an authorized session. That session was used to select and verify the E1G2 pair listed above. The remaining acquisition work is to resolve saturation units and pixel masks, validate geometry and the numeric radiance scale, and add independent tracks before thermal processing or M3 scoring. The [initial gap matrix](docs/gap_matrix.md), [literature findings](results/phase-1/m1-literature/findings.md), and [M1 task plan](tasks/task_plan.md) track these gates. The matrix is an initial targeted review, not a systematic review or a novelty claim.
+The live [PRADAN Browse and Download route](https://pradan.issdc.gov.in/ch2/protected/payload.xhtml) redirects unauthenticated visitors to sign-in; the scene table and IIRS filters require an authorized session. That session was used to select and verify the E1G2 pair listed above. Remaining M1 work is to resolve threshold and pixel-mask semantics, validate full-resolution geometry and radiance scale against an independent reference, and add independent tracks before thermal processing or M3 scoring. The [initial gap matrix](docs/gap_matrix.md), [literature findings](results/phase-1/m1-literature/findings.md), and [M1 task plan](tasks/task_plan.md) track these gates. The matrix is an initial targeted review, not a systematic review or a novelty claim.
 
 ## Scientific scope and constraints
 
@@ -129,7 +152,7 @@ The project is deliberately staged. Each stage must pass its scientific gate bef
 
 This is the current phase.
 
-**M1, acquisition and inventory** establishes exactly what each IIRS product contains. We parse the PDS4 labels, verify dimensions, byte counts, archive and extracted checksums, wavelengths, geometry, footprints, and processing levels. The active set now has two verified 2020 pairs and one verified 2026 E1G2 pair, plus the official archive/SIS, a data dictionary, and an initial literature gap matrix. Numeric radiance-scale and mask validation, geometry review, a scene-coverage report, and independent tracks remain open. The current strips do not support a polar or independent generalization claim, so additional tracks and provinces must be selected before the final split is frozen.
+**M1, acquisition and inventory** establishes exactly what each IIRS product contains. We parse the PDS4 labels, verify dimensions, byte counts, archive and extracted checksums, wavelengths, geometry, footprints, and processing levels. The active set now has two verified 2020 pairs and one verified 2026 E1G2 pair, plus the official archive/SIS, a data dictionary, and an initial literature gap matrix. Independent radiance-scale validation and mask validation, geometry review, a scene-coverage report, and independent tracks remain open. The current strips do not support a polar or independent generalization claim, so additional tracks and provinces must be selected before the final split is frozen.
 
 **M2, calibration and preprocessing** converts an official calibrated product, or a documented raw-to-calibrated chain, into analysis-ready reflectance. It includes invalid and saturated-pixel masks, thermal-emission correction beyond approximately 2.5 µm, solar normalization, and lunar photometric correction. A pilot scene is validated first using representative spectra, quality fractions, correction residuals, and cross-instrument comparisons. Large-scale processing starts only after the pilot quality gate passes.
 

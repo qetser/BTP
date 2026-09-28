@@ -2,7 +2,7 @@
 
 - Four active IIRS ZIP archives and extracted products are available locally under ignored `data/`: two raw and two calibrated products.
 - Each active label describes a 256-band cube with band centers from approximately 712.3 to 5009.7 nm.
-- The two active pilot footprints are low latitude, approximately 31.6 degrees south to 1.5 degrees south. None is polar.
+- The two 2020 E3G2 pilot footprints are low latitude, approximately 31.6 degrees south to 1.5 degrees south. None is polar. A separate 2026 E1G2 scene is documented in `../m1-e1g2-scene/`.
 - Raw detector counts are not calibrated radiance or reflectance. The calibrated products have product-specific radiance units and are not yet validated as corrected reflectance.
 - Cube checksums and metadata pairing are complete. The official SIS is now available. Numeric unit validation, cube fill interpretation, and independent scene selection remain open.
 
@@ -20,7 +20,7 @@
 
 - The [PRADAN IIRS FAQ](https://pradan.issdc.gov.in/ch2/faq.xhtml) confirms that IIRS has separate raw and calibrated products, that the data folder distinguishes raw and calibrated products, and that the IIRS archive and product guide are under `Other Downloads` → `iir`.
 - The historical four-scene local ZIPs contained only `data/raw`, `browse/raw`, and raw miscellaneous files. The active extraction contains both `data/raw` and `data/calibrated` products.
-- The official archive/SIS has since been acquired. The separate user guide PDF is not in that ZIP. The two active pilot pairs are verified from their XML labels below.
+- The official archive/SIS has since been acquired. The separate user guide PDF is not in that ZIP. The two 2020 pilot pairs were verified from their XML labels below; a later E1G2 pair is documented in `../m1-e1g2-scene/`.
 
 ## Supplied PRADAN download list
 

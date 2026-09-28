@@ -1,6 +1,6 @@
 # M1 literature review summary
 
-**Status:** Targeted review complete for the next acquisition and processing decision. The literature and official mode table identify E1G2 as the preferred thermal pilot mode. M1 acquisition and validation gates remain open.
+**Status:** Targeted review complete for the acquisition decision. Literature and official mode validity identify E1G2 as a candidate thermal mode. Its matched scene is now acquired, but the full-cube audit failed the saturation-threshold gate, so E1G2 is not yet a validated processing input.
 
 **Scope:** Selected Chandrayaan-2 IIRS radiance, thermal correction, reflectance, and photometric correction studies. This is an initial targeted review, not a systematic review.
 
@@ -10,8 +10,8 @@
 
 **Main observation:** The 2022 thermal-correction study uses E1G2 and 2.5–5 µm. The local official workbook marks E1G2 bands 226–248 (4504.1–4874.9 nm) valid. A 2026 study reports strong reflectance sensitivity to temperature error. E1G2 is therefore a supported acquisition target, but not yet a validated correction.
 
-**Limitations:** The literature review did not resolve the saturation-table unit conflict, confirm cube fill rules, or validate a thermal correction on local data. A subsequent authenticated PRADAN selection produced a matched E1G2 pair, documented in the [acquisition record](../m1-e1g2-scene/summary.md). A live read-only check of the public PRADAN browse route redirected to sign-in; the scene table is not publicly visible without authentication. Some full texts are not openly available. The paper-index search had weak coverage for this specialized planetary-science literature, so publisher and official pages were also searched.
+**Limitations:** The literature review did not resolve saturation-table semantics or cube fill rules, provide independent radiometric validation, or validate a thermal correction on local data. A subsequent authenticated PRADAN selection produced a matched E1G2 pair, documented in the [acquisition record](../m1-e1g2-scene/summary.md). A live read-only check of the public PRADAN browse route redirected to sign-in; the scene table is not publicly visible without authentication. Some full texts are not openly available. The paper-index search had weak coverage for this specialized planetary-science literature, so publisher and official pages were also searched.
 
-**Next gate:** Use authorized PRADAN access to select and acquire a matched E1G2 raw/calibrated pair. Verify its labels, mode, units, validity, checksums, and footprint. Resolve unit and mask rules before correction. Compare corrected temperature and reflectance with the published method and independent references.
+**Next gate:** Resolve saturation-table semantics and cube fill/per-pixel validity rules for the acquired pair; validate radiance scale independently and review full-resolution geometry. Only after those gates pass should the published thermal method be tested against independent temperature and reflectance references.
 
 See the [initial gap matrix](../../../docs/gap_matrix.md) and detailed [findings](findings.md).

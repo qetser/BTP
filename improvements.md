@@ -15,6 +15,8 @@ Status: `[ ]` open, `[~]` in progress, `[x]` implemented, `[!]` needs a project 
 **Tradeoff:** Requires more acquisition and validation before modeling.
 **Effort:** Medium.
 
+**Update (2026-09-28):** A full scan finds almost all valid-band values above the saturation CSV threshold as labeled, while no paired raw counts reach `dynamic_range`. A fixed-grid comparison to the official LUT supports the radiance scale internally (median calibrated/LUT ratio 1.00375, median band correlation 0.922). The threshold semantics and masks remain unresolved, and no independent calibration reference was used.
+
 ### 2026-09-28 — Thermal-capable pilot mode
 
 **Source:** Official IIRS `E3G2` band-validity workbook

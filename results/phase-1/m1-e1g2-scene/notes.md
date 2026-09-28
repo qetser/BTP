@@ -7,3 +7,4 @@
 - The first calibrated request with the earlier session returned HTTP 302. A refreshed PRADAN session later allowed the single calibrated product transfer.
 - Extracted only the official calibrated browse PNG to `figures/20260227_e1g2_calibrated_browse.png`; the guide describes it as a subsampled band 40 browse image. It is for visual orientation, not spectral interpretation.
 - No metric was computed. The PNG is a source browse figure, not a plotted metric, so no CSV/JSON metric artifact was created.
+- The follow-up E1G2 audit is reproducible with `uv run --no-project --with numpy --with matplotlib python scripts/analyze_iirs_e1g2_scene.py`. It creates the per-band CSV and a descriptive figure while streaming the two QUB objects from their ZIPs. Counts are exact; quantiles are fixed-grid samples. The LUT comparison supports internal radiance-scale consistency, not independent validation. The saturation comparison is unresolved and must not be used as a mask.

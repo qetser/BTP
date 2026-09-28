@@ -2,6 +2,22 @@
 
 Meaningful project changes are recorded newest first. Entries describe the change and evidence; the Git history supplies the exact commit hash.
 
+## 2026-09-28 — Audit E1G2 radiance scale, thresholds, and footprint
+
+**Phase:** Phase 1, M1 data quality and geometry
+
+**Type:** Full-cube QA analysis and research documentation
+
+- Streamed the matched raw and calibrated E1G2 QUB objects from their ZIP archives; all 781,440,000 calibrated values are finite.
+- Compared calibrated values with the official band-major LUT using `raw_count × gain + offset`, then converted product values from µW to mW as directed by the SIS. The fixed-grid median calibrated/LUT ratio is 1.00375, with median per-band correlation 0.922. This supports internal scale consistency, not independent calibration validation.
+- The saturation CSV threshold as labeled is met or exceeded by 99.878921% of valid-band values. Interpreting table values as mW yields 12 exceedances. No paired raw counts reach `dynamic_range`. These checks do not define masks, so no saturation or fill mask was assigned.
+- Inspected the 1,476-point sparse geometry grid, which spans about 5.47°W–3.50°W and 6.53°S–26.86°N.
+- Saved a per-band CSV, reproducible scan script, figure, and findings record. Updated the README figure and LR flow, task plan, and gap matrix.
+
+**Why:** E1G2 supplies officially valid longwave bands, but thermal processing needs trustworthy radiance values, masks, and spatial geometry first.
+
+**Impact:** The scene is a low-latitude E1G2 candidate, not a validated thermal-correction input. M2 remains blocked pending authoritative threshold/fill semantics, independent radiance validation, and full-resolution geometry review.
+
 ## 2026-09-28 — Verify the matched E1G2 raw/calibrated pair
 
 **Phase:** Phase 1, M1 acquisition and inventory

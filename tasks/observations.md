@@ -5,7 +5,7 @@ Record measured values alongside the run, source IDs, code revision, and artifac
 | Gate | Measure | Current state |
 | --- | --- | --- |
 | M1 integrity | Archives and extracted cubes with verified size and checksum | Historical four-scene raw inventory passed. Current four pilot ZIPs passed HTTP and Python ZIP integrity checks; extraction and label checks remain pending. Evidence: `results/phase-1/m1-inventory/summary.md` |
-| M1 lineage | Raw scenes paired with calibrated product ID and units | **Measured for two pilot pairs:** exact timestamp, job ID, orbit, dimensions, and wavelengths match. Units are product-specific and recorded in `results/phase-1/m1-inventory/pilot_lineage.md` |
+| M1 lineage | Raw scenes paired with calibrated product ID and units | **Measured for three pairs:** exact timestamp, job ID, orbit, dimensions, and wavelengths match. The 2020 E3G2 pairs' units are in `results/phase-1/m1-inventory/pilot_lineage.md`; 2026 E1G2 radiance, threshold, and geometry QA are in `results/phase-1/m1-e1g2-scene/`. |
 | M1 coverage | Independent orbits/provinces and polar scenes in train/validation/test | Two low-latitude pilot pairs from 2020-02-08; split not fixed and no polar coverage |
 | M2 quality | Invalid-pixel/band fraction, stripe residual, geometry and thermal-correction error | Not measured |
 | M2 comparison | Matched IIRS–M³ and official L2 spectral differences | Not measured |
