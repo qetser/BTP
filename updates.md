@@ -2,6 +2,72 @@
 
 Meaningful project changes are recorded newest first. Entries describe the change and evidence; the Git history supplies the exact commit hash.
 
+## 2026-09-28 — Extract and pair the M2 pilot products
+
+**Phase:** Phase 1, M1 product lineage
+**Type:** Data and research evidence
+
+- Cleared the old ignored data products and kept only two selected raw/calibrated pairs.
+- Extracted all four archives and regenerated the active metadata manifest.
+- Confirmed exact raw-to-calibrated pairing by timestamp, job ID, orbit, dimensions, and wavelength table.
+- Recorded product-specific calibrated units in `results/phase-1/m1-inventory/pilot_lineage.md`.
+
+**Why:** M2 needs a verified raw-to-calibrated pair and explicit units before any numerical correction or reflectance interpretation.
+
+**Impact:** The active local pilot is two pairs from 2020-02-08. The previous four-scene raw inventory remains historical and is no longer present in `data/`.
+
+## 2026-09-28 — Reject nonmatching PRADAN download list
+
+**Phase:** Phase 1, M1 product lineage
+**Type:** Research evidence
+
+- Compared the ten supplied PRADAN `ndi` URLs with the four raw scene timestamps.
+- Found no exact observation match; all supplied URLs are from 2024 or 2025.
+- Stopped and removed the partial first download before retaining any product.
+
+**Why:** A derived product from another observation cannot serve as the calibrated counterpart for a raw scene.
+
+**Impact:** No new data was retained. A new PRADAN selection must be generated using the raw observation timestamp.
+
+## 2026-09-28 — Complete M1 local integrity inventory
+
+**Phase:** Phase 1, M1 inventory
+**Type:** Feature and research evidence
+
+- Added `scripts/build_iirs_manifest.py` to parse PDS4 labels and compute archive and cube integrity fields.
+- Added `results/phase-1/m1-inventory/iirs_inventory.csv` with metadata, dimensions, byte counts, MD5, and ZIP SHA-256 values.
+- Recorded the four-scene integrity pass in the M1 findings and observation checklist.
+
+**Why:** The raw scenes must be traceable and byte-verified before calibration work begins.
+
+**Impact:** All four local scenes passed the integrity checks. Calibrated product lineage and independent coverage remain open.
+
+## 2026-09-28 — Make foundation-model timing explicit
+
+**Phase:** Research roadmap
+**Type:** Planning
+
+- Added Phase 4 for HyperFree and HyperSIGMA transfer experiments.
+- Added Phase 5 for lunar self-supervised adaptation and Phase 6 for downstream scientific tasks.
+- Kept M1 manifest and integrity verification as the active next step.
+
+**Why:** Foundation-model comparisons are only interpretable after calibration, labels, splits, and M3 baselines pass their quality gates.
+
+**Impact:** No model runs or scientific results changed.
+
+## 2026-09-28 — Add research result protocol
+
+**Phase:** Project workflow setup
+**Type:** Documentation and process
+
+- Added `results/` phase and module directories for M1 inventory, M2 calibration, and M3 baselines.
+- Added rules for concise findings, research notes, machine-readable metrics, and PNG or SVG metric figures.
+- Marked M1 manifest and integrity verification as the active next unit.
+
+**Why:** Every scientific stage needs a durable evidence trail. Quantitative claims must be accompanied by source values and a saved figure.
+
+**Impact:** No data or scientific scores changed. The result directories contain setup notes only until processing runs.
+
 ## 2026-09-28 — Keep agent tooling local
 
 **Phase:** Project workflow setup

@@ -37,6 +37,18 @@ Status: `[ ]` open, `[~]` in progress, `[x]` implemented, `[!]` needs a project 
 **Tradeoff:** Remains manual until decided.
 **Effort:** Small to define; ongoing to operate.
 
+### 2026-09-28 — Structured research result artifacts
+
+**Source:** User feedback
+**Category:** Process and reproducibility
+**Status:** `[x]`
+
+**What:** Store phase and module summaries, findings, notes, machine-readable metrics, and metric figures under `results/`.
+**Why:** Research decisions and quantitative evidence must survive context changes and remain reviewable.
+**Tradeoff:** Each module needs a small documentation step before it can be marked complete.
+**Effort:** Small.
+
 ## Implemented
 
 - 2026-09-28: Added local untracked project instructions and a commit-message check for co-author attribution.
+- 2026-09-28: Added the phase/module result protocol and initialized M1–M3 result directories.

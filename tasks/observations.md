@@ -1,12 +1,12 @@
 # M1–M3 observation checklist
 
-Record measured values alongside the run, source IDs, code revision, and artifact path. `Not measured` is an honest initial state. This is an evidence checklist, not a dashboard claiming results.
+Record measured values alongside the run, source IDs, code revision, and artifact path. `Not measured` is an honest initial state. This is an evidence checklist, not a dashboard claiming results. Module records live under [`results/`](../results/).
 
 | Gate | Measure | Current state |
 | --- | --- | --- |
-| M1 integrity | Archives and extracted cubes with verified size and checksum | Size checked for four scenes; checksums not yet recorded |
-| M1 lineage | Raw scenes paired with calibrated product ID and units | Not measured |
-| M1 coverage | Independent orbits/provinces and polar scenes in train/validation/test | Four low-to-mid-latitude raw scenes; split not fixed |
+| M1 integrity | Archives and extracted cubes with verified size and checksum | Historical four-scene raw inventory passed. Current four pilot ZIPs passed HTTP and Python ZIP integrity checks; extraction and label checks remain pending. Evidence: `results/phase-1/m1-inventory/summary.md` |
+| M1 lineage | Raw scenes paired with calibrated product ID and units | **Measured for two pilot pairs:** exact timestamp, job ID, orbit, dimensions, and wavelengths match. Units are product-specific and recorded in `results/phase-1/m1-inventory/pilot_lineage.md` |
+| M1 coverage | Independent orbits/provinces and polar scenes in train/validation/test | Two low-latitude pilot pairs from 2020-02-08; split not fixed and no polar coverage |
 | M2 quality | Invalid-pixel/band fraction, stripe residual, geometry and thermal-correction error | Not measured |
 | M2 comparison | Matched IIRS–M³ and official L2 spectral differences | Not measured |
 | M3 labels | Reviewed class support and boundary exclusions per split | Not measured |

@@ -12,6 +12,19 @@
 - Kept `AGENTS.md` and `codex.md` local and ignored. Added a Git commit-message check for the no-co-author rule.
 - Next work: create and verify an M1 manifest for the four raw scenes, then obtain the official IIRS product guide and calibrated counterparts.
 
+## 2026-09-28 — Research result protocol
+
+- Added a phase and module result structure under `results/`.
+- Required concise summaries, findings, and notes for every module.
+- Required machine-readable metric values plus PNG or SVG figures whenever metrics or graphs are produced.
+- No metric figures were created because M1 inventory metrics have not yet been computed.
+- Active next step: finish the M1 manifest and integrity checks for the four local scenes.
+- M1 manifest and integrity verification completed for all four local scenes. The next M1 unit is product-guide and calibrated-counterpart identification, followed by acquisition of independent scenes.
+- The supplied PRADAN URL list was checked before download. It contains no exact timestamp match for the four raw scenes; the interrupted partial transfer was removed. A new PRADAN selection is required.
+- HyperFree and HyperSIGMA are now explicitly scheduled for Phase 4 (M4), after the M1–M3 quality gates. M5 adaptation and M6 scientific tasks follow reproducible M4 transfer results.
+- Replaced the old `data/` contents with four selected pilot archives: raw and calibrated pairs for `20200208T1245274109_d_img_d18` and `20200208T0057589143_d_img_m65`. All four downloads completed and passed Python ZIP integrity checks. Next: extract and inspect their XML labels.
+- Extracted all four pilot archives and regenerated the active manifest. Both raw-to-calibrated pairs match on timestamp, job ID, orbit, dimensions, and wavelengths. The calibrated unit strings differ by product and are now recorded as an M2 conversion gate.
+
 ## Earlier work
 
 - Researched M1–M3, documented scientific gates in `docs/m1_m3_plan.md`, and inventoried four raw IIRS strips.

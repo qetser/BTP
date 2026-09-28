@@ -4,18 +4,18 @@ This repository supports the first phase of **Cross-Domain Transfer of Hyperspec
 
 For tasks, deliverables, and pass criteria, see [the M1–M3 implementation plan](docs/m1_m3_plan.md). For the project workflow and Codex setup, read [SETUP.md](SETUP.md).
 
+The complete execution roadmap is described below. The repository is currently working on M1. HyperFree and HyperSIGMA are planned comparison backbones for a later phase; they have not been trained or evaluated in this checkout.
+
 ## Current state (28 September 2026)
 
-The repository currently contains four downloaded IIRS ZIP archives in `data/`, and all four are extracted. There is **no calibration code, analysis-ready reflectance dataset, label set, trained model, or measured baseline score yet**. The PDS4 labels describe the cubes as `Raw`, with `UnsignedLSB2` detector **counts**, not physical radiance or reflectance. Do not use the `.qub` values directly for mineral or 3 µm band-depth interpretation.
+The repository currently contains four selected IIRS ZIP archives under ignored `data/pradan/`: two raw products and their two calibrated products for 2020-02-08. The archives are downloaded, ZIP-integrity checked, extracted, and XML-paired. Physical calibration validation, an analysis-ready reflectance dataset, labels, trained models, and measured baseline scores do not exist yet. The earlier four-scene raw inventory remains as a historical manifest in the M1 results directory, but those old products were removed from `data/` before this pilot selection.
 
-| Observation (UTC, archive suffix) | Raw cube, lines × samples × bands | Approximate latitude range from label corners | Local state |
+| Active pilot observation (UTC, archive suffix) | Raw and calibrated cube, lines × samples × bands | Approximate latitude range from label corners | Local state |
 | --- | ---: | ---: | --- |
-| 2020-02-05 17:56, `d18` | 10,872 × 250 × 256 | 30.8°S–0.9°S | ZIP and extracted |
-| 2020-02-05 23:49, `m65` | 10,850 × 250 × 256 | 30.9°S–1.0°S | ZIP and extracted |
-| 2021-11-22 03:54, `hw1` | 6,864 × 250 × 256 | 15.8°S–2.8°N | ZIP and extracted |
-| 2023-11-30 00:02, `d18` | 10,255 × 250 × 256 | 5.0°S–23.3°N | ZIP and extracted |
+| 2020-02-08 00:57, `m65` | 10,925 × 250 × 256 | 31.4°S–1.5°S | ZIP and extracted; raw plus calibrated |
+| 2020-02-08 12:45, `d18` | 10,927 × 250 × 256 | 31.6°S–1.7°S | ZIP and extracted; raw plus calibrated |
 
-The labels list 256 band centers from **712.3 to 5009.7 nm** for these files. ISRO describes the nominal instrument range as approximately 0.8–5.0 µm; use each product's actual band centers and widths. The extracted example has 1,391,616,000 bytes, matching `256 × 10,872 × 250 × 2`. Its ENVI header specifies band-sequential layout, but the PDS4 XML label remains the authoritative source for type, axes, wavelength, size, and checksum. The four current footprints are **not polar**.
+The labels list 256 band centers from **712.3 to 5009.7 nm** for the active pilot files. ISRO describes the nominal instrument range as approximately 0.8–5.0 µm; use each product's actual band centers and widths. Raw labels specify `UnsignedLSB2` detector counts. Calibrated labels specify `IEEE754LSBSingle` values, with units that must be read per product: `mW/cm**2/sr/µm` for the `m65` pilot and `µW/cm**2/sr/µm` for the `d18` pilot. The PDS4 XML label remains authoritative for type, axes, wavelength, units, size, and checksum. Both active pilot footprints are low latitude and are **not polar**. The previous four-scene raw inventory is retained as historical evidence in the M1 results directory.
 
 ## Scientific scope and constraints
 
@@ -25,10 +25,59 @@ The labels list 256 band centers from **712.3 to 5009.7 nm** for these files. IS
 
 Two proposal assumptions need an explicit feasibility gate. First, the [USGS unified geologic map](https://astrogeology.usgs.gov/search/map/Moon/Geology/Unified_Geologic_Map_of_the_Moon_GIS_v2/) provides **geologic units at 1:5,000,000**, not pixel-level mineral abundances; unit polygons may supply coarse labels after boundary exclusion and manual review. Second, a 3 µm reflectance feature in a permanently shadowed region requires enough **indirect light** and signal to noise to measure it. M³ has demonstrated this under specific conditions, but the current IIRS scenes are not polar and do not establish IIRS feasibility there. A 3 µm absorption alone must not be called a water-ice detection.
 
+## Full research roadmap
+
+The project is deliberately staged. Each stage must pass its scientific gate before the next stage can produce a defensible result.
+
+### Phase 1: IIRS foundations, M1–M3
+
+This is the current phase.
+
+**M1, acquisition and inventory** establishes exactly what each IIRS product contains. We parse the PDS4 labels, verify dimensions, byte counts, archive and extracted checksums, wavelengths, geometry, footprints, and processing levels. We also identify the official IIRS product guide and the calibrated counterpart for each raw scene. The output is a versioned manifest, a data dictionary, a scene-coverage report, and a gap list. The current four scenes are not enough for a polar or independent generalization claim, so additional tracks and provinces must be selected before the final split is frozen.
+
+**M2, calibration and preprocessing** converts an official calibrated product, or a documented raw-to-calibrated chain, into analysis-ready reflectance. It includes invalid and saturated-pixel masks, thermal-emission correction beyond approximately 2.5 µm, solar normalization, and lunar photometric correction. A pilot scene is validated first using representative spectra, quality fractions, correction residuals, and cross-instrument comparisons. Large-scale processing starts only after the pilot quality gate passes.
+
+**M3, baselines and evaluation** freezes reviewed labels and orbit or province splits. It runs diagnostic mineral spectral methods, a thermally corrected 3 µm index where the signal supports it, unsupervised clustering, and a small CNN trained from random initialization. Held-out accuracy, macro-F1, balanced accuracy, IoU, class support, uncertainty, and failure cases are reported only when the labels support those metrics.
+
+### Phase 2: Earth-to-Moon foundation-model transfer, M4
+
+M4 begins only after M1–M3 pass. Its purpose is to measure how much general hyperspectral representation learned from Earth survives on lunar IIRS data.
+
+The two planned comparison backbones are:
+
+- **HyperFree:** the channel-adaptive Earth hyperspectral foundation model.
+- **HyperSIGMA:** the two-stream spectral and spatial Earth hyperspectral foundation model.
+
+For each backbone, the same corrected IIRS inputs, labels, masks, and held-out split are used in three conditions:
+
+1. **Frozen zero-shot transfer:** use the released encoder without lunar training and classify against projected laboratory reference spectra or nearest-centroid prototypes.
+2. **Linear probe:** keep the encoder frozen and train only a small lunar task head.
+3. **Controlled fine-tuning:** allow encoder adaptation under a fixed training budget and the same evaluation protocol.
+
+Because IIRS wavelengths and band spacing do not exactly match the Earth pretraining sensors, M4 first uses a continuous wavelength-aware adapter. It evaluates a comparable SWIR range before testing the extended 0.8–5.0 µm range. The backbone checkpoint, license, preprocessing, adapter version, split, seed, and code revision are recorded for every run.
+
+M4 outputs a quantified Earth-to-Moon transfer gap, not a claim that either model is already lunar-ready.
+
+### Phase 2: Lunar self-supervised adaptation, M5
+
+M5 continues pretraining the selected backbone on unlabeled calibrated IIRS patches. The main objective masks spectral tokens and reconstructs them. Ablations test spectral derivative consistency and band-ratio consistency so that adaptation does not smooth away narrow mineral or hydration absorptions. The adapted encoder is then evaluated with the same few-shot and held-out protocol as M4.
+
+### Phase 2: Downstream scientific tasks, M6
+
+M6 applies the validated representations to reviewed mineral classes or abundance proxies and to a thermally corrected apparent hydroxyl or water-equivalent 3 µm absorption index. Polar water-ice interpretation remains conditional on indirect-light signal, thermal stability, independent references, and uncertainty checks. A 3 µm anomaly is not reported as definitive water ice without those checks.
+
+### Phase 2: Reporting and release, M7
+
+M7 consolidates ablations, limitations, reproducibility checks, checkpoints, processed products, figures, and code. It records which quality gates passed or failed and separates measured results from unresolved research questions.
+
+## Research results and evidence storage
+
+Every phase and module has a concise record under [`results/`](results/). Each module contains a summary, findings, and notes. When a metric or graph is computed, its source values are saved as CSV or JSON in `metrics/`, and the corresponding PNG or SVG is saved in `figures/`. The summary records the data version, split, units, code revision, generation command, and figure path. If no metric or graph exists, the result remains a text record and no artificial plot is created. See the [results protocol](docs/results_protocol.md).
+
 ## Data handling
 
 1. Retain the original ZIP archives and XML labels as immutable inputs. Record SHA-256 for each ZIP and verify each extracted `.qub` against the label's MD5 and byte count.
-2. Read the `data/raw/.../*.xml` label before opening a cube. For the extracted example, the expected shape is `(bands=256, lines=10872, samples=250)` and the element type is little-endian unsigned 16-bit. Stream or memory-map large cubes; do not load the whole archive into memory for a quick look.
+2. Read the extracted `data/extracted/*/data/{raw,calibrated}/.../*.xml` label before opening a cube. The active pilot raw products are `(bands=256, lines=10925 or 10927, samples=250)` little-endian unsigned 16-bit; the calibrated products are IEEE 32-bit floating point. Stream or memory-map large cubes; do not load the whole archive into memory for a quick look.
 3. Keep raw counts, calibrated radiance, corrected reflectance, masks, and model-ready tiles in distinct directories. Store wavelengths, units, coordinate convention, source product IDs, correction versions, and split IDs with every derived artifact.
 4. Split by orbital track and geologic province before fitting normalization, selecting thresholds, or tuning models. Four nearby low-latitude strips are insufficient for a defensible independent transfer benchmark; acquire more distinct scenes before claiming generalization.
 
