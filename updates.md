@@ -12,6 +12,7 @@ Meaningful project changes are recorded newest first. Entries describe the chang
 - Added a glossary for IIRS, E1G2/E3G2, NRI/NCI, raw counts, calibrated radiance, LUTs, bands, PDS4 labels, QUB, integrity checks, and quality masks.
 - Expanded the Mermaid LR chart to trace all three pairs through mode checks, cube scans, LUT comparison, threshold and geometry gates, saved evidence, and M2/M3 readiness.
 - Linked table rows to the supporting figures, CSVs, scripts, and module records. Stated clearly that M1 does not produce reflectance or mineral, hydration, or ice detections.
+- Updated `results/README.md`, which had incorrectly stated that no quantitative results existed. It now indexes M1 measurements, evidence figures, module records, and remaining gates.
 
 **Why:** Readers need to understand both the measured results and the terms used to describe the products.
 
