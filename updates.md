@@ -2,6 +2,20 @@
 
 Meaningful project changes are recorded newest first. Entries describe the change and evidence; the Git history supplies the exact commit hash.
 
+## 2026-09-28 — Summarize M1 work and explain IIRS product terms
+
+**Phase:** Phase 1, M1 product inventory and data quality
+
+**Type:** Results documentation
+
+- Added an M1 summary table to the README with work performed, key outputs, numerical results, evidence links, and gate status.
+- Added a glossary for IIRS, E1G2/E3G2, NRI/NCI, raw counts, calibrated radiance, LUTs, bands, PDS4 labels, QUB, integrity checks, and quality masks.
+- Linked table rows to the supporting figures, CSVs, scripts, and module records. Stated clearly that M1 does not produce reflectance or mineral, hydration, or ice detections.
+
+**Why:** Readers need to understand both the measured results and the terms used to describe the products.
+
+**Impact:** M1 evidence and open gates are now summarized in one place. M2 reflectance processing and M3 scoring remain gated by unresolved masks, independent radiance validation, geometry, and coverage.
+
 ## 2026-09-28 — Audit E1G2 radiance scale, thresholds, and footprint
 
 **Phase:** Phase 1, M1 data quality and geometry

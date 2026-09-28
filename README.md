@@ -72,11 +72,46 @@ The calibrated geometry table supplies 1,476 sparse points across 246 scan lines
 
 **Figure: E1G2 radiance, LUT comparison, and geometry audit.** Left: sampled positive median radiance and threshold as labeled in the official table. Center: median calibrated/LUT ratio by valid band after unit conversion. Right: sparse geometry points colored by scan line. The threshold conflict does not provide a saturation mask. Geometry is coarse, not a full-resolution footprint. No reflectance or thermal correction was computed.
 
+### M1 results at a glance
+
+M1 records which observations and products we have, checks their metadata and file integrity, and tests whether the data are ready for later physical processing. It does not create reflectance or detect minerals, hydration, or ice.
+
+#### Decode the product names
+
+| Term | Meaning in this project |
+| --- | --- |
+| **IIRS** | Imaging Infrared Spectrometer, a Chandrayaan-2 instrument that records a spectrum at each image location. |
+| **E1G2** | Instrument operating mode from the XML label: exposure setting **E1** and gain setting **G2**. Exposure and gain affect the signal acquisition. The filename suffix `d18` is a receiving-station code. It does not mean E1G2. |
+| **E3G2** | Exposure setting **E3** with gain setting **G2**. The two 2020 pilot pairs use this mode. |
+| **NRI / NCI** | Filename product codes used here for IIRS raw (`nri`) and calibrated (`nci`) products. The XML label gives the authoritative processing level and units. |
+| **Raw count** | The detector's recorded digital value before physical radiance calibration. A raw count is not radiance or reflectance. |
+| **Calibrated radiance** | Instrument signal converted to a physical radiance unit. Our calibrated products are Level 1 radiance, not surface reflectance. |
+| **LUT** | Look-up table. For this E1G2 product, the official table supplies gain and offset coefficients applied to raw counts. We compared that calculation with the paired calibrated cube as an internal consistency check. |
+| **Band / band-pixel** | A spectral band is one wavelength channel. A band-pixel is one spatial sample in one band. Counts summed across bands are not counts of unique surface locations. |
+| **PDS4 label, QUB, CRC, MD5** | The PDS4 XML label describes the product. QUB is the binary image cube. ZIP CRC and label MD5 checks test file integrity. They do not prove scientific calibration accuracy. |
+| **Saturation / fill mask** | A per-pixel flag for measurements that cannot be trusted due to saturation or missing/invalid data. We have not created this mask because the official threshold and fill rules remain unresolved. |
+
+#### Work completed, output, and interpretation
+
+| M1 work | What we did | Result | Supporting evidence and status |
+| --- | --- | --- | --- |
+| Inventory and product documentation | Reviewed three matched raw/calibrated pairs: two 2020 E3G2 observations and one 2026 E1G2 observation. Read their labels and the official IIRS archive/SIS. | The E1G2 pair has observation ID `20260227T1239538758`. Its labels report exposure E1, gain G2, orbit, dimensions, wavelengths, and radiance units. | [E1G2 record](results/phase-1/m1-e1g2-scene/summary.md), [data dictionary](results/phase-1/m1-inventory/data_dictionary.md). **Inventory recorded.** |
+| File integrity and pair matching | Checked ZIP CRCs, compared raw/calibrated label fields, and streamed each QUB to check its label MD5. | The E1G2 pair matches on observation and instrument metadata. Both archive and cube integrity checks pass. These checks show that the files are intact and paired. They do not prove that calibration is scientifically accurate. | [E1G2 findings](results/phase-1/m1-e1g2-scene/findings.md). **Passed for this pair.** |
+| Mode suitability | Read official band-validity flags and compared E3G2 with E1G2. | E3G2 valid bands stop at 3155.9 nm, so these strips lack valid 4–5 µm channels needed by the selected longwave thermal method. E1G2 bands 226–248 are valid from 4504.1 to 4874.9 nm. | [Band-validity figure](results/phase-1/m1-inventory/figures/band_validity_by_mode.svg), [source table](results/phase-1/m1-inventory/metrics/band_validity_by_mode.csv). E1G2 is a **candidate mode**, not yet an approved processing input. |
+| 2020 calibrated-cube scan | Counted finite, zero, negative, and positive values in both E3G2 calibrated cubes. | All scanned values are finite. Across valid bands, `m65` has 2,809 zero and 26 negative band-pixels. `d18` has 3,059 zero and 26 negative band-pixels. Sampled median radiance ranges overlap after we apply each label's unit. The counts do not show whether zeros or negatives mean fill. | [2020 per-band CSV](results/phase-1/m1-inventory/metrics/pilot_radiance_quality_by_band.csv), [scan figure](results/phase-1/m1-inventory/figures/pilot_radiance_quality_by_band.png). **Quality scan complete. Pixel meanings remain open.** |
+| E1G2 full-cube scan | Streamed all 256 calibrated bands and the matching raw-count cube from the ZIPs. | The calibrated cube has 781,440,000 finite values. On its 222 mode-valid bands, it has 4,829 exact zeros and 42,081 negative band-pixels. These are band-pixel counts. They do not count unique spatial pixels, and they are not classified as fill. | [E1G2 per-band CSV](results/phase-1/m1-e1g2-scene/metrics/e1g2_radiance_by_band.csv), [analysis script](scripts/analyze_iirs_e1g2_scene.py). **Scan complete.** |
+| E1G2 radiance-scale cross-check | Applied the official E1G2 gain/offset LUT to sampled raw counts. Compared its output with calibrated values converted from µW to mW. | Across valid bands, median calibrated/LUT ratio is **1.00375** and median per-band correlation is **0.922**. For valid longwave bands 226–248, these values are **0.9952** and **0.899**. A ratio near 1 indicates internal agreement. This comparison is not an independent test of radiometric calibration. | [E1G2 plot, center panel](results/phase-1/m1-e1g2-scene/figures/e1g2_radiance_and_footprint.png), [per-band values](results/phase-1/m1-e1g2-scene/metrics/e1g2_radiance_by_band.csv). **Internal check supports consistency. Independent validation remains open.** |
+| Saturation and fill rules | Compared calibrated radiance with the official saturation table and raw counts with its dynamic-range field. | Under the table's XML-declared µW unit, **676,834,500 / 677,655,000** valid-band values (**99.878921%**) meet or exceed the threshold. If we interpret threshold values as mW and convert them, only **12** exceed. No valid-band raw count reaches the `dynamic_range` field. The threshold interpretations conflict. Neither defines a valid mask. | [E1G2 per-band CSV](results/phase-1/m1-e1g2-scene/metrics/e1g2_radiance_by_band.csv), [detailed findings](results/phase-1/m1-e1g2-scene/findings.md). **Open gate. Do not apply these comparisons as a mask.** |
+| Footprint check | Read the calibrated product's sparse geometry table and plotted its points by scan line. | The table has **1,476 points across 246 scan lines**, from about **5.47°W to 3.50°W** and **6.53°S to 26.86°N**. This locates a low-latitude strip. It does not provide full-resolution pixel geometry. | [E1G2 geometry plot, right panel](results/phase-1/m1-e1g2-scene/figures/e1g2_radiance_and_footprint.png), [summary](results/phase-1/m1-e1g2-scene/summary.md). **Coarse coverage checked. Full-resolution geometry remains open.** |
+| Literature and gap review | Reviewed IIRS thermal/reflectance papers and compared their needs with available modes and products. | E1G2 is the next thermal-pilot candidate because it has valid longwave bands. Temperature uncertainty matters to 3 µm interpretation, but no local temperature or reflectance result exists yet. | [Literature summary](results/phase-1/m1-literature/summary.md), [gap matrix](docs/gap_matrix.md). **Targeted review recorded. It is not systematic.** |
+
+**M1 status:** The M1 records cover product inventory, pair checks, mode review, cube scans, and an initial literature gap review. M1 is still in progress. The next gates are authoritative saturation and fill rules, independent radiance validation, full-resolution geometry, and more geographically independent observations. M2 reflectance processing and M3 scoring have not started. The current quality and coverage gates remain open.
+
 ### What the pilot scan did
 
 ```mermaid
 flowchart LR
-    A[Two raw and calibrated scene pairs] --> B[Check PDS4 labels and pair identity]
+    A[2020 pilot: two raw/calibrated E3G2 pairs] --> B[Check PDS4 labels and pair identity]
     C[Official iir.zip, SIS, validity workbook, and saturation table] --> D[Read E3G2 band flags and candidate thresholds]
     B --> E[Memory-map both calibrated radiance cubes]
     D --> F[Keep only official valid bands for quality summaries]
