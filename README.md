@@ -107,54 +107,50 @@ M1 records which observations and products we have, checks their metadata and fi
 
 **M1 status:** The M1 records cover product inventory, pair checks, mode review, cube scans, and an initial literature gap review. M1 is still in progress. The next gates are authoritative saturation and fill rules, independent radiance validation, full-resolution geometry, and more geographically independent observations. M2 reflectance processing and M3 scoring have not started. The current quality and coverage gates remain open.
 
-### What the pilot scan did
+### M1 workflow, results, and remaining gates
+
+The chart follows the M1 evidence from product selection to the decisions that control later processing. It shows the 2020 E3G2 scan and the separate 2026 E1G2 audit, with each numerical result tied to its interpretation and next gate.
 
 ```mermaid
 flowchart LR
-    A[2020 pilot: two raw/calibrated E3G2 pairs] --> B[Check PDS4 labels and pair identity]
-    C[Official iir.zip, SIS, validity workbook, and saturation table] --> D[Read E3G2 band flags and candidate thresholds]
-    B --> E[Memory-map both calibrated radiance cubes]
-    D --> F[Keep only official valid bands for quality summaries]
-    E --> G[Count finite, zero, negative, and positive values per band]
-    E --> H[Sample every 32nd line and every fifth sample]
-    H --> I[Apply each product's declared radiance unit]
-    G --> J[Save per-band CSV and quality figure]
-    F --> G
-    I --> J
-    D --> K[Compare saturation thresholds as µW and as mW]
-    E --> K
-    K --> J
-    J --> L[Unit prefixes are provisionally supported by similar sampled scales]
-    J --> M[Saturation unit and pixel masks remain unresolved]
-    J --> N[E3G2 has no valid 4–5 µm bands]
-    R[2022 IIRS thermal study used E1G2] --> S[Official workbook marks bands 226–248 valid at 4504.1–4874.9 nm]
-    T[2026 study shows reflectance sensitivity to temperature error] --> U[Carry temperature uncertainty into M2]
-    S --> V[Select an E1G2 raw and calibrated candidate]
-    V --> P[Select products in authenticated PRADAN table]
-    P --> Q[Same timestamp pair listed: 20260227T1239538758]
-    Q --> RC[Download raw ZIP and inspect its XML label]
-    RC -->|Exposure e1, gain g2; CRC passes| CAND[Raw E1G2 candidate verified]
-    CAND --> CAL[Request matching calibrated NCI ZIP]
-    CAL -->|First request: 302 sign-in| ACQGATE[Renew authenticated session]
-    ACQGATE --> REFRESH[Retrieve only matching NCI ZIP]
-    REFRESH --> CXML[Check calibrated XML and cube MD5]
-    CXML -->|Same pair and mode; checksums pass| SCAN[Stream calibrated and raw cubes; scan all bands]
-    SCAN --> LUT[Apply official band-major gain and offset tables]
-    LUT -->|Median ratio 1.00375; median band correlation 0.922| SCALE[Internal radiance scale consistency supported]
-    SCALE --> INDEP[Independent radiometric validation remains open]
-    SCAN -->|99.8789% meet labeled threshold; 12 under mW interpretation| MASKGATE[Mask gate unresolved: threshold meaning and fill rules]
-    SCAN --> GEO[Inspect sparse geometry grid]
-    GEO -->|5.47°W–3.50°W; 6.53°S–26.86°N| COVER[Low-latitude strip; full-resolution footprint still open]
-    MASKGATE --> CHK[Resolve threshold semantics and pixel validity]
-    COVER --> CHK
-    INDEP --> CHK
-    M --> W[Resolve threshold units and per-pixel masks]
-    N --> X[Do not use the current E3G2 strips for longwave temperature retrieval]
-    CHK --> Y[Run thermal pilot only after units, geometry, and masks pass]
-    W --> Y
-    U --> Y
-    Y --> Z[Compare spectra and temperature with independent references]
-    Z --> AA[Select nonoverlapping tracks and reviewed labels for M3]
+    A["Three matched raw/calibrated pairs<br/>Two 2020 E3G2 and one 2026 E1G2"] --> B["Read PDS4 labels<br/>Match time, orbit, mode, axes, and bands"]
+    C["Official iir.zip<br/>SIS, LUT, band validity, saturation tables"] --> D["Set mode-valid bands and calibration references"]
+    B --> E["Check ZIP CRC and QUB MD5"]
+    E --> F["E1G2 pair passes identity and integrity<br/>20260227T1239538758"]
+    D --> G["Review exposure/gain mode validity"]
+
+    G --> H["2020 E3G2<br/>127 valid bands; no valid 4–5 µm bands"]
+    H --> I["Scan two calibrated cubes<br/>All values finite<br/>Zeros: 2809 and 3059<br/>Negatives: 26 and 26 band-pixels"]
+    I --> J["Save 2020 per-band CSV and quality plot"]
+
+    LT["Published IIRS thermal method uses E1G2"] --> K["2026 E1G2<br/>222 valid bands<br/>Bands 226–248 span 4504.1–4874.9 nm"]
+    G --> K
+    F --> L["Stream paired raw counts and calibrated cube<br/>Scan 781,440,000 calibrated values"]
+    K --> L
+    L --> M["All calibrated values finite<br/>Valid-band zeros: 4,829<br/>Valid-band negatives: 42,081"]
+    L --> N["Apply official gain/offset LUT<br/>Convert calibrated µW values to mW"]
+    N --> O["Median ratio: 1.00375<br/>Median per-band correlation: 0.922"]
+    O --> P["Across valid bands: median ratio 1.00375<br/>Median per-band correlation 0.922"]
+    P --> P2["Internal consistency supported<br/>Independent calibration validation remains open"]
+
+    L --> Q["Compare saturation and raw dynamic-range fields"]
+    Q --> R["Valid bands: 99.878921% meet threshold as labeled<br/>If threshold is mW: 12 exceed<br/>Raw counts at/above dynamic_range: 0"]
+    R --> S["Threshold and fill meaning unresolved<br/>Do not create a pixel mask"]
+
+    L --> T["Inspect sparse calibrated geometry"]
+    T --> U["1,476 points across 246 scan lines<br/>5.47°W–3.50°W<br/>6.53°S–26.86°N"]
+    U --> V["Low-latitude strip only<br/>Full-resolution geometry remains open"]
+
+    M --> W["Save per-band CSV, audit figure, and findings"]
+    P2 --> W
+    S --> W
+    V --> W
+    J --> W
+    W --> X["M1 outputs: verified inventory, QA evidence, and gap review"]
+    X --> Y["M2 gate: resolve masks, independent radiance validation, and full geometry"]
+    Y --> Z["Then validate thermal correction and reflectance"]
+    LT --> Z
+    Z --> AA["M3 gate: add independent tracks, reviewed labels, and fixed split"]
 ```
 
 The original E3G2 scan did not produce reflectance or a saturation mask, and those products remain unsuitable for thermal fitting that requires 4–5 µm. The matched E1G2 pair passes identity and checksum checks, and its LUT comparison supports the numeric radiance scale internally. The saturation threshold and raw dynamic-range checks remain in conflict, so no mask is assigned. Obtain authoritative threshold and fill rules, validate the full-resolution geometry, and seek independent radiometric validation before thermal correction. The published Verma et al. method uses the extended IIRS spectrum for surface-temperature retrieval and thermal-emission removal, so E1G2 remains a candidate mode rather than an approved processing input ([paper](https://doi.org/10.1016/j.icarus.2022.115075)).

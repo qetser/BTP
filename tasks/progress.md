@@ -6,7 +6,7 @@
 - All values are finite. The 222 officially valid bands contain 4,829 zero and 42,081 negative band-pixels. Sampled positive medians span 118.218–1,305.46 µW/cm²/sr/µm.
 - Found a threshold conflict: the saturation CSV labels its threshold in µW, which 99.878921% of valid-band values meet or exceed. If threshold values are interpreted as mW, only 12 exceed. Paired raw counts do not reach the table's dynamic-range field. None of these comparisons defines a mask. The official LUT comparison supports internal radiance-scale consistency: after converting product values from µW to mW, the median calibrated/LUT ratio is 1.00375 and median per-band correlation is 0.922. This does not replace independent calibration validation.
 - The sparse geometry grid covers approximately 5.47°W–3.50°W and 6.53°S–26.86°N. It shows a low-latitude strip but is not a full-resolution footprint.
-- Saved per-band QA values and the radiance/LUT/threshold/geometry figure under `results/phase-1/m1-e1g2-scene/`. The README now has an M1 breakdown table, evidence links, and a glossary for E1G2 and other product terms.
+- Saved per-band QA values and the radiance/LUT/threshold/geometry figure under `results/phase-1/m1-e1g2-scene/`. The README now has an M1 breakdown table, evidence links, and a glossary for E1G2 and other product terms. Its Mermaid LR chart traces all three pairs through the QA outputs and remaining M2/M3 gates.
 - Next: obtain authoritative interpretation of saturation, dynamic-range, and fill fields. Define documented per-pixel validity rules, validate the radiance scale independently, and review full-resolution geometry. Keep thermal correction blocked.
 
 ## 2026-09-28 — Verify the matched E1G2 raw/calibrated pair
