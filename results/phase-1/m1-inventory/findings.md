@@ -4,7 +4,7 @@
 - Each active label describes a 256-band cube with band centers from approximately 712.3 to 5009.7 nm.
 - The two active pilot footprints are low latitude, approximately 31.6 degrees south to 1.5 degrees south. None is polar.
 - Raw detector counts are not calibrated radiance or reflectance. The calibrated products have product-specific radiance units and are not yet validated as corrected reflectance.
-- Cube checksums and metadata pairing are complete. Official guide interpretation, complete label field coverage, and independent scene selection remain open.
+- Cube checksums and metadata pairing are complete. The official SIS is now available. Numeric unit validation, cube fill interpretation, and independent scene selection remain open.
 
 ## Integrity run
 
@@ -20,7 +20,7 @@
 
 - The [PRADAN IIRS FAQ](https://pradan.issdc.gov.in/ch2/faq.xhtml) confirms that IIRS has separate raw and calibrated products, that the data folder distinguishes raw and calibrated products, and that the IIRS archive and product guide are under `Other Downloads` → `iir`.
 - The historical four-scene local ZIPs contained only `data/raw`, `browse/raw`, and raw miscellaneous files. The active extraction contains both `data/raw` and `data/calibrated` products.
-- The official product guide remains an acquisition task. The two active pilot pairs are verified from their XML labels below.
+- The official archive/SIS has since been acquired. The separate user guide PDF is not in that ZIP. The two active pilot pairs are verified from their XML labels below.
 
 ## Supplied PRADAN download list
 
@@ -52,6 +52,13 @@
 
 ## Guide access and unit gate
 
-- The [PRADAN IIRS FAQ](https://pradan.issdc.gov.in/ch2/faq.xhtml) directs users to `Other Downloads` → `iir.zip` for the archive/SIS and user guide. An unauthenticated request to the [download page](https://pradan.issdc.gov.in/ch2/protected/miscDownloads.xhtml) redirected to ISSDC sign-in on 2026-09-28; the guide was not acquired.
+- The [PRADAN IIRS FAQ](https://pradan.issdc.gov.in/ch2/faq.xhtml) directs users to `Other Downloads` → `iir.zip`. An unauthenticated request to the [download page](https://pradan.issdc.gov.in/ch2/protected/miscDownloads.xhtml) redirected to ISSDC sign-in on 2026-09-28. The user subsequently supplied the ZIP; its contents and findings are recorded below.
 - The calibrated labels' `mW` and `µW` unit prefixes differ by 1000. Their numeric scales and official conversion conventions have not been checked. Pooling or converting these cubes for M2 is blocked pending that check.
 - The provisional [data dictionary](data_dictionary.md) lists what the local labels establish and which mask and calibration fields remain unknown.
+
+## Official archive and mode validity
+
+- The user supplied official `iir.zip` on 2026-09-28. ZIP CRC validation passed; the archive SHA-256 is `5afe64c3efe445e6d0334e8a374756ecab45698494dcee0d19616bf5dcb80720`. It contains the SIS V17 (March 2026), LUTs, saturation tables, solar flux, and band validity. The separate user guide PDF is absent.
+- SIS V17 section 4.2.2 describes dark subtraction, LUT correction, destriping, and post-processing before storing Level 1 radiance. Section 4.2.3 and Appendix L describe thermal and photometric correction as Level 2 work. This confirms the active calibrated cubes are not corrected reflectance.
+- Both pilots are `E3G2` at 10 ms. The official workbook marks bands 7–28, 35–68, and 76–146 valid for `E3G2`. Bands 147 onward, including 4–5 µm, are invalid or low confidence for this mode. The full [CSV](metrics/band_validity_by_mode.csv) and [figure](figures/band_validity_by_mode.svg) preserve the source flags by mode.
+- SIS V17 section 4.2.2 uses `mW/cm²/sr/µm` as the general radiance unit. The active `d18` XML and `E3G2` saturation-table XML use `µW/cm²/sr/µm`; the active `m65` XML uses `mW/cm²/sr/µm`. These source declarations need numerical checks before any unit conversion is accepted. The workbook's mode mask is not a per-pixel saturation mask.

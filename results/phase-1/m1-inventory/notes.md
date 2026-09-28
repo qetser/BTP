@@ -3,7 +3,8 @@
 - Keep the raw archives immutable and untracked.
 - The manifest and integrity script has run on the four active products. Its output is versioned as a small CSV under `results/`.
 - Do not make a metric plot for archive counts or dimensions unless those values are deliberately analyzed as a quality result. Inventory evidence is currently recorded as text.
-- The two active calibrated counterparts are paired. M1 cannot pass until the official IIRS product guide is checked and independent coverage is selected.
+- The two active calibrated counterparts are paired, and the official SIS has been checked. M1 cannot pass until unit scales, cube fill and pixel-level masks are validated and independent coverage is selected. The separate user guide remains to be inspected if required.
+- Generate the validity artifacts with `uv run --no-project --with xlrd python scripts/plot_iirs_band_validity.py` from the repository root. The command reads the ignored ZIP and writes the tracked CSV and SVG.
 - The reproducible manifest command is `python3 scripts/build_iirs_manifest.py` from the repository root.
 - The generated CSV is small enough to track. Raw ZIP archives and cubes remain ignored under `data/`.
 

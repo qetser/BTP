@@ -1,6 +1,6 @@
 # M1 inventory summary
 
-**Status:** Local pilot inventory and metadata pairing complete; M1 documentation and coverage gates open
+**Status:** Local pilot inventory, metadata pairing, and official SIS review complete; unit-scale validation and coverage gates open
 
 **Scope:** Two raw/calibrated IIRS pairs observed on 2020-02-08
 
@@ -10,8 +10,10 @@
 
 **Evidence:** [`iirs_inventory.csv`](iirs_inventory.csv), [`pilot_lineage.md`](pilot_lineage.md), and [`data_dictionary.md`](data_dictionary.md)
 
+**Validity artifact:** [Mode CSV](metrics/band_validity_by_mode.csv) and [mode figure](figures/band_validity_by_mode.svg). The source is official `iir.zip` SHA-256 `5afe64c3efe445e6d0334e8a374756ecab45698494dcee0d19616bf5dcb80720`, SIS V17 (March 2026), and its band-validity workbook. Wavelength units are nm; validity is a binary flag by band and exposure/gain mode. No train/validation/test split applies to this instrument metadata. Generation code commit: `4ef154b`.
+
 All four extracted cubes match their PDS4 MD5 and declared byte size. Each raw product has an exact calibrated match by observation time, job ID, orbit, dimensions, and wavelength table. The calibrated labels explicitly call their cubes radiance spectral images, but declare different units for the two pairs. Neither product is validated reflectance.
 
-The official IIRS product guide and archive/SIS are behind PRADAN's authenticated `Other Downloads` page. Their calibration conventions, fill and saturation values, and band validity rules have not been verified, so the M2 correction pilot remains gated. The two current tracks also do not meet the independent coverage gate for later evaluation.
+The supplied official archive confirms that the calibrated cubes are Level 1 radiance. It provides the count-to-radiance processing outline, mode-specific saturation thresholds, solar irradiance, and a band-validity list. Both pilots use `E3G2`, whose valid bands stop at 3155.9 nm. The separate user guide is absent from the ZIP. Cube fill values, pixel-level saturation, and the products' numerical unit scales still require validation before M2 correction. The two current tracks do not meet the independent coverage gate for later evaluation.
 
-The initial four raw scenes are retained only as a historical manifest: [`iirs_inventory_initial_four_scenes.csv`](iirs_inventory_initial_four_scenes.csv). No scientific metric or graph was computed for M1, so there are no metric or figure files.
+The initial four raw scenes are retained only as a historical manifest: [`iirs_inventory_initial_four_scenes.csv`](iirs_inventory_initial_four_scenes.csv). The validity CSV and figure document instrument metadata; no reflectance or scientific performance metric has been computed.

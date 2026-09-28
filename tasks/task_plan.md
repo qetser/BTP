@@ -20,10 +20,11 @@ Every phase and module produces a concise record under `results/<phase>/<module>
 
 - [x] Parse every PDS4 label into a versioned manifest.
 - [x] Verify archive and extracted cube checksums and dimensions.
-- [ ] Obtain the authenticated IIRS product guide/SIS and validate the two pilot products' unit conventions, fill/saturation rules, band validity, and correction lineage. Label-based pairing and a provisional data dictionary are complete.
+- [x] Obtain and inspect the official IIRS archive/SIS, calibration tables, and band-validity list. The separate user guide PDF is not included in `iir.zip`.
+- [ ] Validate the two pilot cubes' numerical unit scales, fill and per-pixel saturation rules, and a correction path that respects `E3G2` band validity.
 - [ ] Select additional independent scenes and record the split design.
 
-**Status:** in progress. The active two-pair inventory and metadata lineage passed. Next concrete unit: obtain the official guide through PRADAN access, resolve the calibrated-unit discrepancy, then select independent scenes and freeze the acquisition plan.
+**Status:** in progress. The active two-pair inventory, metadata lineage, and SIS review passed. Next concrete unit: validate units and masks with representative cube values, and select a suitable exposure mode for thermal correction before freezing the independent acquisition plan.
 
 ## Phase 2 — M2 calibrated reflectance
 

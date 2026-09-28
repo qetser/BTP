@@ -2,6 +2,20 @@
 
 Meaningful project changes are recorded newest first. Entries describe the change and evidence; the Git history supplies the exact commit hash.
 
+## 2026-09-28 — Inspect official IIRS archive and validity
+
+**Phase:** Phase 1, M1 product documentation
+
+**Type:** Research evidence
+
+- Verified the supplied official `iir.zip` and read its SIS V17, calibration tables, and band-validity workbook.
+- Saved the mode validity CSV and SVG figure; recorded that both `E3G2` pilots lack valid 4–5 µm bands.
+- Updated the pilot dictionary and M2 gate for unit-scale, pixel-mask, and thermal-method validation.
+
+**Why:** Instrument mode validity and radiance units control which corrections and spectral claims are defensible.
+
+**Impact:** No reflectance cube or scientific performance score was produced.
+
 ## 2026-09-28 — Record pilot radiance dictionary and M1 gate
 
 **Phase:** Phase 1, M1 product documentation

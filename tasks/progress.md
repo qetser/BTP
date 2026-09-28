@@ -1,5 +1,12 @@
 # Progress
 
+## 2026-09-28 — Official IIRS archive inspected
+
+- Received `data/pradan/iir.zip`, verified all ZIP entries, and recorded SHA-256 `5afe64c3efe445e6d0334e8a374756ecab45698494dcee0d19616bf5dcb80720`. The archive contains the 149-page SIS V17, LUTs, saturation tables, solar flux, and band-validity workbook. The separate user guide is absent.
+- The SIS confirms Level 1 calibrated radiance and places thermal and photometric correction in Level 2 processing. Both pilots are `E3G2`; the official mask has no valid 4–5 µm bands for that mode.
+- Saved source band flags in `results/phase-1/m1-inventory/metrics/band_validity_by_mode.csv` and a plot in `figures/band_validity_by_mode.svg`.
+- Next work: validate each cube's unit scale and pixel masks, then assess a suitable mode or method for thermal correction. No reflectance claim was made.
+
 ## 2026-09-28 — M1 pilot dictionary and guide access check
 
 - Corrected the M1 summary to reflect completed extraction, integrity checks, and XML pairing.

@@ -17,6 +17,8 @@ The repository currently contains four selected IIRS ZIP archives under ignored 
 
 The labels list 256 band centers from **712.3 to 5009.7 nm** for the active pilot files. ISRO describes the nominal instrument range as approximately 0.8–5.0 µm; use each product's actual band centers and widths. Raw labels specify `UnsignedLSB2` detector counts. Calibrated labels specify `IEEE754LSBSingle` values, with units that must be read per product: `mW/cm**2/sr/µm` for the `m65` pilot and `µW/cm**2/sr/µm` for the `d18` pilot. The PDS4 XML label remains authoritative for type, axes, wavelength, units, size, and checksum. Both active pilot footprints are low latitude and are **not polar**. The previous four-scene raw inventory is retained as historical evidence in the M1 results directory.
 
+The official `iir.zip` archive is now local. Its SIS identifies calibrated products as Level 1 radiance and gives mode-specific band validity. Both pilots use `E3G2`, for which the official list has no valid 4–5 µm bands. See the [M1 data dictionary](results/phase-1/m1-inventory/data_dictionary.md) and [validity figure](results/phase-1/m1-inventory/figures/band_validity_by_mode.svg). Numeric unit-scale and pixel-mask checks remain open.
+
 ## Scientific scope and constraints
 
 - **M1:** Build a documented, diverse IIRS corpus. Obtain the matching calibrated product when available and record its processing level and units. Collect a small set of overlapping Chandrayaan-1 M³ Level-2 reflectance scenes and a geologic reference layer for comparison. Track observation, orbit, footprint, incidence/emission/phase geometry, product version, and checksums.
@@ -33,7 +35,7 @@ The project is deliberately staged. Each stage must pass its scientific gate bef
 
 This is the current phase.
 
-**M1, acquisition and inventory** establishes exactly what each IIRS product contains. We parse the PDS4 labels, verify dimensions, byte counts, archive and extracted checksums, wavelengths, geometry, footprints, and processing levels. The active two-scene pilot has verified raw/calibrated pairs and a provisional data dictionary. The official IIRS product guide, a scene-coverage report, and a gap list remain open. These two low-latitude scenes are not enough for a polar or independent generalization claim, so additional tracks and provinces must be selected before the final split is frozen.
+**M1, acquisition and inventory** establishes exactly what each IIRS product contains. We parse the PDS4 labels, verify dimensions, byte counts, archive and extracted checksums, wavelengths, geometry, footprints, and processing levels. The active two-scene pilot has verified raw/calibrated pairs, the official archive/SIS, and a data dictionary. Numeric unit and mask validation, the separate user guide, a scene-coverage report, and a gap list remain open. These two low-latitude scenes are not enough for a polar or independent generalization claim, so additional tracks and provinces must be selected before the final split is frozen.
 
 **M2, calibration and preprocessing** converts an official calibrated product, or a documented raw-to-calibrated chain, into analysis-ready reflectance. It includes invalid and saturated-pixel masks, thermal-emission correction beyond approximately 2.5 µm, solar normalization, and lunar photometric correction. A pilot scene is validated first using representative spectra, quality fractions, correction residuals, and cross-instrument comparisons. Large-scale processing starts only after the pilot quality gate passes.
 

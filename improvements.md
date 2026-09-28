@@ -10,9 +10,20 @@ Status: `[ ]` open, `[~]` in progress, `[x]` implemented, `[!]` needs a project 
 **Category:** Data quality
 **Status:** `[~]`
 
-**What:** Complete the official calibration guide review and validate the differing unit conventions for the two paired pilot scenes.
-**Why:** The active pilot now contains raw counts and calibrated radiance products, but their unit conventions and mask rules have not been validated for reflectance processing.
+**What:** Validate the paired pilot cubes' numerical unit scales and pixel masks against the official SIS, labels, and calibration tables.
+**Why:** The official SIS and mode tables are now available, but product-specific units and pixel-level validity have not been validated for reflectance processing.
 **Tradeoff:** Requires more acquisition and validation before modeling.
+**Effort:** Medium.
+
+### 2026-09-28 — Thermal-capable pilot mode
+
+**Source:** Official IIRS `E3G2` band-validity workbook
+**Category:** Data quality
+**Status:** `[ ]`
+
+**What:** Select a pilot with valid long-wavelength bands or validate another thermal correction method before 3 µm analysis.
+**Why:** The current `E3G2` pilots have no valid 4–5 µm bands under the official mode mask.
+**Tradeoff:** Additional acquisition or method validation is needed.
 **Effort:** Medium.
 
 ### 2026-09-28 — Independent evaluation coverage
