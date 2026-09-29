@@ -2,6 +2,32 @@
 
 Meaningful project changes are recorded newest first. Entries describe the change and evidence; the Git history supplies the exact commit hash.
 
+## 2026-09-29 — Rank M³ candidates with sparse geometry points
+
+**Phase:** M1 reference data
+**Type:** Spatial candidate-screening diagnostic
+
+- Retrieved ODE footprint polygons and counted how many of the 1,476 E1G2 geometry coordinates fall inside each candidate footprint.
+- The leading product footprint contains 1,033 points (69.99%). Saved source footprint metadata, a metrics CSV, SVG figure, and analysis script.
+- Marked the result as a sparse-point screen, not a pixel-area or valid-pixel overlap fraction.
+
+**Why:** Rank candidate M³ scenes before acquiring large reflectance cubes.
+
+**Impact:** No M³ cube was downloaded; no radiance, reflectance, or model result changed. M2 remains gated.
+
+## 2026-09-29 — Review M³ Level-2 candidate labels
+
+**Phase:** M1 reference data
+**Type:** Source metadata review
+
+- Retrieved the five public PDS labels identified by the ODE footprint query.
+- Recorded the 304 x 85 dimensions, line counts, thermal-correction flag, special-pixel value, and reflectance scale in `m3_label_review.csv`.
+- Kept actual pixel overlap and product selection open. No M³ cubes or geolocation arrays were downloaded.
+
+**Why:** Confirm candidate product contents before acquiring large reference cubes.
+
+**Impact:** No radiance, reflectance, masks, or metrics changed. M2 remains gated.
+
 ## 2026-09-29 — Identify independent references for E1G2
 
 **Phase:** M1 references

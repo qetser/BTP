@@ -1,9 +1,23 @@
 # Progress
 
+## 2026-09-29 — Screen M³ footprints against sparse E1G2 geometry
+
+- Saved PDS ODE product-footprint WKT for the five M³ candidates. Compared those footprints with the 1,476 IIRS geometry-table coordinates from the matched calibrated archive.
+- `M3G20090206T010833_V01_L2` contains 1,033 IIRS control points (69.99%), highest among the five. Other counts are 703 (47.63%), 259 (17.55%), 5 (0.34%), and 0. Values and SVG plot are saved in `results/phase-1/m1-reference-data/metrics/` and `figures/`.
+- This is a sparse geometry-point screen only. It does not measure areal or valid-pixel overlap. No M³ data cube was downloaded and no reflectance comparison was run.
+- Next: inspect per-pixel location and special-pixel behavior for the top candidate, estimate a spatially matched sample, then download only the needed M³ product/area. M1 mask and radiance validation gates remain open.
+
+## 2026-09-29 — Review M³ Level-2 candidate labels
+
+- Retrieved the five PDS M³ labels returned by the footprint-intersection search. All describe 304-sample, 85-band Level-2 reflectance cubes, with thermal correction flagged and -999.0 listed as the special-pixel value. Stored IDs, timestamps, dimensions, and label URLs in `results/phase-1/m1-reference-data/m3_label_review.csv`.
+- Candidate scene lengths vary from 9,310 to 27,796 lines. The shortest cube is not selected based on size alone because the amount of usable overlap is not known.
+- No image cubes or geolocation arrays were acquired, and no spectral comparison was performed. The label review establishes product metadata only.
+- Next: compare the E1G2 sparse geometry with M³ pixel-location data, inspect valid pixels for shared support, and estimate which small candidate is useful before downloading its full cube. Keep IIRS radiance and mask blockers active.
+
 ## 2026-09-29 — Define independent geometry and reflectance reference paths
 
 - Identified LROC WAC global imagery at 100 m/pixel as an external geometry reference candidate for the low-latitude E1G2 footprint. The operational next step is a footprint-sized acquisition, documented control-point registration, and residual measurement on held-out points. This can test geolocation, not radiometric calibration.
-- Queried PDS ODE for M³ Level-2 footprint intersections with E1G2 bounds. Five orbit-1080 candidates were returned; metadata and external label URLs are saved in `results/phase-1/m1-reference-data/m3_overlap_candidates.csv`, with a reproducible query at `scripts/query_m3_overlap.py`. The M³ labels and usable-pixel footprints still need review.
+- Queried PDS ODE for M³ Level-2 footprint intersections with E1G2 bounds. Five orbit-1080 candidates were returned; metadata and label review are saved in `results/phase-1/m1-reference-data/`. Sparse control-grid coverage ranks one product first, while per-pixel valid overlap remains unchecked.
 - No reference imagery was acquired. No image registration, validated common pixel area, reflectance comparison, metrics, or figures were produced. Planning record: `results/phase-1/m1-reference-data/`.
 - The Apollo 16 site used in the 2025 Level-2 paper is outside this E1G2 scene footprint, so that paper's ground comparison is not a local calibration target.
 - Next: inspect the five M³ candidate labels and select valid common coverage; acquire a cropped WAC reference; separately seek authoritative mask/radiance guidance and independent calibration evidence. Compare M³ spectra only after IIRS reflectance gates pass.

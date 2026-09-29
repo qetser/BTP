@@ -9,7 +9,7 @@ A research pipeline to measure whether Earth-pretrained hyperspectral models can
 
 ## Why it exists
 
-The proposed transfer study is only interpretable if raw detector counts become validated reflectance and the comparison uses geographically independent evaluation. The local pilot now contains three matched low-latitude raw/calibrated pairs: two 2020 E3G2 strips and one 2026 E1G2 strip. The E1G2 LUT comparison supports the numeric radiance scale internally. Saturation and fill semantics, independent scale validation, and full-resolution geometry remain open. A footprint query identified five M³ Level-2 candidate labels for possible comparison, pending label and usable-pixel review. See the [reference-data shortlist](results/phase-1/m1-reference-data/summary.md), [research README](README.md), and [scientific plan](docs/m1_m3_plan.md).
+The proposed transfer study is only interpretable if raw detector counts become validated reflectance and the comparison uses geographically independent evaluation. The local pilot now contains three matched low-latitude raw/calibrated pairs: two 2020 E3G2 strips and one 2026 E1G2 strip. The E1G2 LUT comparison supports the numeric radiance scale internally. Saturation and fill semantics, independent scale validation, and full-resolution geometry remain open. A footprint query identified five M³ Level-2 candidates, and a sparse geometry-grid screen ranks one candidate for pixel-coverage review. Actual common valid-pixel coverage remains unknown. See the [reference-data shortlist](results/phase-1/m1-reference-data/summary.md), [research README](README.md), and [scientific plan](docs/m1_m3_plan.md).
 
 ## Who uses it
 
@@ -23,7 +23,7 @@ The proposed transfer study is only interpretable if raw detector counts become 
 | Layer | Current choice | Reason | Status |
 | --- | --- | --- | --- |
 | Source data | Chandrayaan-2 IIRS PDS4 products | Primary instrument for the question | Two complete 2020 pairs; one 2026 E1G2 pair verified by labels and checksums; internal LUT scale check passed; independent validation, geometry, and masks pending |
-| Comparison data | M³ L2, USGS geologic map and spectral library | Cross-check and weak contextual labels | Five M³ footprint-intersection candidates identified; labels/pixels not yet reviewed and no image acquired |
+| Comparison data | M³ L2, USGS geologic map and spectral library | Cross-check and weak contextual labels | Five candidates label-reviewed; sparse-grid screen ranks one; usable overlap not quantified and no image acquired |
 | Processing language | Python | Suitable for chunked scientific I/O and reproducible analysis | Proposed; packages not selected |
 | Model framework | Undecided | Select after baseline task and compute budget are fixed | Open |
 | Deployment | None | Research pipeline rather than a service | No deploy target |
@@ -51,6 +51,8 @@ Version 1 is M1–M3: a verified scene manifest; an analysis-ready reflectance p
 
 | Date | Change | Reason |
 | --- | --- | --- |
+| 2026-09-29 | Screened five M³ footprints against sparse E1G2 geometry | Rank a candidate before acquiring large images; valid-pixel overlap remains open |
+| 2026-09-29 | Reviewed the five candidate M³ L2 labels | Product dimensions and special-pixel values are documented; usable overlap still needs checking |
 | 2026-09-29 | Queried footprint-intersecting M³ Level-2 candidates and defined WAC registration path | Five orbit-1080 M³ labels returned; geometry validation still requires held-out residuals |
 | 2026-09-28 | Added literature-backed E1G2 acquisition target and temperature-uncertainty gate | Published thermal work and the official mode table identify valid 4.5–4.9 µm bands in E1G2 |
 | 2026-09-28 | Confirmed the PRADAN scene table requires sign-in and updated the acquisition flow | The public Browse and Download route redirects to account authentication |

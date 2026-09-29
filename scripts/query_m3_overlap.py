@@ -5,6 +5,7 @@ from __future__ import annotations
 
 import argparse
 import csv
+import json
 import urllib.parse
 import urllib.request
 import xml.etree.ElementTree as ET
@@ -20,6 +21,11 @@ def main() -> int:
         "--output",
         type=Path,
         default=Path("results/phase-1/m1-reference-data/m3_overlap_candidates.csv"),
+    )
+    parser.add_argument(
+        "--footprints-output",
+        type=Path,
+        default=Path("results/phase-1/m1-reference-data/m3_ode_footprints.json"),
     )
     args = parser.parse_args()
 
@@ -48,16 +54,24 @@ def main() -> int:
         raise RuntimeError("PDS ODE query did not succeed: {}".format(status))
 
     rows = []
+    footprints = []
     for product in root.findall(".//Product"):
         label_url = product.findtext("External_url", "")
+        label_product_id = Path(urllib.parse.urlparse(label_url).path).stem
         rows.append(
             {
-                "label_product_id": Path(urllib.parse.urlparse(label_url).path).stem,
+                "label_product_id": label_product_id,
                 "observation_time_utc": product.findtext("Observation_time", ""),
                 "start_orbit": product.findtext("Start_orbit_number", ""),
                 "center_latitude_deg": product.findtext("Center_latitude", ""),
                 "center_longitude_east_deg": product.findtext("Center_longitude", ""),
                 "external_label_url": label_url,
+            }
+        )
+        footprints.append(
+            {
+                "label_product_id": label_product_id,
+                "footprint_gl_geometry": product.findtext("Footprint_GL_geometry", ""),
             }
         )
 
@@ -75,10 +89,31 @@ def main() -> int:
         writer.writeheader()
         writer.writerows(rows)
 
+    args.footprints_output.parent.mkdir(parents=True, exist_ok=True)
+    with args.footprints_output.open("w", encoding="utf-8") as handle:
+        json.dump(
+            {
+                "query_date": root.findtext("QuerySummary/Date", ""),
+                "query_service": ODE_URL,
+                "location_mode": "footprint intersection",
+                "product_type": "CH1-ORB/M3/REFIMG",
+                "bounds": {
+                    "west_longitude_east_deg": float(params["westernlon"]),
+                    "east_longitude_east_deg": float(params["easternlon"]),
+                    "min_latitude_deg": float(params["minlat"]),
+                    "max_latitude_deg": float(params["maxlat"]),
+                },
+                "footprints": footprints,
+            },
+            handle,
+            indent=2,
+        )
+
     print("ODE status: {}".format(status))
     print("ODE-reported intersecting products: {}".format(root.findtext("Count", "unknown")))
     print("Metadata rows saved: {}".format(len(rows)))
     print("Saved: {}".format(args.output))
+    print("Saved: {}".format(args.footprints_output))
     return 0
 
 

@@ -1,5 +1,17 @@
 # Findings
 
+## 2026-09-29 — Screen M³ footprints against sparse E1G2 geometry
+
+- The ODE-reported footprint for `M3G20090206T010833_V01_L2` contains 1,033/1,476 sparse E1G2 geometry points (69.99%), the most among five label-reviewed candidates.
+- This is a control-grid point count, not a pixel area or valid-data fraction. M³ per-pixel location and fill arrays have not been checked. Machine-readable values and SVG figure are saved under `results/phase-1/m1-reference-data/metrics/` and `figures/`.
+- Continue with pixel-level footprint and valid-pixel assessment before downloading a complete cube or comparing spectra.
+
+## 2026-09-29 — Review M³ Level-2 candidate labels
+
+- All five candidate labels describe Level-2 reflectance cubes with 304 samples and 85 bands. They set `CH1:THERMAL_CORRECTION_FLAG = Y`, declare special-pixel value -999.0, and define stored 1.0 as 100% reflectance.
+- Scene lengths range from 9,310 to 27,796 lines. The shortest file is not automatically the best comparator; actual shared valid coverage remains unknown.
+- See [`m3_label_review.csv`](../results/phase-1/m1-reference-data/m3_label_review.csv). No image cube, valid-pixel mask, or spectral metric was produced.
+
 ## 2026-09-29 — Independent references for E1G2
 
 - LROC WAC global morphology imagery at 100 m/pixel is a candidate reference for registering the low-latitude E1G2 strip. No WAC subset is local and no registration residual has been measured. Use withheld control points to quantify geolocation error. This does not test radiometric calibration.
