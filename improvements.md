@@ -15,7 +15,7 @@ Status: `[ ]` open, `[~]` in progress, `[x]` implemented, `[!]` needs a project 
 **Tradeoff:** Requires more acquisition and validation before modeling.
 **Effort:** Medium.
 
-**Update (2026-09-28):** A full scan finds almost all valid-band values above the saturation CSV threshold as labeled, while no paired raw counts reach `dynamic_range`. A fixed-grid comparison to the official LUT supports the radiance scale internally (median calibrated/LUT ratio 1.00375, median band correlation 0.922). The threshold semantics and masks remain unresolved, and no independent calibration reference was used.
+**Update (2026-09-29):** The official E1G2 saturation-table XML explicitly declares `Saturation` in µW/cm**2/sr/µm and `Dynamic_Range` in counts. This resolves the unit-field question, not the observed mismatch: 99.878921% of valid-band calibrated values meet the declared saturation threshold, while no raw counts reach `Dynamic_Range`. The calibrated QUB label contains no missing-value constant. A fixed-grid comparison to the official LUT supports the radiance scale internally (median calibrated/LUT ratio 1.00375, median band correlation 0.922), but no independent calibration reference was used. Field application, fill rules, and masks remain unresolved.
 
 ### 2026-09-28 — Thermal-capable pilot mode
 

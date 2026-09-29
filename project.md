@@ -33,7 +33,7 @@ The proposed transfer study is only interpretable if raw detector counts become 
 1. **Invalid reflectance** — Raw counts and thermal emission can masquerade as absorption. Mitigation: official calibrated products, published correction chain, and spectral validation.
 2. **Weak or leaking labels** — Geologic polygons are coarse and neighboring pixels correlate. Mitigation: reviewed labels, boundary exclusion, orbit/province splits.
 3. **Insufficient coverage** — Three current low-latitude strips do not test polar feasibility or independent generalization. Mitigation: expand geographically distinct IIRS scenes before claims.
-4. **Mode-limited thermal evidence** — The active `E3G2` strips lack valid 4–5 µm bands under the official mask. The matched `E1G2` pair is acquired and has valid 4504.1–4874.9 nm mode bands, and its LUT comparison supports internal radiance-scale consistency. Saturation thresholds still conflict with the product values. Mitigation: resolve threshold and fill semantics, validate radiance scale independently and review geometry, then validate thermal correction before 3 µm interpretation.
+4. **Mode-limited thermal evidence** — The active `E3G2` strips lack valid 4–5 µm bands under the official mask. The matched `E1G2` pair is acquired and has valid 4504.1–4874.9 nm mode bands, and its LUT comparison supports internal radiance-scale consistency. The official saturation XML declares units of µW/cm²/sr/µm and dynamic range in counts, but applying those fields conflicts with the paired cube values. Mitigation: clarify field application and fill rules, validate radiance scale independently and register geometry against a reference, then validate thermal correction before 3 µm interpretation.
 
 ## Version 1 definition
 

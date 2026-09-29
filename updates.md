@@ -2,6 +2,21 @@
 
 Meaningful project changes are recorded newest first. Entries describe the change and evidence; the Git history supplies the exact commit hash.
 
+## 2026-09-29 — Clarify IIRS saturation fields and geometry gate
+
+**Phase:** Phase 1, M1 product and data quality
+
+**Type:** Scientific metadata review and documentation
+
+- Checked the official E1G2 saturation-table XML. It declares saturation radiance in µW/cm**2/sr/µm and dynamic range in counts. The mW comparison is counterfactual and is not the table's declared unit.
+- Checked the calibrated QUB label. It has no missing-value constant, so it does not define a fill value.
+- Checked the geometry product label. It declares 1,476 coordinate rows with pixel and line indices across 246 of 250 image lines. The grid is sparse, and registration error remains unmeasured.
+- Updated the M1 summary, task plan, gap matrix, project charter, data dictionary, and research logs. The mask, independent radiance, geometry-registration, and coverage gates remain open. M2 and M3 remain gated.
+
+**Why:** Keep the known unit declarations separate from the unresolved mismatch and mask rules.
+
+**Impact:** The M1 record no longer treats the saturation unit as ambiguous. It does not assign a pixel mask or report new scientific metrics.
+
 ## 2026-09-28 — Summarize M1 work and explain IIRS product terms
 
 **Phase:** Phase 1, M1 product inventory and data quality

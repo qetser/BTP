@@ -1,5 +1,11 @@
 # Findings
 
+## 2026-09-29 — Clarify saturation units and geometry product
+
+- The official E1G2 saturation-table XML explicitly defines saturation radiance in `µW/cm**2/sr/µm` and dynamic range in `count`. The table and calibrated cube labels agree on radiance units. Do not describe this as an unresolved unit choice. The unresolved observation is numerical and operational: 99.878921% of valid-band radiance values meet the table threshold, but no raw counts reach the dynamic-range values. The alternative mW calculation is counterfactual and not supported by the table XML.
+- The calibrated QUB label defines no missing-value constant, so fill values and per-pixel validity cannot be inferred from it. The official geometry label describes a 1,476-row table of longitude, latitude, pixel, and line coordinates. It spans 246 of 250 lines and is not a full per-pixel geometry array.
+- The LUT comparison is internal to the official calibration path, not independent validation. The current scene is not ready for masks, reflectance, or thermal correction. Seek authoritative clarification, independent radiometric validation, and image registration against an external lunar reference.
+
 ## 2026-09-28 — E1G2 calibrated-value and footprint audit
 
 - The E1G2 cube scan is complete and reproducible from [`analyze_iirs_e1g2_scene.py`](../scripts/analyze_iirs_e1g2_scene.py). It streams the matched raw and calibrated QUBs from their ignored ZIPs and saves [`per-band values`](../results/phase-1/m1-e1g2-scene/metrics/e1g2_radiance_by_band.csv) and a [radiance/threshold/geometry figure](../results/phase-1/m1-e1g2-scene/figures/e1g2_radiance_and_footprint.png).
@@ -22,7 +28,7 @@
 - Whether corresponding calibrated products are downloadable for the four historical raw scenes. The active three-scene pilot has exact raw/calibrated pairs.
 - Which high-confidence labels and additional tracks can support M3 evaluation.
 - Whether polar IIRS shadowed observations have enough indirect-light signal for a 3 µm measurement.
-- The saturation-table units and cube fill/per-pixel mask remain unresolved. The user supplied text from the IIRS PDS4 User Guide V6; it documents filenames, raw/calibrated product contents, a basic apparent-reflectance conversion, and cautions about longwave radiance, but the supplied sections do not settle these mask rules.
+- The E1G2 saturation-table unit fields are explicit, but their operational use and mismatch with observed values remain unresolved. Its calibrated cube label declares no missing-value constant. The user supplied text from the IIRS PDS4 User Guide V6; it documents filenames, raw/calibrated product contents, a basic apparent-reflectance conversion, and cautions about longwave radiance, but the supplied sections do not settle these mask rules.
 - The supplied PRADAN download script lists ten `ndi` derived products dated 2024 and 2025. None matches the four local raw observation timestamps, so no exact counterpart was downloaded. A partial transfer was stopped and removed.
 - The latest PRADAN script contains the already-local 2020 raw scene plus an unrelated 2019 raw scene. Neither is a calibrated counterpart.
 - The expanded PRADAN selection had 30 reachable URLs: 12 complete raw/calibrated pairs, four calibrated-only products, and two raw-only products. The target 2020-02-05 raw scene remains without a calibrated counterpart in that selection. Two pairs from the selection were subsequently downloaded as the active pilot.

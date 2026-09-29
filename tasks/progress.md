@@ -1,5 +1,13 @@
 # Progress
 
+## 2026-09-29 — Recheck saturation, fill, and geometry metadata
+
+- Read the official E1G2 saturation-table XML and calibrated-product labels from the already verified archive. The table unit declarations are explicit: `Saturation` is `µW/cm**2/sr/µm` and `Dynamic_Range` is `count`. The previous alternate mW calculation is counterfactual only. It does not resolve why 99.878921% of valid-band radiance values meet the declared threshold while zero raw counts meet the dynamic-range values.
+- The calibrated QUB label has no `Special_Constants` or missing-value constant. This leaves pixel fill and validity rules unresolved; do not classify zeros or other values as fill.
+- The geometry label declares a 1,476-row table with longitude, latitude, pixel, and line fields across 246 of 250 image lines. It is a sparse control grid, not full per-pixel geometry. Registration error has not been measured against an independent reference.
+- Updated the E1G2 module record, data dictionary, task plan, README workflow, and scientific plan to distinguish known units from unresolved field application. M1 remains open; reflectance and thermal processing remain blocked.
+- Next: obtain authoritative clarification of the saturation and fill rules, independently validate radiance, register the strip against an independent lunar reference with residuals, and review candidate independent tracks before fixing any geographic split.
+
 ## 2026-09-28 — Audit E1G2 radiance values, thresholds, and footprint
 
 - Added a reproducible streamed audit of the matching E1G2 raw and calibrated cubes. It scanned all 781,440,000 calibrated values without extracting either QUB from its archive.
