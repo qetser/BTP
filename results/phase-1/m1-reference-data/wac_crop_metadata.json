@@ -1,0 +1,79 @@
+{
+  "source_url": "https://pds.lroc.im-ldi.com/data/LRO-L-LROC-5-RDR-V1.0/LROLRC_2001/EXTRAS/BROWSE/WAC_GLOBAL/WAC_GLOBAL_O000N0000_100M.PYR.TIF",
+  "source_http": {
+    "content_length_bytes": "1617959634",
+    "last_modified": "Fri, 14 Aug 2026 18:41:05 GMT",
+    "etag": "\"e2137517b2bb1afa7232c407ebbd1ada\"",
+    "accept_ranges": "bytes"
+  },
+  "source_product": "WAC_GLOBAL_O000N0000_100M.PYR.TIF",
+  "source_page": "https://data.lroc.im-ldi.com/lroc/view_rdr_product/WAC_GLOBAL_O000N0000_100M",
+  "retrieved_utc": "2026-09-29T13:01:03.588226+00:00",
+  "crop_file": "data/reference/lroc_wac_e1g2/e1g2_wac_crop.pgm",
+  "crop_format": "binary PGM P5, one 8-bit grayscale channel",
+  "source_raster_width": 34748,
+  "source_raster_height": 34748,
+  "crop_origin_sample": 15697,
+  "crop_origin_line": 9322,
+  "crop_width": 824,
+  "crop_height": 10230,
+  "margin_km": 20.0,
+  "tile_size": [
+    256,
+    256
+  ],
+  "tiles_fetched": 164,
+  "bytes_fetched_for_tiles": 10747904,
+  "map_projection": "Orthographic centered at 0N, 0E, per source product page",
+  "pixel_scale_model_units": [
+    100.0,
+    100.0,
+    0.0
+  ],
+  "model_tiepoint": [
+    0.0,
+    0.0,
+    0.0,
+    -1737400.0,
+    1737400.0,
+    0.0
+  ],
+  "geographic_radius_m": 1737400.0,
+  "tiff_metadata": {
+    "ifd_offset": 1212153864,
+    "byte_order": "<",
+    "tags": {
+      "256": 34748,
+      "257": 34748,
+      "258": 8,
+      "259": 1,
+      "262": 1,
+      "277": 1,
+      "284": 1,
+      "322": 256,
+      "323": 256,
+      "33550": [
+        100.0,
+        100.0,
+        0.0
+      ],
+      "33922": [
+        0.0,
+        0.0,
+        0.0,
+        -1737400.0,
+        1737400.0,
+        0.0
+      ]
+    },
+    "next_ifd_offset": 1515340962
+  },
+  "iirs_geometry_archive": "data/pradan/e1g2_candidate_20260227T1239538758/ch2_iir_nci_20260227T1239538758_d_img_d18.zip",
+  "iirs_geometry_point_count": 1476,
+  "iirs_geometry_latlon_bounds": {
+    "min_longitude_east_deg": 354.533003,
+    "max_longitude_east_deg": 356.499296,
+    "min_latitude_deg": -6.53116669,
+    "max_latitude_deg": 26.8648086
+  }
+}

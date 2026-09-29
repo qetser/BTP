@@ -2,6 +2,19 @@
 
 Meaningful project changes are recorded newest first. Entries describe the change and evidence; the Git history supplies the exact commit hash.
 
+## 2026-09-29 — Acquire footprint-sized LROC WAC crop
+
+**Phase:** M1 reference data
+**Type:** External geometry-reference acquisition
+
+- Used HTTP byte-range requests to retrieve 164 tiles from `WAC_GLOBAL_O000N0000_100M.PYR.TIF`, assembling an 824 x 10,230 pixel grayscale crop at 100 m/pixel with a 20 km margin around projected E1G2 geometry.
+- Fetched 10,747,904 tile bytes from the 1,617,959,634-byte source pyramid. The local crop is in ignored `data/reference/lroc_wac_e1g2/`; acquisition metadata and source version are recorded in `results/phase-1/m1-reference-data/wac_crop_metadata.json`.
+- Added a rerunnable acquisition script and updated the README, task records, gap matrix, and reference-data module notes.
+
+**Why:** Obtain the external image needed to measure E1G2 geolocation against held-out control points.
+
+**Impact:** The crop was visually inspected, but no registration or residual was computed. It cannot validate radiometric calibration. IIRS mask and independent radiance gates remain open.
+
 ## 2026-09-29 — Rank M³ candidates with sparse geometry points
 
 **Phase:** M1 reference data

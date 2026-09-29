@@ -9,7 +9,7 @@ A research pipeline to measure whether Earth-pretrained hyperspectral models can
 
 ## Why it exists
 
-The proposed transfer study is only interpretable if raw detector counts become validated reflectance and the comparison uses geographically independent evaluation. The local pilot now contains three matched low-latitude raw/calibrated pairs: two 2020 E3G2 strips and one 2026 E1G2 strip. The E1G2 LUT comparison supports the numeric radiance scale internally. Saturation and fill semantics, independent scale validation, and full-resolution geometry remain open. A footprint query identified five M³ Level-2 candidates, and a sparse geometry-grid screen ranks one candidate for pixel-coverage review. Actual common valid-pixel coverage remains unknown. See the [reference-data shortlist](results/phase-1/m1-reference-data/summary.md), [research README](README.md), and [scientific plan](docs/m1_m3_plan.md).
+The proposed transfer study is only interpretable if raw detector counts become validated reflectance and the comparison uses geographically independent evaluation. The local pilot now contains three matched low-latitude raw/calibrated pairs: two 2020 E3G2 strips and one 2026 E1G2 strip. The E1G2 LUT comparison supports the numeric radiance scale internally. Saturation and fill semantics, independent scale validation, and full-resolution geometry remain open. A WAC crop now covers the E1G2 geometry for registration, but no held-out residual has been measured. A footprint query identified five M³ Level-2 candidates, and a sparse geometry-grid screen ranks one candidate for pixel-coverage review. Actual common valid-pixel coverage remains unknown. See the [reference-data record](results/phase-1/m1-reference-data/summary.md), [research README](README.md), and [scientific plan](docs/m1_m3_plan.md).
 
 ## Who uses it
 
@@ -52,6 +52,7 @@ Version 1 is M1–M3: a verified scene manifest; an analysis-ready reflectance p
 | Date | Change | Reason |
 | --- | --- | --- |
 | 2026-09-29 | Screened five M³ footprints against sparse E1G2 geometry | Rank a candidate before acquiring large images; valid-pixel overlap remains open |
+| 2026-09-29 | Acquired footprint-sized WAC crop by TIFF byte ranges | Prepare the independent geometry reference; registration residuals remain unmeasured |
 | 2026-09-29 | Reviewed the five candidate M³ L2 labels | Product dimensions and special-pixel values are documented; usable overlap still needs checking |
 | 2026-09-29 | Queried footprint-intersecting M³ Level-2 candidates and defined WAC registration path | Five orbit-1080 M³ labels returned; geometry validation still requires held-out residuals |
 | 2026-09-28 | Added literature-backed E1G2 acquisition target and temperature-uncertainty gate | Published thermal work and the official mode table identify valid 4.5–4.9 µm bands in E1G2 |

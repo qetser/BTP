@@ -1,5 +1,12 @@
 # Progress
 
+## 2026-09-29 — Acquire WAC reference crop for E1G2 geometry
+
+- Retrieved `WAC_GLOBAL_O000N0000_100M.PYR.TIF` metadata and 164 tiled image regions through HTTP byte ranges. Transferred 10,747,904 raster bytes from the 1,617,959,634-byte pyramid and assembled an 824 x 10,230 8-bit crop at 100 m/pixel with 20 km margin around projected IIRS control coordinates.
+- The source version, ETag, retrieval time, crop origin, TIFF scale/tiepoint, and projection assumption are saved in `results/phase-1/m1-reference-data/wac_crop_metadata.json`. The crop is under ignored `data/reference/lroc_wac_e1g2/`; the acquisition can be rerun with `scripts/fetch_wac_reference_crop.py`.
+- Visually inspected a temporary preview. No registration, held-out residual, or calibration validation was performed. The WAC crop is only a spatial reference.
+- Next: register the sparse IIRS geometry to the WAC crop using documented training controls, then quantify held-out residuals in metres and IIRS pixels. Keep M1 mask and independent radiance gates open.
+
 ## 2026-09-29 — Screen M³ footprints against sparse E1G2 geometry
 
 - Saved PDS ODE product-footprint WKT for the five M³ candidates. Compared those footprints with the 1,476 IIRS geometry-table coordinates from the matched calibrated archive.

@@ -1,5 +1,11 @@
 # Findings
 
+## 2026-09-29 — WAC reference crop acquisition
+
+- Retrieved an E1G2-sized subset of the LROC WAC global morphologic pyramid TIFF by HTTP byte ranges. 164 tiles (10,747,904 raster bytes) produced an 824 x 10,230 pixel crop at 100 m/pixel, with 20 km margin. Source product metadata and crop georeferencing details are recorded in [`wac_crop_metadata.json`](../results/phase-1/m1-reference-data/wac_crop_metadata.json).
+- The crop is available under ignored `data/reference/lroc_wac_e1g2/`. Visual inspection confirms a continuous grayscale lunar surface image, but no registration or control-point residual has been computed. This is geometry evidence only when registration is completed, not radiometric validation.
+- Next gate: fit a registration with documented training controls and assess it on held-out controls in metres and IIRS pixels.
+
 ## 2026-09-29 — Screen M³ footprints against sparse E1G2 geometry
 
 - The ODE-reported footprint for `M3G20090206T010833_V01_L2` contains 1,033/1,476 sparse E1G2 geometry points (69.99%), the most among five label-reviewed candidates.
