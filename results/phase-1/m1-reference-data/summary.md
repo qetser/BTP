@@ -14,6 +14,6 @@
 
 **Metric artifacts:** The table reports counts and percent of IIRS geometry control points inside each ODE footprint, from 1,476 source points. Split: not applicable to candidate screening. Machine-readable values: [`metrics/m3_control_grid_overlap.csv`](metrics/m3_control_grid_overlap.csv). Figure: [`figures/m3_control_grid_overlap.svg`](figures/m3_control_grid_overlap.svg). These are screening values, not geolocation residuals or reflectance errors.
 
-**Code commit:** Candidate-query code is in commit `ff1b854`; the control-grid analysis code will be recorded with this result update.
+**Code commit:** Candidate query in `ff1b854`; label review and control-grid analysis in `fe61f95`.
 
 **Next gate:** Review M³ pixel-location products and valid-pixel rules within the candidate 010833 footprint; confirm actual common valid coverage and estimate retrieval size. Then obtain only the selected M³ observation and a footprint-sized WAC reference. Confirm coordinate conventions and product versions before implementing registration or spectral comparisons. Keep mask semantics and independent radiance validation as separate M2 blockers.
