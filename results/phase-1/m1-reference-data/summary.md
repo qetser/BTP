@@ -26,7 +26,7 @@
 
 **Limitations and gate:** This is a provisional browse-scale consistency diagnostic. The browse image is lower resolution than the IIRS cube, only eight accepted held-out patches were available, and the held-out patches occupy two regions of the same observation. The residual is relative image alignment after a trained correction, not surveyed absolute ground-control error. It does not establish full-resolution geometry or radiometric calibration. Keep the geometry gate open until the transform is checked against a full-resolution IIRS band and additional spatially separated held-out ties; seek independent absolute controls if available.
 
-**Code commit:** `register_iirs_to_wac.py` and `extract_iirs_registration_band.py` in the current work unit (record the exact commit after commit). Software: Python 3.11.16, NumPy 2.4.6, OpenCV 5.0.0, Matplotlib 3.11.2. Re-run with `uv run --python 3.11 --with numpy --with opencv-python-headless --with matplotlib python scripts/register_iirs_to_wac.py`.
+**Code commit:** `register_iirs_to_wac.py` and `extract_iirs_registration_band.py` in `d7fff49`. Software: Python 3.11.16, NumPy 2.4.6, OpenCV 5.0.0, Matplotlib 3.11.2. Re-run with `uv run --python 3.11 --with numpy --with opencv-python-headless --with matplotlib python scripts/register_iirs_to_wac.py`.
 
 ## Full-resolution WAC-to-IIRS band-40 diagnostic
 
@@ -38,7 +38,7 @@
 
 **Data version and units:** IIRS calibrated image archive `ch2_iir_nci_20260227T1239538758_d_img_d18.zip`, band 40 at 1,369.6 nm. The display PNG MD5 and percentile stretch are in the JSON metric metadata. WAC pyramid last-modified `2026-08-14T18:41:05Z`, ETag `"e2137517b2bb1afa7232c407ebbd1ada"`. Residuals are in IIRS cube pixels and WAC projected map metres calculated from the local IIRS-to-WAC coordinate Jacobian. Projected map metres are not lunar ground distances.
 
-**Code and reproduction:** `scripts/extract_iirs_registration_band.py` and `scripts/register_iirs_to_wac.py` in the current work unit (record the commit after commit). Extract with `uv run --python 3.11 --with numpy --with opencv-python-headless python scripts/extract_iirs_registration_band.py`; register with the full-resolution command in [`notes.md`](notes.md). Software versions are recorded in the JSON metric metadata.
+**Code and reproduction:** `scripts/extract_iirs_registration_band.py` and `scripts/register_iirs_to_wac.py` in `d7fff49`. Extract with `uv run --python 3.11 --with numpy --with opencv-python-headless python scripts/extract_iirs_registration_band.py`; register with the full-resolution command in [`notes.md`](notes.md). Software versions are recorded in the JSON metric metadata.
 
 **Limitations and gate:** This uses one display-stretched radiance band only to match surface morphology. Its validity designation does not validate radiance scale or pixel masks. Image ties are not surveyed ground controls. Twelve accepted held-out patches across three parts of one observation and an RMSE of 2.757 pixels do not close the geolocation gate. Review low-confidence matches, add well-separated control regions, and seek absolute controls before treating geometry as validated.
 
