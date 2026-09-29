@@ -1,6 +1,6 @@
 # Project charter: IIRS lunar hyperspectral transfer
 
-**Last updated:** 2026-09-28
+**Last updated:** 2026-09-29
 **Status:** Active, M1–M3 setup
 
 ## What this is
@@ -9,7 +9,7 @@ A research pipeline to measure whether Earth-pretrained hyperspectral models can
 
 ## Why it exists
 
-The proposed transfer study is only interpretable if raw detector counts become validated reflectance and the comparison uses geographically independent evaluation. The local pilot now contains three matched low-latitude raw/calibrated pairs: two 2020 E3G2 strips and one 2026 E1G2 strip. The E1G2 LUT comparison supports the numeric radiance scale internally. Saturation and fill semantics, independent scale validation, and full-resolution geometry remain open. A WAC crop now covers the E1G2 geometry for registration, but no held-out residual has been measured. A footprint query identified five M³ Level-2 candidates, and a sparse geometry-grid screen ranks one candidate for pixel-coverage review. Actual common valid-pixel coverage remains unknown. See the [reference-data record](results/phase-1/m1-reference-data/summary.md), [research README](README.md), and [scientific plan](docs/m1_m3_plan.md).
+The proposed transfer study is only interpretable if raw detector counts become validated reflectance and the comparison uses geographically independent evaluation. The local pilot now contains three matched low-latitude raw/calibrated pairs: two 2020 E3G2 strips and one 2026 E1G2 strip. The E1G2 LUT comparison supports the numeric radiance scale internally. Saturation and fill semantics, independent scale validation, and full-resolution geometry remain open. A WAC crop now covers the E1G2 geometry. Browse and full-resolution image-tie diagnostics report held-out residuals, but the full-resolution residuals are larger and neither establishes absolute geolocation. A footprint query identified five M³ Level-2 candidates, and a sparse geometry-grid screen ranks one candidate for pixel-coverage review. Actual common valid-pixel coverage remains unknown. See the [reference-data record](results/phase-1/m1-reference-data/summary.md), [research README](README.md), and [scientific plan](docs/m1_m3_plan.md).
 
 ## Who uses it
 
@@ -23,7 +23,7 @@ The proposed transfer study is only interpretable if raw detector counts become 
 | Layer | Current choice | Reason | Status |
 | --- | --- | --- | --- |
 | Source data | Chandrayaan-2 IIRS PDS4 products | Primary instrument for the question | Two complete 2020 pairs; one 2026 E1G2 pair verified by labels and checksums; internal LUT scale check passed; independent validation, geometry, and masks pending |
-| Comparison data | M³ L2, USGS geologic map and spectral library | Cross-check and weak contextual labels | Five candidates label-reviewed; sparse-grid screen ranks one; usable overlap not quantified and no image acquired |
+| Comparison data | LROC WAC, M³ L2, USGS geologic map and spectral library | Spatial registration, cross-checks, and weak contextual labels | WAC crop acquired; preliminary browse-scale tie residuals computed; M³ candidates label-reviewed; usable M³ overlap remains unknown |
 | Processing language | Python | Suitable for chunked scientific I/O and reproducible analysis | Proposed; packages not selected |
 | Model framework | Undecided | Select after baseline task and compute budget are fixed | Open |
 | Deployment | None | Research pipeline rather than a service | No deploy target |
@@ -52,6 +52,8 @@ Version 1 is M1–M3: a verified scene manifest; an analysis-ready reflectance p
 | Date | Change | Reason |
 | --- | --- | --- |
 | 2026-09-29 | Screened five M³ footprints against sparse E1G2 geometry | Rank a candidate before acquiring large images; valid-pixel overlap remains open |
+| 2026-09-29 | Matched full-resolution E1G2 band 40 to WAC | Residuals vary and are larger than the browse result; full-resolution geolocation remains unvalidated |
+| 2026-09-29 | Compared E1G2 browse image with WAC on held-out spatial tie windows | Initial residuals are promising but provisional; full-resolution geolocation remains open |
 | 2026-09-29 | Acquired footprint-sized WAC crop by TIFF byte ranges | Prepare the independent geometry reference; registration residuals remain unmeasured |
 | 2026-09-29 | Reviewed the five candidate M³ L2 labels | Product dimensions and special-pixel values are documented; usable overlap still needs checking |
 | 2026-09-29 | Queried footprint-intersecting M³ Level-2 candidates and defined WAC registration path | Five orbit-1080 M³ labels returned; geometry validation still requires held-out residuals |

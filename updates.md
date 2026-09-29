@@ -2,6 +2,32 @@
 
 Meaningful project changes are recorded newest first. Entries describe the change and evidence; the Git history supplies the exact commit hash.
 
+## 2026-09-29 — Match full-resolution E1G2 band 40 to WAC
+
+**Phase:** M1 reference data
+**Type:** Full-resolution geometry diagnostic
+
+- Extracted calibrated band 40 at 1,369.6 nm from the E1G2 BSQ archive. The band is marked valid in the official mode table. A 1st-to-99th-percentile display stretch was used only for morphology matching.
+- Used 30 accepted training image ties and 12 held-out ties in three along-track blocks. Held-out RMSE is 2.757 IIRS pixels (198.2 WAC projected map metres), with p95 5.317 pixels (382.7 projected map metres). Values and SVG are stored under `results/phase-1/m1-reference-data/metrics/` and `figures/`.
+- Added reproducible extraction and registration scripts. Corrected pixel-scale conversion and recorded source image checksums and projection metadata.
+
+**Why:** Check whether the preliminary browse-scale WAC registration holds at the full dimensions of an IIRS spectral image.
+
+**Impact:** Full-resolution residuals are larger and variable. These image ties do not provide absolute surveyed geolocation accuracy. The geometry gate remains open. Radiance validation and pixel-mask gates are unchanged.
+
+## 2026-09-29 — Compute a preliminary WAC-to-IIRS browse registration
+
+**Phase:** M1 reference data
+**Type:** Spatial registration diagnostic
+
+- Used the E1G2 sparse longitude/latitude grid to geowarp the WAC crop into the official IIRS browse image. Matched x/y gradient patches; fit a robust along-track correction on 23 training ties and evaluated 8 held-out ties across two separated blocks.
+- Held-out residual RMSE is 0.781 IIRS cube-pixel equivalents (57.4 WAC projected map metres), with 95th percentile 1.075 pixels (78.0 projected metres). Saved per-window CSV values, JSON metadata, and an SVG plot.
+- Corrected the geometry grid description: the cube is 250 samples x 12,210 lines, with six sparse coordinate samples at each of 246 sampled scan lines.
+
+**Why:** Obtain an initial external-image check of the E1G2 spatial geometry after acquiring the WAC crop.
+
+**Impact:** This is a browse-scale image-consistency diagnostic, not surveyed absolute geolocation accuracy or radiometric validation. Full-resolution geometry remains open. The next step is tie matching on a full-resolution IIRS band with more spatially separated holdout regions.
+
 ## 2026-09-29 — Acquire footprint-sized LROC WAC crop
 
 **Phase:** M1 reference data
@@ -64,7 +90,7 @@ Meaningful project changes are recorded newest first. Entries describe the chang
 
 - Checked the official E1G2 saturation-table XML. It declares saturation radiance in µW/cm**2/sr/µm and dynamic range in counts. The mW comparison is counterfactual and is not the table's declared unit.
 - Checked the calibrated QUB label. It has no missing-value constant, so it does not define a fill value.
-- Checked the geometry product label. It declares 1,476 coordinate rows with pixel and line indices across 246 of 250 image lines. The grid is sparse, and registration error remains unmeasured.
+- Checked the geometry product label. It declares 1,476 coordinate rows with pixel and line indices: six sample positions at each of 246 sampled scan lines across a 250-sample x 12,210-line image. The grid is sparse, and registration error remains unmeasured at this stage.
 - Updated the M1 summary, task plan, gap matrix, project charter, data dictionary, and research logs. The mask, independent radiance, geometry-registration, and coverage gates remain open. M2 and M3 remain gated.
 
 **Why:** Keep the known unit declarations separate from the unresolved mismatch and mask rules.

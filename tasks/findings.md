@@ -3,8 +3,20 @@
 ## 2026-09-29 — WAC reference crop acquisition
 
 - Retrieved an E1G2-sized subset of the LROC WAC global morphologic pyramid TIFF by HTTP byte ranges. 164 tiles (10,747,904 raster bytes) produced an 824 x 10,230 pixel crop at 100 m/pixel, with 20 km margin. Source product metadata and crop georeferencing details are recorded in [`wac_crop_metadata.json`](../results/phase-1/m1-reference-data/wac_crop_metadata.json).
-- The crop is available under ignored `data/reference/lroc_wac_e1g2/`. Visual inspection confirms a continuous grayscale lunar surface image, but no registration or control-point residual has been computed. This is geometry evidence only when registration is completed, not radiometric validation.
-- Next gate: fit a registration with documented training controls and assess it on held-out controls in metres and IIRS pixels.
+- The crop is available under ignored `data/reference/lroc_wac_e1g2/`. Visual inspection confirmed a continuous grayscale lunar surface image. Subsequent browse and full-resolution tie diagnostics are provisional and do not validate radiometric calibration.
+- Next gate: review tie residuals, improve match confidence, and seek well-distributed absolute controls.
+
+## 2026-09-29 — Preliminary browse-scale WAC registration
+
+- The official E1G2 browse image and WAC morphology align after projecting the sparse IIRS geolocation grid into the WAC orthographic image. A robust linear along-track correction fitted to 23 training image ties was evaluated on 8 held-out ties in two separated along-track blocks.
+- Held-out residual RMSE is 0.781 IIRS cube-pixel equivalents (57.4 WAC projected map metres); the 95th percentile is 1.075 pixels (78.0 projected metres). The tie CSV and JSON summary preserve per-window values, data versions, split and units. See the [figure](../results/phase-1/m1-reference-data/figures/iirs_wac_registration_browse_residuals.svg).
+- This is provisional image-alignment evidence only. The ties come from the 175 x 8,547 browse, not a full-resolution band, and are not surveyed ground controls. Eight ties in two regions are not enough to validate absolute geolocation. The geometry gate remains open; continue with full-resolution band imagery and more separated held-out regions.
+
+## 2026-09-29 — Full-resolution WAC registration diagnostic
+
+- Extracted calibrated E1G2 band 40 at 1,369.6 nm, marked valid in the official mode table, with a 1st-to-99th-percentile display stretch for morphology matching only. The 250 x 12,210 image produced 30 accepted training image ties and 12 held-out ties in three along-track blocks.
+- Held-out residual RMSE is 2.757 IIRS pixels (198.2 WAC projected map metres); the 95th percentile is 5.317 pixels (382.7 projected map metres). Several held-out ties show larger residuals, and the full-resolution RMSE exceeds the browse-scale residual. Per-tie values, source metadata, and figure are saved in the module record.
+- These are local image matches, not absolute surveyed ground controls. The tie count, three holdout blocks, and variable match residuals are not sufficient to close the geometry gate. Continue with match-confidence review and well-distributed controls.
 
 ## 2026-09-29 — Screen M³ footprints against sparse E1G2 geometry
 
@@ -20,16 +32,16 @@
 
 ## 2026-09-29 — Independent references for E1G2
 
-- LROC WAC global morphology imagery at 100 m/pixel is a candidate reference for registering the low-latitude E1G2 strip. No WAC subset is local and no registration residual has been measured. Use withheld control points to quantify geolocation error. This does not test radiometric calibration.
+- LROC WAC global morphology imagery at 100 m/pixel is the spatial reference for the low-latitude E1G2 strip. A crop is local, and provisional browse/full-resolution tie diagnostics exist. They do not establish absolute geolocation error. This does not test radiometric calibration.
 - The PDS Chandrayaan-1 M³ Level-2 collection contains pixel-located, reflectance-calibrated observations. It is a future reflectance comparator after IIRS calibration, mask, geometry, and correction gates pass, not a direct comparator for the current Level-1 radiance cube.
 - The ODE footprint-intersection query found five M³ Level-2 candidate labels in orbit 1080 on 2009-02-05/06. Candidate metadata are in [`m3_overlap_candidates.csv`](../results/phase-1/m1-reference-data/m3_overlap_candidates.csv). Inspect actual label geometry and valid pixels before selecting one.
 - The 2025 paper's Apollo 16 ground comparison is outside the E1G2 footprint. No local validation follows from that paper's result.
-- See the source-backed [reference-data plan](../results/phase-1/m1-reference-data/summary.md). No reference data or validation metric has been produced.
+- See the source-backed [reference-data plan](../results/phase-1/m1-reference-data/summary.md). WAC imagery and provisional relative alignment metrics are local; no M³ image, local ground target, or validated absolute geolocation result exists.
 
 ## 2026-09-29 — Clarify saturation units and geometry product
 
 - The official E1G2 saturation-table XML explicitly defines saturation radiance in `µW/cm**2/sr/µm` and dynamic range in `count`. The table and calibrated cube labels agree on radiance units. Do not describe this as an unresolved unit choice. The unresolved observation is numerical and operational: 99.878921% of valid-band radiance values meet the table threshold, but no raw counts reach the dynamic-range values. The alternative mW calculation is counterfactual and not supported by the table XML.
-- The calibrated QUB label defines no missing-value constant, so fill values and per-pixel validity cannot be inferred from it. The official geometry label describes a 1,476-row table of longitude, latitude, pixel, and line coordinates. It spans 246 of 250 lines and is not a full per-pixel geometry array.
+- The calibrated QUB label defines no missing-value constant, so fill values and per-pixel validity cannot be inferred from it. The image dimensions are 250 samples x 12,210 lines. Its geometry table has 1,476 rows: six sample positions at each of 246 scan-line positions spanning lines 0–12,209. It is not a full per-pixel geometry array.
 - The LUT comparison is internal to the official calibration path, not independent validation. The current scene is not ready for masks, reflectance, or thermal correction. Seek authoritative clarification, independent radiometric validation, and image registration against an external lunar reference.
 
 ## 2026-09-28 — E1G2 calibrated-value and footprint audit

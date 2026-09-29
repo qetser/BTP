@@ -3,9 +3,24 @@
 ## 2026-09-29 — Acquire WAC reference crop for E1G2 geometry
 
 - Retrieved `WAC_GLOBAL_O000N0000_100M.PYR.TIF` metadata and 164 tiled image regions through HTTP byte ranges. Transferred 10,747,904 raster bytes from the 1,617,959,634-byte pyramid and assembled an 824 x 10,230 8-bit crop at 100 m/pixel with 20 km margin around projected IIRS control coordinates.
+- Corrected the E1G2 geometry description: the image is 250 samples x 12,210 lines. Its 1,476 coordinate records cover six sample positions at each of 246 sampled scan lines spanning the image, not 246 of 250 lines.
 - The source version, ETag, retrieval time, crop origin, TIFF scale/tiepoint, and projection assumption are saved in `results/phase-1/m1-reference-data/wac_crop_metadata.json`. The crop is under ignored `data/reference/lroc_wac_e1g2/`; the acquisition can be rerun with `scripts/fetch_wac_reference_crop.py`.
 - Visually inspected a temporary preview. No registration, held-out residual, or calibration validation was performed. The WAC crop is only a spatial reference.
 - Next: register the sparse IIRS geometry to the WAC crop using documented training controls, then quantify held-out residuals in metres and IIRS pixels. Keep M1 mask and independent radiance gates open.
+
+## 2026-09-29 — Compare the E1G2 browse image with WAC
+
+- Interpolated the IIRS sparse geometry grid and used it to warp the LROC WAC crop into the official 175 x 8,547 browse image. Matched local x/y image gradients; 23 accepted tie windows trained a robust linear along-track offset correction.
+- Held out windows in two separated 1,000-line blocks. Eight accepted ties produced a residual RMSE of 0.781 IIRS cube-pixel equivalents (57.4 WAC projected metres), with 95th percentile 1.075 pixels (78.0 projected metres). Saved per-patch CSV, metric JSON, and SVG figure under `results/phase-1/m1-reference-data/`.
+- This is provisional browse-scale image consistency, not surveyed absolute geolocation error. The lower-resolution browse and only two held-out spatial blocks are insufficient to close the geometry gate. The metric does not validate IIRS radiance.
+- Next: match confidence needs review, and absolute controls are needed before accepting geometry. Preserve mask and independent radiance blockers.
+
+## 2026-09-29 — Match full-resolution E1G2 band 40 to WAC
+
+- Extracted official E1G2 band 40 (1,369.6 nm, valid in the local mode table) from the calibrated archive without extracting the full cube. A 1st-to-99th-percentile display stretch was used only for morphology matching. The generated image and extraction metadata remain under ignored `data/reference/lroc_wac_e1g2/`.
+- Repeated the WAC geowarp and image-tie fit at 250 x 12,210 resolution. Used 30 accepted training ties and 12 held-out ties across three spatial blocks. Held-out RMSE is 2.757 IIRS pixels (198.2 WAC projected map metres); p95 is 5.317 pixels (382.7 projected map metres).
+- The full-resolution residuals are larger than the browse-scale result and include several large tie errors. This does not establish absolute geolocation accuracy. The geometry gate remains open. Per-tie values, metric metadata, and figure are saved in `results/phase-1/m1-reference-data/`.
+- Next: review match confidence, improve held-out control coverage, and seek independent absolute controls. Radiance scale, masks, and reflectance gates remain separate.
 
 ## 2026-09-29 — Screen M³ footprints against sparse E1G2 geometry
 
@@ -33,7 +48,7 @@
 
 - Read the official E1G2 saturation-table XML and calibrated-product labels from the already verified archive. The table unit declarations are explicit: `Saturation` is `µW/cm**2/sr/µm` and `Dynamic_Range` is `count`. The previous alternate mW calculation is counterfactual only. It does not resolve why 99.878921% of valid-band radiance values meet the declared threshold while zero raw counts meet the dynamic-range values.
 - The calibrated QUB label has no `Special_Constants` or missing-value constant. This leaves pixel fill and validity rules unresolved; do not classify zeros or other values as fill.
-- The geometry label declares a 1,476-row table with longitude, latitude, pixel, and line fields across 246 of 250 image lines. It is a sparse control grid, not full per-pixel geometry. Registration error has not been measured against an independent reference.
+- The geometry label declares a 1,476-row table with longitude, latitude, pixel, and line fields. The 250-sample x 12,210-line image has six geometry samples at each of 246 sampled scan lines spanning lines 0–12,209. It is a sparse control grid, not full per-pixel geometry.
 - Updated the E1G2 module record, data dictionary, task plan, README workflow, and scientific plan to distinguish known units from unresolved field application. M1 remains open; reflectance and thermal processing remain blocked.
 - Next: obtain authoritative clarification of the saturation and fill rules, independently validate radiance, register the strip against an independent lunar reference with residuals, and review candidate independent tracks before fixing any geographic split.
 

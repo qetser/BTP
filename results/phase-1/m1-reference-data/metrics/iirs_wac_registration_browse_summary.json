@@ -1,0 +1,72 @@
+{
+  "status": "provisional registration diagnostic; not a calibration validation",
+  "iirs_observation": "20260227T1239538758",
+  "iirs_archive": "data/pradan/e1g2_candidate_20260227T1239538758/ch2_iir_nci_20260227T1239538758_d_img_d18.zip",
+  "iirs_image_description": "Official IIRS browse image",
+  "iirs_image_path": "browse product stored in IIRS archive",
+  "iirs_image_md5": "8f8c9caabf07e346bd2afa38383c34a4",
+  "iirs_image_source_metadata": null,
+  "iirs_browse_label": {
+    "creation_date_time": "2026-03-13T20:29:24",
+    "md5_checksum": "8f8c9caabf07e346bd2afa38383c34a4"
+  },
+  "iirs_dimensions_samples_lines": [
+    250,
+    12210
+  ],
+  "iirs_geometry_record_count": 1476,
+  "iirs_geometry_sample_positions": 6,
+  "iirs_geometry_scan_positions": 246,
+  "analysis_image_dimensions_width_height": [
+    175,
+    8547
+  ],
+  "analysis_image_to_cube_sample_scale": 1.4285714285714286,
+  "analysis_image_to_cube_line_scale": 1.4285714285714286,
+  "wac_image": "data/reference/lroc_wac_e1g2/e1g2_wac_crop.pgm",
+  "wac_metadata": "results/phase-1/m1-reference-data/wac_crop_metadata.json",
+  "wac_source_etag": "\"e2137517b2bb1afa7232c407ebbd1ada\"",
+  "wac_source_last_modified": "Fri, 14 Aug 2026 18:41:05 GMT",
+  "software_versions": {
+    "python": "3.11.16",
+    "numpy": "2.4.6",
+    "opencv": "5.0.0",
+    "matplotlib": "3.11.2"
+  },
+  "initial_transform": "Interpolate sparse IIRS lon/lat grid; project to WAC orthographic GeoTIFF coordinates; remap WAC into the IIRS image grid",
+  "tie_method": "Patch matching on x/y Sobel gradients after CLAHE, OpenCV TM_CCOEFF_NORMED",
+  "training_split": "Spatial blocks 0-2 modulo 4, with 1.5 patch-height guard near block boundaries",
+  "heldout_split": "Every fourth 1000-image-line block, separated from training ties by guard zones",
+  "accepted_tie_rule": "Mean gradient NCC >= 0.15 and match peak at least 1 pixel inside search radius",
+  "candidate_ties": 83,
+  "accepted_training_ties": 23,
+  "accepted_heldout_ties": 8,
+  "heldout_spatial_blocks": 2,
+  "heldout_ncc_median": 0.31810370087623596,
+  "heldout_ncc_min": 0.2784374952316284,
+  "heldout_residual_median_image_px": 0.425054690611955,
+  "heldout_residual_rmse_image_px": 0.5465412957364497,
+  "heldout_residual_p95_image_px": 0.7521720285966786,
+  "heldout_residual_rmse_iirs_px": 0.7807732796234996,
+  "heldout_residual_p95_iirs_px": 1.0745314694238266,
+  "heldout_residual_rmse_wac_projected_m": 57.41576490443566,
+  "heldout_residual_p95_wac_projected_m": 78.0491220652203,
+  "correction_model": "Robust linear along-track trend of horizontal and vertical tie offsets, fit on training blocks only",
+  "correction_coefficients": {
+    "image_pixel_intercept_xy": [
+      1.8660258444847864,
+      0.1857294974840448
+    ],
+    "image_pixel_slope_per_line_xy": [
+      -0.0001554067278346805,
+      -0.00013149543268763908
+    ]
+  },
+  "units_note": "Image offsets are multiplied by the image-to-cube scale. Map metres use the local interpolated IIRS-to-WAC GeoTIFF-coordinate Jacobian and GeoTIFF map scale; these are projected map distances, not lunar surface ground distances.",
+  "limitations": [
+    "Image tie offsets use a display-stretched IIRS raster. Radiance validation and masks remain open.",
+    "Patch matches are image tie points, not surveyed ground control points.",
+    "LROC WAC is a morphology reference only and cannot validate IIRS radiometry.",
+    "Matched patches are spatially distributed but not statistically independent observations."
+  ]
+}
