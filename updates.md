@@ -2,6 +2,19 @@
 
 Meaningful project changes are recorded newest first. Entries describe the change and evidence; the Git history supplies the exact commit hash.
 
+## 2026-09-29 — Add a visual research guide
+
+**Phase:** M1–M3 project orientation
+**Type:** Research communication
+
+- Reorganized `research_guide/` into short lessons that explain the research question, data checks, calibration cross-check, geometry review, and future model evaluation.
+- Added plain-language Mermaid diagrams and existing project figures, with captions that state what each visual can and cannot show.
+- Linked the guide to the detailed evidence records and the M1 Mermaid flowchart in the main README.
+
+**Why:** Make the project's purpose, current evidence, and remaining gates easier to explain without hiding scientific uncertainty.
+
+**Impact:** No science results, metrics, data products, or quality-gate status changed.
+
 ## 2026-09-29 — Match full-resolution E1G2 band 40 to WAC
 
 **Phase:** M1 reference data

@@ -4,6 +4,8 @@ This repository supports the first phase of **Cross-Domain Transfer of Hyperspec
 
 For tasks, deliverables, and pass criteria, see [the M1–M3 implementation plan](docs/m1_m3_plan.md). For the project workflow and Codex setup, read [SETUP.md](SETUP.md).
 
+For a plain-language walkthrough of the goal, evidence, workflow, terms, and limits, see the [research guide](research_guide/README.md).
+
 The complete execution roadmap is described below. The repository is currently working on M1. HyperFree and HyperSIGMA are planned comparison backbones for a later phase; they have not been trained or evaluated in this checkout.
 
 ## M1 results at a glance
