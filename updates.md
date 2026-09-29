@@ -2,6 +2,19 @@
 
 Meaningful project changes are recorded newest first. Entries describe the change and evidence; the Git history supplies the exact commit hash.
 
+## 2026-09-29 — Consolidate the research guide into one project snapshot
+
+**Phase:** M1–M3 project orientation
+**Type:** Research communication
+
+- Combined the overview, workflow, reproduction notes, and glossary into `research_guide/README.md`. Removed the separate guide pages.
+- Added the research approach, stage status, next steps, figures, and Mermaid diagrams. Linked each result to its evidence and limitations.
+- Explained how M1 data checks support M2 reflectance work, how M2 supports M3 baselines, and why model transfer waits until those stages pass.
+
+**Why:** Keep the full project explanation in one readable place and show how current checks move toward the research question.
+
+**Impact:** No data, measurements, metrics, or scientific quality-gate status changed.
+
 ## 2026-09-29 — Add a visual research guide
 
 **Phase:** M1–M3 project orientation
