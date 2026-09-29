@@ -70,6 +70,50 @@ The diamonds are quality gates. Both must pass before reflectance processing can
 
 The three current observations cover low latitudes. They do not yet provide a geographically independent evaluation set or polar coverage. Any polar ice question would need its own coverage and validation plan.
 
+## Research agenda tracker
+
+This table is the working agenda. “Done” means the named check has evidence in the repository. It does not mean the entire research stage has passed. “Open” means work or evidence is still needed. “Gated” means the work must wait for an earlier quality check.
+
+| Order | Work item | Status now | Next action | Evidence needed to close it |
+| --- | --- | --- | --- | --- |
+| 1 | Inventory and pair the pilot products | **Done for the three current pairs** | Add future scenes to the same verified manifest. | Product labels, pair fields, file sizes, and checksums recorded for each selected scene. |
+| 2 | Interpret units, calibration, fill, and saturation | **Open** | Get authoritative guidance for the saturation and dynamic-range fields. Establish documented fill and invalid-pixel rules. Validate radiance against a reference independent of the paired LUT calculation. | A reviewed per-band/per-pixel mask method, radiance validation report, and recorded limits. |
+| 3 | Validate IIRS pixel locations | **In progress** | Review poor WAC matches, improve spatial coverage of controls, and seek absolute lunar controls. | Registration residuals on well-distributed holdouts plus independent location evidence sufficient for the intended comparison. |
+| 4 | Review literature gaps, reference coverage, and scene selection | **In progress.** A targeted, cited literature matrix exists. M³ labels have been reviewed, but common valid coverage is unknown. | Keep the cited gap matrix current. Inspect the leading M³ candidate's pixel locations and valid-pixel flags. Estimate common valid area. Find additional non-overlapping IIRS tracks and suitable regions. | An updated [gap matrix](../docs/gap_matrix.md), an overlap report based on valid pixels, a scene-selection table, and a fixed orbit/province split. |
+| 5 | Pass the M1 gate | **Not passed** | Close the applicable measurement, mask, geometry, and coverage checks above. | A documented decision that the selected inputs support physical processing and independent evaluation. |
+| 6 | Build an M2 reflectance pilot | **Gated by M1** | Convert calibrated radiance to apparent reflectance. Validate thermal correction and lunar photometry. Preserve uncertainty, input masks, and pre/post-correction spectra. | A one-scene quality report with validated units, correction residuals, representative spectra, mask fractions, and independent comparisons. |
+| 7 | Export analysis-ready patches | **Gated by M2** | Save wavelength metadata, valid-band and pixel masks, location, orbit, processing version, split, and quality flags with each patch. | Reproducible patches and a manifest that traces each output to its source and correction. |
+| 8 | Prepare M3 labels and evaluation | **Gated by M2 and coverage** | Review a limited label task, flag uncertain areas, exclude uncertain map boundaries, and freeze geographically separate train/validation/test regions before tuning. | A label record, fixed split manifest, class support, and leakage checks. |
+| 9 | Measure M3 baselines | **Gated by labels and split** | Run physical spectral methods, clustering, and a small CNN trained from random initialization. | Held-out scores with the same inputs and split, uncertainty by region or track, saved values, figures, configurations, and failure cases. |
+| 10 | Test M4 Earth-to-Moon transfer | **Future, gated by M3** | Freeze HyperFree and HyperSIGMA versions and licenses. Test zero-shot prototypes, a frozen-encoder linear probe, then controlled fine-tuning. | Reproducible comparisons on the M3 task and test regions, alongside the physical and from-scratch baselines. |
+| 11 | Test M5 lunar adaptation | **Future, gated by M4** | Adapt a selected model on unlabeled calibrated lunar patches. Compare reconstruction and spectral constraints in controlled experiments. | Reproducible adaptation runs evaluated with the same split and task as M4. |
+| 12 | Evaluate M6 science tasks | **Future, gated by M2 corrections, M3 labels, and M4/M5 model validation** | Assess reviewed mineral tasks and thermally corrected 3 µm hydration signals. Keep any water-ice claim separate and require independent ice evidence. | Uncertainty-aware maps and evaluations tied to reviewed labels and independent references. |
+
+### What the agenda says to do now
+
+The immediate agenda has four parallel M1 threads: resolve the pixel-mask rules, validate radiance independently, improve geometry controls, and determine real IIRS/M³ coverage while selecting more independent scenes. They meet at the M1 decision gate. Reflectance code can be prototyped, but it must not produce scientific reflectance outputs until the source units, masks, and geometry meet the required checks.
+
+```mermaid
+flowchart TD
+    A[Current evidence: inventory and pilot audits] --> B[Mask and fill rules]
+    A --> C[Independent radiance validation]
+    A --> D[Better geometry controls]
+    A --> E[Valid reference overlap and more tracks]
+    B --> F{M1 data gate}
+    C --> F
+    D --> F
+    E --> F
+    F -->|Pass| G[M2: validated reflectance patches]
+    G --> H[M3: reviewed labels and geographic split]
+    H --> I[M3: physical, clustering, and from-scratch baselines]
+    I --> J[M4: Earth-trained model transfer]
+    J --> K[M5: lunar adaptation]
+    G --> L[M6: bounded scientific tasks]
+    I --> L
+```
+
+The M1 threads can make progress at the same time. M2 cannot pass its gate until the relevant M1 evidence is ready. M4 cannot start until the M3 baselines use reviewed labels and a defensible test split.
+
 ## What we have done so far
 
 ### 1. Matched IIRS observations and checked the files
@@ -140,6 +184,40 @@ This is only a shortlist. Point counts do not tell us how much image area overla
 
 [M³ candidate and WAC reference record](../results/phase-1/m1-reference-data/summary.md) · [Candidate point counts](../results/phase-1/m1-reference-data/metrics/m3_control_grid_overlap.csv)
 
+## Reproduce the main completed checks
+
+Run commands from the repository root. Several commands need source archives or derived images from ignored `data/`. The research records list source versions, software, outputs, and limits. Do not commit raw archives or large intermediate cubes.
+
+**E1G2 radiance and LUT audit:**
+
+```sh
+uv run --no-project --with numpy --with matplotlib python scripts/analyze_iirs_e1g2_scene.py
+```
+
+This streams the paired raw and calibrated cubes from their archives and recreates the per-band CSV and audit figure.
+
+**Official band-validity figure and values:**
+
+```sh
+uv run --no-project --with xlrd python scripts/plot_iirs_band_validity.py
+```
+
+This reads the official workbook under ignored `data/` and recreates the CSV and SVG.
+
+**Browse-scale WAC registration:**
+
+```sh
+uv run --python 3.11 --with numpy --with opencv-python-headless --with matplotlib python scripts/register_iirs_to_wac.py
+```
+
+**Full-resolution WAC registration:** this requires the ignored band-40 PNG and metadata described in the [reference-data notes](../results/phase-1/m1-reference-data/notes.md).
+
+```sh
+uv run --python 3.11 --with numpy --with opencv-python-headless --with matplotlib python scripts/register_iirs_to_wac.py --iirs-image data/reference/lroc_wac_e1g2/e1g2_band040_1369nm.png --iirs-image-metadata data/reference/lroc_wac_e1g2/e1g2_band040_1369nm.json --image-description 'E1G2 calibrated band 40, 1369.6 nm, 1-99 percentile display stretch' --artifact-suffix band040_1369nm --search-radius 16
+```
+
+The per-tie source values and output figure are linked in the WAC record above. Re-running a command is useful only when its input version and code match the record.
+
 ## How the current stage moves us toward the goal
 
 The current checks reduce uncertainty before it can contaminate later results:
@@ -186,7 +264,7 @@ We are testing whether models trained on Earth hyperspectral data can help analy
 
 ## Technical trail and key records
 
-The guide is one page. The reproducible evidence remains in the research records:
+This README is the single entry point for the guide. Reproducible evidence remains in the research records:
 
 - [M1–M3 plan and quality gates](../docs/m1_m3_plan.md)
 - [Current task plan](../tasks/task_plan.md)

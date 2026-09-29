@@ -2,6 +2,19 @@
 
 Meaningful project changes are recorded newest first. Entries describe the change and evidence; the Git history supplies the exact commit hash.
 
+## 2026-09-29 — Add a trackable research agenda to the guide
+
+**Phase:** M1–M6 research roadmap
+**Type:** Research planning and communication
+
+- Added a status table with twelve work items, next actions, and the evidence needed to close each gate.
+- Added a Mermaid dependency map that shows parallel M1 work and the gates before M2 reflectance, M3 baselines, and later transfer and science work.
+- Added commands to reproduce the main completed radiance, mode-validity, and WAC registration checks.
+
+**Why:** Show the work sequence and current blockers in a form that supports planning and progress review.
+
+**Impact:** No scientific results or quality-gate statuses changed.
+
 ## 2026-09-29 — Consolidate the research guide into one project snapshot
 
 **Phase:** M1–M3 project orientation
