@@ -1,5 +1,13 @@
 # Progress
 
+## 2026-09-29 — Define independent geometry and reflectance reference paths
+
+- Identified LROC WAC global imagery at 100 m/pixel as an external geometry reference candidate for the low-latitude E1G2 footprint. The operational next step is a footprint-sized acquisition, documented control-point registration, and residual measurement on held-out points. This can test geolocation, not radiometric calibration.
+- Queried PDS ODE for M³ Level-2 footprint intersections with E1G2 bounds. Five orbit-1080 candidates were returned; metadata and external label URLs are saved in `results/phase-1/m1-reference-data/m3_overlap_candidates.csv`, with a reproducible query at `scripts/query_m3_overlap.py`. The M³ labels and usable-pixel footprints still need review.
+- No reference imagery was acquired. No image registration, validated common pixel area, reflectance comparison, metrics, or figures were produced. Planning record: `results/phase-1/m1-reference-data/`.
+- The Apollo 16 site used in the 2025 Level-2 paper is outside this E1G2 scene footprint, so that paper's ground comparison is not a local calibration target.
+- Next: inspect the five M³ candidate labels and select valid common coverage; acquire a cropped WAC reference; separately seek authoritative mask/radiance guidance and independent calibration evidence. Compare M³ spectra only after IIRS reflectance gates pass.
+
 ## 2026-09-29 — Recheck saturation, fill, and geometry metadata
 
 - Read the official E1G2 saturation-table XML and calibrated-product labels from the already verified archive. The table unit declarations are explicit: `Saturation` is `µW/cm**2/sr/µm` and `Dynamic_Range` is `count`. The previous alternate mW calculation is counterfactual only. It does not resolve why 99.878921% of valid-band radiance values meet the declared threshold while zero raw counts meet the dynamic-range values.

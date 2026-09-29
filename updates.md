@@ -2,6 +2,21 @@
 
 Meaningful project changes are recorded newest first. Entries describe the change and evidence; the Git history supplies the exact commit hash.
 
+## 2026-09-29 — Identify independent references for E1G2
+
+**Phase:** M1 references
+**Type:** Evidence-backed acquisition plan
+
+- Added LROC WAC imagery as a geometry-reference candidate and specified held-out control-point residuals as the validation output.
+- Queried PDS ODE for footprint intersection and saved five orbit-1080 M³ Level-2 candidates plus a rerunnable script. Their actual valid-pixel overlap remains to be checked.
+- Kept M³ as a future reflectance comparator, gated on IIRS mask, radiance, geometry, and reflectance checks.
+- Recorded that neither data source is local and no comparison has been computed. Clarified that Apollo 16 is outside the current E1G2 footprint.
+- Added `results/phase-1/m1-reference-data/` with source, method, limitations, and next gate; updated README flowchart and gap matrix.
+
+**Why:** Geometry validation and reflectance comparison answer different questions and must not be conflated.
+
+**Impact:** No cube, mask, reflectance, or model metric changed. M2 remains gated.
+
 ## 2026-09-29 — Clarify IIRS saturation fields and geometry gate
 
 **Phase:** Phase 1, M1 product and data quality

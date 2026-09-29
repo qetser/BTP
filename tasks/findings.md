@@ -1,5 +1,13 @@
 # Findings
 
+## 2026-09-29 — Independent references for E1G2
+
+- LROC WAC global morphology imagery at 100 m/pixel is a candidate reference for registering the low-latitude E1G2 strip. No WAC subset is local and no registration residual has been measured. Use withheld control points to quantify geolocation error. This does not test radiometric calibration.
+- The PDS Chandrayaan-1 M³ Level-2 collection contains pixel-located, reflectance-calibrated observations. It is a future reflectance comparator after IIRS calibration, mask, geometry, and correction gates pass, not a direct comparator for the current Level-1 radiance cube.
+- The ODE footprint-intersection query found five M³ Level-2 candidate labels in orbit 1080 on 2009-02-05/06. Candidate metadata are in [`m3_overlap_candidates.csv`](../results/phase-1/m1-reference-data/m3_overlap_candidates.csv). Inspect actual label geometry and valid pixels before selecting one.
+- The 2025 paper's Apollo 16 ground comparison is outside the E1G2 footprint. No local validation follows from that paper's result.
+- See the source-backed [reference-data plan](../results/phase-1/m1-reference-data/summary.md). No reference data or validation metric has been produced.
+
 ## 2026-09-29 — Clarify saturation units and geometry product
 
 - The official E1G2 saturation-table XML explicitly defines saturation radiance in `µW/cm**2/sr/µm` and dynamic range in `count`. The table and calibrated cube labels agree on radiance units. Do not describe this as an unresolved unit choice. The unresolved observation is numerical and operational: 99.878921% of valid-band radiance values meet the table threshold, but no raw counts reach the dynamic-range values. The alternative mW calculation is counterfactual and not supported by the table XML.

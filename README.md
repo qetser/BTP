@@ -153,9 +153,18 @@ flowchart LR
     Y --> Z["Then validate thermal correction and reflectance"]
     LT --> Z
     Z --> AA["M3 gate: add independent tracks, reviewed labels, and fixed split"]
+    U --> AB["Acquire LROC WAC reference<br/>Register using training controls"]
+    AB --> AC["Measure residuals on held-out controls"]
+    Z --> AD["Review five PDS M3 L2 candidates<br/>Compare corrected reflectance only"]
 ```
 
 The original E3G2 scan did not produce reflectance or a saturation mask, and those products remain unsuitable for thermal fitting that requires 4–5 µm. The matched E1G2 pair passes identity and checksum checks, and its LUT comparison supports the numeric radiance scale internally. The official table's units are explicit, but its threshold and raw dynamic-range values remain inconsistent with this observation, so no mask is assigned. Obtain authoritative clarification of field application and fill rules, validate the geometry against an independent lunar reference, and seek independent radiometric validation before thermal correction. The published Verma et al. method uses the extended IIRS spectrum for surface-temperature retrieval and thermal-emission removal, so E1G2 remains a candidate mode rather than an approved processing input ([paper](https://doi.org/10.1016/j.icarus.2022.115075)).
+
+### Independent reference-data path
+
+The E1G2 footprint has a candidate spatial reference in the [LROC WAC global morphologic map](https://data.lroc.im-ldi.com/lroc/view_rdr_product/WAC_GLOBAL_O000N0000_100M), listed at 100 m/pixel. The next geometry task is to obtain a footprint-sized subset, register using documented control points, and report residuals on held-out points in metres and IIRS pixels. This tests geolocation only; it does not validate radiance calibration. A recent SIFT registration preprint is a method lead, not independent validation evidence.
+
+The [PDS M³ Level-2 archive](https://pds.nasa.gov/ds-view/pds/viewProfile.jsp?dsid=CH1-ORB-L-M3-4-L2-REFLECTANCE-V1.0) provides pixel-located reflectance products. A [PDS ODE REST footprint-intersection query](https://oderest.rsl.wustl.edu/) returned five candidate product labels from orbit 1080, observed on 2009-02-05/06. See the [candidate CSV](results/phase-1/m1-reference-data/m3_overlap_candidates.csv) and [query script](scripts/query_m3_overlap.py). These labels still need review for valid common pixels. Compare spectra only after IIRS masks, radiance validation, geometry, and reflectance correction pass. Account for wavelength response, spatial support, and observation geometry. No WAC or M³ image products are local, and no residual or reflectance comparison has been computed. See the [M1 reference-data record](results/phase-1/m1-reference-data/summary.md).
 
 ### What IIRS papers tell us to do next
 
