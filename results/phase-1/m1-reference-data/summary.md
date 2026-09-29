@@ -14,6 +14,6 @@
 
 **Metric artifacts:** The table reports counts and percent of IIRS geometry control points inside each ODE footprint, from 1,476 source points. Split: not applicable to candidate screening. Machine-readable values: [`metrics/m3_control_grid_overlap.csv`](metrics/m3_control_grid_overlap.csv). Figure: [`figures/m3_control_grid_overlap.svg`](figures/m3_control_grid_overlap.svg). These are screening values, not geolocation residuals or reflectance errors.
 
-**Code commit:** Candidate query in `ff1b854`; label review and control-grid analysis in `fe61f95`; WAC crop acquisition script is included in the current work unit (record its commit after commit).
+**Code commit:** Candidate query in `ff1b854`; label review and control-grid analysis in `fe61f95`; WAC crop acquisition script in `e99e613`.
 
 **Next gate:** Register WAC and IIRS using documented training controls, then measure held-out residuals in metres and IIRS pixels. Confirm orthographic coordinate conventions and inspect registration stability before treating geometry as validated. In parallel, review M³ pixel-location products and valid-pixel rules within candidate 010833 before acquiring M³ imagery. Keep mask semantics and independent radiance validation as separate M2 blockers. This is a screening module, not a train/validation/test experiment (split not applicable); no metric was computed from the WAC crop, so no metric figure is applicable.
