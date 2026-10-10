@@ -1,0 +1,56 @@
+method,class,test_pixels,precision,recall,f1,overall_accuracy
+majority class,mare basalt,144974,0.3132,1.0,0.477,0.3132
+majority class,dark mantle,10209,0.0,0.0,0.0,0.3132
+majority class,highland/terra,60514,0.0,0.0,0.0,0.3132
+majority class,crater material,10790,0.0,0.0,0.0,0.3132
+majority class,basin material,236387,0.0,0.0,0.0,0.3132
+band parameters + nearest centroid,mare basalt,144974,0.7457,0.7107,0.7278,0.575
+band parameters + nearest centroid,dark mantle,10209,0.1579,0.4815,0.2378,0.575
+band parameters + nearest centroid,highland/terra,60514,0.2859,0.3388,0.3101,0.575
+band parameters + nearest centroid,crater material,10790,0.0419,0.1586,0.0663,0.575
+band parameters + nearest centroid,basin material,236387,0.7514,0.5753,0.6517,0.575
+spectra PCA20 + logistic regression,mare basalt,144974,0.8631,0.8277,0.845,0.6503
+spectra PCA20 + logistic regression,dark mantle,10209,0.2245,0.6808,0.3377,0.6503
+spectra PCA20 + logistic regression,highland/terra,60514,0.3384,0.3833,0.3595,0.6503
+spectra PCA20 + logistic regression,crater material,10790,0.0385,0.1512,0.0613,0.6503
+spectra PCA20 + logistic regression,basin material,236387,0.8204,0.6313,0.7135,0.6503
+spectra + random forest,mare basalt,144974,0.9429,0.8123,0.8727,0.7152
+spectra + random forest,dark mantle,10209,0.2142,0.7015,0.3282,0.7152
+spectra + random forest,highland/terra,60514,0.4225,0.5242,0.4679,0.7152
+spectra + random forest,crater material,10790,0.036,0.0706,0.0477,0.7152
+spectra + random forest,basin material,236387,0.8337,0.7346,0.781,0.7152
+1D spectral CNN (from scratch),mare basalt,144974,0.9588,0.8166,0.882,0.7002
+1D spectral CNN (from scratch),dark mantle,10209,0.2141,0.6949,0.3273,0.7002
+1D spectral CNN (from scratch),highland/terra,60514,0.3838,0.4732,0.4238,0.7002
+1D spectral CNN (from scratch),crater material,10790,0.0328,0.0899,0.0481,0.7002
+1D spectral CNN (from scratch),basin material,236387,0.8365,0.715,0.771,0.7002
+context 64px band parameters + nearest centroid,mare basalt,144974,0.8335,0.8554,0.8443,0.7227
+context 64px band parameters + nearest centroid,dark mantle,10209,0.2059,0.4044,0.2729,0.7227
+context 64px band parameters + nearest centroid,highland/terra,60514,0.4156,0.5584,0.4765,0.7227
+context 64px band parameters + nearest centroid,crater material,10790,0.0,0.0,0.0,0.7227
+context 64px band parameters + nearest centroid,basin material,236387,0.8417,0.7301,0.7819,0.7227
+context 64px spectra PCA20 + logistic regression,mare basalt,144974,0.982,0.942,0.9616,0.8461
+context 64px spectra PCA20 + logistic regression,dark mantle,10209,0.3584,0.5101,0.421,0.8461
+context 64px spectra PCA20 + logistic regression,highland/terra,60514,0.6127,0.6185,0.6156,0.8461
+context 64px spectra PCA20 + logistic regression,crater material,10790,0.0,0.0,0.0,0.8461
+context 64px spectra PCA20 + logistic regression,basin material,236387,0.859,0.8986,0.8784,0.8461
+context 64px spectra + random forest,mare basalt,144974,0.9978,0.9262,0.9607,0.8678
+context 64px spectra + random forest,dark mantle,10209,0.5198,0.7846,0.6253,0.8678
+context 64px spectra + random forest,highland/terra,60514,0.7322,0.5963,0.6573,0.8678
+context 64px spectra + random forest,crater material,10790,0.0246,0.0063,0.01,0.8678
+context 64px spectra + random forest,basin material,236387,0.8558,0.9444,0.8979,0.8678
+HyperFree frozen + linear probe,mare basalt,144974,0.8546,0.7801,0.8156,0.7335
+HyperFree frozen + linear probe,dark mantle,10209,0.2893,0.9105,0.4391,0.7335
+HyperFree frozen + linear probe,highland/terra,60514,0.6863,0.5548,0.6136,0.7335
+HyperFree frozen + linear probe,crater material,10790,0.0537,0.0875,0.0665,0.7335
+HyperFree frozen + linear probe,basin material,236387,0.7875,0.7726,0.78,0.7335
+HyperSIGMA spatial frozen + linear probe,mare basalt,144974,0.973,0.9698,0.9714,0.8676
+HyperSIGMA spatial frozen + linear probe,dark mantle,10209,0.4195,0.8245,0.556,0.8676
+HyperSIGMA spatial frozen + linear probe,highland/terra,60514,0.784,0.7655,0.7747,0.8676
+HyperSIGMA spatial frozen + linear probe,crater material,10790,0.1534,0.231,0.1843,0.8676
+HyperSIGMA spatial frozen + linear probe,basin material,236387,0.9139,0.862,0.8872,0.8676
+HyperSIGMA spectral (tile-level) frozen + linear probe,mare basalt,144974,0.9483,0.8827,0.9143,0.8207
+HyperSIGMA spectral (tile-level) frozen + linear probe,dark mantle,10209,0.2088,0.4629,0.2878,0.8207
+HyperSIGMA spectral (tile-level) frozen + linear probe,highland/terra,60514,0.7867,0.7687,0.7776,0.8207
+HyperSIGMA spectral (tile-level) frozen + linear probe,crater material,10790,0.0254,0.0339,0.0291,0.8207
+HyperSIGMA spectral (tile-level) frozen + linear probe,basin material,236387,0.8643,0.8474,0.8558,0.8207

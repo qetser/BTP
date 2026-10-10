@@ -375,6 +375,35 @@ Macro F1 on the same held-out test blocks:
 
 The Earth models produce useful lunar features: all three beat the per-pixel baselines, and HyperSIGMA scores highest. The context control shows that much of HyperSIGMA's lead comes from seeing the surrounding area. A classical method with the same context scores within its confidence interval. Results did not change with wider guard bands. The honest summary for this stage: Earth models transfer and are competitive, and showing a clear benefit from their Earth pretraining needs the next experiments.
 
+### What we understand by these scores of HyperSIGMA & HyperFree
+
+**What the task is.** For every pixel in the held-out test blocks, the model must say which of the five geologic classes it belongs to: mare basalt, dark mantle, highland or terra, crater material, or basin material. The answer is checked against the USGS geologic map. The model never saw these test areas during training, and the Earth model itself was never changed (frozen). Only one linear layer was trained on top of it.
+
+**What the score means.** Macro F1 is not "percent correct". It scores each class separately (balancing correct finds against false alarms) and then averages the five classes equally. A small, difficult class therefore counts as much as a large, easy one. That makes macro F1 a strict score, lower than plain accuracy. For reference, always guessing the most common class gives macro F1 0.10, and a perfect model gives 1.0.
+
+**HyperSIGMA spatial: macro F1 0.67, overall accuracy 87%.** It labels 87 of every 100 test pixels correctly. Per class (F1):
+
+- **Mare basalt: 0.97.** Dark volcanic plains are almost perfectly recognised.
+- **Basin material: 0.89.** Impact basin deposits are reliably separated from mare.
+- **Highland or terra: 0.77.** A large improvement over the per-pixel random forest (0.47).
+- **Dark mantle (volcanic ash): 0.56.** It finds 82% of the true dark-mantle pixels, but also calls some neighbouring dark mare "dark mantle". Both are dark and iron-rich, so this confusion is physically reasonable.
+- **Crater material: 0.18.** The weak class, and the main reason the average is 0.67 rather than about 0.8. In this map, "crater material" is ejecta of a certain age. It looks spectrally like its surroundings and forms small patches at 1:5,000,000 scale, and every method struggles with it.
+
+**HyperFree: macro F1 0.54, overall accuracy 73%.** It labels 73 of every 100 test pixels correctly, about the same as the per-pixel random forest (72%). Per class (F1):
+
+- **Mare basalt: 0.82** and **basin material: 0.78.** Good, though a little below HyperSIGMA.
+- **Highland or terra: 0.61.** Better than the per-pixel random forest (0.47).
+- **Dark mantle: 0.44.** It finds 91% of the true dark-mantle pixels, the highest of any method, but with many false alarms.
+- **Crater material: 0.07.** Weak, like the per-pixel methods.
+
+**Why the two models differ.** HyperFree looks at each pixel's spectrum on its own, using the real IIRS wavelengths. Its result is therefore close to the best per-pixel classical method, with a gain on highlands and on finding dark mantle. HyperSIGMA's spatial encoder looks at a 64 × 64 pixel neighbourhood (about 5 km), so it also uses texture and surrounding terrain. Because the map classes are large regions, that context helps a lot.
+
+**How this compares with the context control.** The classical random forest given the same 64-pixel neighbourhood also reaches 87% overall accuracy, the same as HyperSIGMA, with a macro F1 of 0.63. The two agree on the large classes: mare 0.96 against 0.97, and basin 0.90 against 0.89. HyperSIGMA's extra 0.04 in macro F1 comes from highlands (0.77 against 0.66) and crater material (0.18 against 0.01). So most of HyperSIGMA's lead over per-pixel methods comes from spatial context. Its pretrained features add a smaller improvement on the harder classes, which is within the confidence interval for now.
+
+**How to say it in one sentence.** "With the Earth model frozen and a single linear layer trained, HyperSIGMA classifies 87% of held-out lunar pixels correctly and almost perfectly separates mare from basin material. HyperFree performs like the best per-pixel classical method. Most of HyperSIGMA's advantage comes from seeing the surrounding terrain, and the pretraining adds a smaller gain on the harder highland and crater classes, which our next experiments will test."
+
+*Values: [per-class scores for every method](../results/phase-2/m4-transfer/metrics/e1g2_benchmark_per_class.csv), [overall scores](../results/phase-2/m4-transfer/metrics/e1g2_benchmark_m4.csv).*
+
 ### What comes next
 
 - **Zero-shot test:** compare embeddings with laboratory mineral spectra, without any lunar training.
