@@ -1,276 +1,442 @@
-# IIRS lunar research: purpose, approach, and current status
+# IIRS lunar research: a module-by-module guide
 
-This page is the complete plain-language snapshot of the project. It explains the research question, the plan, the evidence collected so far, the open checks, and what comes next. Technical details link to the research records in the repository.
+This guide explains the whole project in plain language: the question, the data, each module from start to current state, the methods and algorithms used, what each figure shows, and what comes next. It is written to be read in full before a presentation. A shorter version can be cut from it for slides. Every number links back to saved values and figures in the [`results/`](../results/) records, and the full technical record is the [main README](../README.md).
 
-## The question we want to answer
+**Status on 10 October 2026:** M1 (trusting the data) is mostly complete. M2 (from signal to surface physics) has a one-scene pilot with independent checks. M3 (reference baselines) has exploratory results on proxy labels. M4 (Earth models on the Moon) has an exploratory first test.
+
+## Contents
+
+1. [The research question](#1-the-research-question)
+2. [Understanding the data](#2-understanding-the-data)
+3. [The plan: build trust, then test models](#3-the-plan-build-trust-then-test-models)
+4. [Progress at a glance](#4-progress-at-a-glance)
+5. [M1: Trusting the data](#5-m1-trusting-the-data)
+6. [M2: From signal to surface physics](#6-m2-from-signal-to-surface-physics)
+7. [M3: Reference baselines](#7-m3-reference-baselines)
+8. [M4: Earth models on the Moon](#8-m4-earth-models-on-the-moon)
+9. [What it all means](#9-what-it-all-means)
+10. [Limits to keep in mind](#10-limits-to-keep-in-mind)
+11. [Glossary](#11-glossary)
+12. [A short explanation to share](#12-a-short-explanation-to-share)
+13. [Records and where to find them](#13-records-and-where-to-find-them)
+
+## 1. The research question
 
 Can a hyperspectral model trained on Earth data help us understand the Moon from observations made by Chandrayaan-2's Imaging Infrared Spectrometer (**IIRS**)?
 
-IIRS records a narrow strip of the Moon. At each image location, it measures light at many wavelengths. Some materials reflect light differently at different wavelengths. Those patterns can help scientists study lunar surface materials.
+Large "foundation models" now exist for Earth hyperspectral images. They were trained on huge numbers of airborne and satellite images. If what they learned also works for lunar spectra, they could speed up lunar mineral and water studies, where labelled training data are scarce. To test that fairly, we first need trustworthy lunar data, a fair test setup, and simple reference methods to compare against. That is why the project is built in stages.
 
-The project is not ready to test the model question yet. First, we must show that the measurements are trustworthy, know where each pixel is on the Moon, and prepare fair comparisons. This guide explains why those steps come first.
+## 2. Understanding the data
 
-## A simple way to picture IIRS data
+### What IIRS measures
 
-A regular camera records a few colors at each pixel. IIRS records hundreds of wavelength measurements. Imagine a stack of black-and-white images, with one image for each wavelength. That stack is a **spectral cube**.
+A normal camera records three colours (red, green, blue) at each pixel. IIRS records **256 wavelength channels** (called **bands**) at each pixel, from about 0.7 to 5.0 micrometres (µm). This is infrared light, beyond what the eye sees. The result is a **spectral cube**: a stack of 256 images of the same ground, one per wavelength.
 
 ```text
-One place on the Moon  -> measurements at many wavelengths
-Many places on the Moon -> many wavelength lists side by side
-All places and wavelengths -> a spectral cube
+One pixel        -> a spectrum: 256 brightness values, one per wavelength
+One image line   -> 250 pixels side by side across the strip
+Whole observation -> 12,210 lines x 250 pixels x 256 bands  (a spectral cube)
 ```
 
-![Official browse preview of the 2026 E1G2 IIRS strip. This display image helps show the observed terrain. It is not reflectance or a mineral map.](../results/phase-1/m1-e1g2-scene/figures/20260227_e1g2_calibrated_browse.png)
+IIRS images a narrow strip as the spacecraft moves. Our main scene (observed on 27 February 2026) is about 18 km wide and about 1,000 km long. It runs from 6.5°S to 26.9°N near 4°W, close to the centre of the Moon's near side. Each pixel covers roughly 80 m of ground. The scene was recorded in the lunar morning (about 08:10 local time), with the Sun about 57 to 62 degrees from overhead.
 
-*This quick-look image shows surface texture along one IIRS observation. The science checks use values in the measured cube, not brightness values from this preview.*
+### What the light contains
 
-## The approach: build trust, then test models
+Two kinds of light reach the instrument:
 
-The project follows a sequence. Each stage checks an assumption needed by the next stage. If an early check fails, later scores could look precise but answer the wrong question.
+- **Reflected sunlight** dominates below about 2.5 µm. How strongly the surface reflects at each wavelength depends on its minerals. For example, iron-bearing minerals such as pyroxene and olivine absorb light near 1 µm and 2 µm, which creates "dips" in the spectrum.
+- **Heat (thermal emission)** dominates beyond about 3 µm. The sunlit lunar surface is about 330 K (57 °C) here, and it glows in the infrared. This heat signal is useful for measuring temperature. It also gets in the way of studying the 3 µm water and hydroxyl absorption, so it must be removed first.
+
+### Three product levels
+
+The same observation exists at different processing levels, and they must not be confused:
+
+1. **Raw counts:** the numbers the detector recorded. They have no physical unit.
+2. **Calibrated radiance:** the counts converted to physical light intensity, in µW or mW per cm² per steradian per µm. This is what ISRO distributes as "calibrated" (Level 1).
+3. **Reflectance:** radiance divided by the incoming sunlight, so it describes the surface itself. A value of 0.1 means the surface reflects 10% of the light. We compute this in M2.
+
+### Instrument modes
+
+IIRS records in different **exposure and gain modes**. The mode name comes from the product label:
+
+- **E1G2:** 1 ms exposure. Keeps valid bands out to 4.9 µm, which is needed for temperature.
+- **E3G2:** 10 ms exposure. Valid bands stop at 3.16 µm.
+
+Only bands marked `VALID` for a mode may be used. File suffixes such as `d18` or `m65` name the receiving ground station, not the mode.
+
+### Our data
+
+- **Main scene:** 2026-02-27, mode E1G2. Raw and calibrated versions.
+- **Two older scenes:** 2020-02-08, mode E3G2. Raw and calibrated versions, used for checks.
+- **Reference data from other missions,** used for independent checks:
+  - SLDEM2015: a lunar elevation model from LRO laser altimetry and Kaguya stereo images.
+  - LROC WAC: an image mosaic from the LRO Wide Angle Camera.
+  - Diviner: LRO's thermal radiometer, which measures surface temperature.
+  - M³: Moon Mineralogy Mapper reflectance from Chandrayaan-1.
+  - The USGS Unified Geologic Map of the Moon.
+  - A standard solar spectrum (ASTM G173).
+
+## 3. The plan: build trust, then test models
+
+Each module checks an assumption the next module needs. If an early check is skipped, later scores could look precise but answer the wrong question.
 
 ```mermaid
 flowchart LR
-    A[Raw detector counts] --> B[Match to calibrated IIRS product]
-    C[Product labels and official IIRS files] --> B
-    B --> D[Check file integrity, units, and valid bands]
-    D --> E{Are radiance and pixel masks understood?}
-    D --> F{Are pixel locations reliable?}
-    E -->|Open now| G[Clarify fill and saturation rules; validate radiance independently]
-    F -->|Open now| H[Improve WAC alignment and seek absolute controls]
-    E -->|Pass| I[Correct radiance to reflectance]
-    F -->|Pass| I
-    I --> J[Check corrections and compare with M3]
-    J --> K[Review labels and reserve separate lunar regions for testing]
-    K --> L[Measure physical and from-scratch baselines]
-    L --> M[Compare Earth-trained hyperspectral models]
+    A["M1 Trusting the data<br/>files, units, bands, locations"] --> B["M2 Signal to surface physics<br/>reflectance, temperature, checks"]
+    B --> C["M3 Reference baselines<br/>labels, fair split, simple models"]
+    C --> D["M4 Earth models on the Moon<br/>HyperFree, HyperSIGMA"]
+    D --> E["M5 and M6 later<br/>lunar adaptation, science tasks"]
 ```
 
-The diamonds are quality gates. Both must pass before reflectance processing can support a defensible comparison. Model transfer comes last because it depends on every stage before it.
+Why this order matters:
 
-### Why this order matters
+1. **Correct files:** pairing the wrong observations would invalidate every comparison.
+2. **Correct measurements:** raw counts are not radiance, and radiance is not reflectance.
+3. **Correct locations:** if pixels sit at the wrong place, reference maps and labels describe the wrong ground.
+4. **Fair comparison:** training and test areas must be geographically separate. Otherwise neighbouring, near-identical pixels appear on both sides and a model looks better than it is.
+5. **Meaningful model test:** an Earth model is only interesting if it beats simple physical methods and a small model trained from scratch.
 
-1. **Correct files:** Pairing the wrong observations would invalidate comparisons.
-2. **Correct measurements:** Raw counts are not physical radiance. Radiance is not surface reflectance.
-3. **Correct locations:** If pixels are placed at the wrong lunar coordinates, reference maps and labels will refer to the wrong ground.
-4. **Fair comparison:** Training and test areas must be geographically separate. Otherwise, nearby and similar pixels can appear on both sides, making a model seem better than it is.
-5. **Useful model test:** Compare an Earth-trained model with simple physical methods and a small model trained from scratch. This shows whether transfer adds value.
+## 4. Progress at a glance
 
-## Where we are now
+- **M1, trusting the data:** mostly complete.
+  - All files are verified, and the usable bands are known.
+  - Pixel locations are aligned to an elevation model to within a fraction of a pixel.
+  - The calibration lookup tables are understood.
+  - Open: a documented rule for saturated and missing pixels, and access to the M³ comparison data.
+- **M2, from signal to surface physics:** a one-scene pilot is complete.
+  - The radiance units are confirmed by physics.
+  - Reflectance and temperature are computed.
+  - Temperature agrees with two independent references: terrain illumination and the Diviner instrument.
+  - Open: absolute reflectance calibration, photometric correction, and the 3 µm water signal.
+- **M3, reference baselines:** exploratory results.
+  - Proxy labels come from a geologic map.
+  - Unsupervised spectral units are mapped.
+  - Five baseline classifiers are scored on a fixed geographic split.
+  - Open: reviewed labels and more scenes.
+- **M4, Earth models on the Moon:** exploratory first test.
+  - Two Earth foundation models run on lunar data.
+  - Their features are scored with the same split, alongside careful controls.
+  - Open: zero-shot and fine-tuning experiments, after M3 is complete.
 
-**Current stage: M1, data and coverage checks.** The inventory and several supporting checks are recorded. M1 is still open because calibration, masks, geometry, and geographic coverage need more evidence. M2 reflectance processing and M3 baseline scoring have not started.
+## 5. M1: Trusting the data
 
-| Stage | Goal | Status | Why it helps |
-| --- | --- | --- | --- |
-| **M1: data and coverage** | Identify products, check files and units, understand valid bands, and select useful independent observations. | **In progress.** Three matched raw/calibrated pairs are documented. File checks and initial radiance and image-alignment checks are recorded. Mask rules, independent radiance validation, absolute geometry, and broader coverage remain open. | Stops bad units, missing data, or location errors from entering the science pipeline. |
-| **M2: calibrated reflectance** | Correct radiance for illumination, thermal emission, and lunar viewing geometry. Export traceable image patches and masks. | **Not started.** Gated by M1 evidence. | Produces a physical input that can support spectral and material comparisons. |
-| **M3: labels and baselines** | Review labels, freeze geographic train/validation/test areas, and measure simple methods and a model trained from scratch. | **Not started.** Five possible M³ products have been screened, but shared valid pixels are not known. | Establishes a fair score that an Earth-trained model must improve on. |
-| **M4: Earth-to-Moon model transfer** | Test selected Earth-trained hyperspectral models on the same lunar task and split. | **Future.** Starts only after M1–M3 pass. | Answers the main transfer question using a tested dataset and fair baseline. |
-| **M5: lunar self-supervised adaptation** | Adapt a selected model using unlabeled lunar data and compare controlled learning choices. | **Future.** Depends on reproducible M4 results and enough calibrated data. | Tests whether learning from lunar observations improves transfer. |
-| **M6: downstream science** | Assess supported mineral tasks and thermally corrected 3 µm hydration signals with uncertainty. | **Future.** Depends on validated corrections, labels, and model evidence. | Connects model results to carefully bounded scientific questions. |
+### Where we started
 
-The three current observations cover low latitudes. They do not yet provide a geographically independent evaluation set or polar coverage. Any polar ice question would need its own coverage and validation plan.
+We had raw IIRS archives and a user guide, but no proof of three things: which raw and calibrated files belong together, which bands are usable, and where each pixel lies on the Moon. The guide also said calibrated values are in mW, while some product labels said µW, a factor of 1000 apart.
 
-## Research agenda tracker
+### What we did
 
-This table is the working agenda. “Done” means the named check has evidence in the repository. It does not mean the entire research stage has passed. “Open” means work or evidence is still needed. “Gated” means the work must wait for an earlier quality check.
+**Step 1. Matched files and checked integrity.** For three observations we paired each raw product with its calibrated product. We confirmed that their labels agree on time, orbit, mode, image size and wavelengths. We then verified **checksums**. A checksum is a fingerprint of a file (MD5, SHA-256 or a ZIP CRC): if one byte changes, the fingerprint changes. Matching checksums prove the files are complete and unaltered. They do not prove the science is right.
 
-| Order | Work item | Status now | Next action | Evidence needed to close it |
-| --- | --- | --- | --- | --- |
-| 1 | Inventory and pair the pilot products | **Done for the three current pairs** | Add future scenes to the same verified manifest. | Product labels, pair fields, file sizes, and checksums recorded for each selected scene. |
-| 2 | Interpret units, calibration, fill, and saturation | **Open** | Get authoritative guidance for the saturation and dynamic-range fields. Establish documented fill and invalid-pixel rules. Validate radiance against a reference independent of the paired LUT calculation. | A reviewed per-band/per-pixel mask method, radiance validation report, and recorded limits. |
-| 3 | Validate IIRS pixel locations | **In progress** | Review poor WAC matches, improve spatial coverage of controls, and seek absolute lunar controls. | Registration residuals on well-distributed holdouts plus independent location evidence sufficient for the intended comparison. |
-| 4 | Review literature gaps, reference coverage, and scene selection | **In progress.** A targeted, cited literature matrix exists. M³ labels have been reviewed, but common valid coverage is unknown. | Keep the cited gap matrix current. Inspect the leading M³ candidate's pixel locations and valid-pixel flags. Estimate common valid area. Find additional non-overlapping IIRS tracks and suitable regions. | An updated [gap matrix](../docs/gap_matrix.md), an overlap report based on valid pixels, a scene-selection table, and a fixed orbit/province split. |
-| 5 | Pass the M1 gate | **Not passed** | Close the applicable measurement, mask, geometry, and coverage checks above. | A documented decision that the selected inputs support physical processing and independent evaluation. |
-| 6 | Build an M2 reflectance pilot | **Gated by M1** | Convert calibrated radiance to apparent reflectance. Validate thermal correction and lunar photometry. Preserve uncertainty, input masks, and pre/post-correction spectra. | A one-scene quality report with validated units, correction residuals, representative spectra, mask fractions, and independent comparisons. |
-| 7 | Export analysis-ready patches | **Gated by M2** | Save wavelength metadata, valid-band and pixel masks, location, orbit, processing version, split, and quality flags with each patch. | Reproducible patches and a manifest that traces each output to its source and correction. |
-| 8 | Prepare M3 labels and evaluation | **Gated by M2 and coverage** | Review a limited label task, flag uncertain areas, exclude uncertain map boundaries, and freeze geographically separate train/validation/test regions before tuning. | A label record, fixed split manifest, class support, and leakage checks. |
-| 9 | Measure M3 baselines | **Gated by labels and split** | Run physical spectral methods, clustering, and a small CNN trained from random initialization. | Held-out scores with the same inputs and split, uncertainty by region or track, saved values, figures, configurations, and failure cases. |
-| 10 | Test M4 Earth-to-Moon transfer | **Future, gated by M3** | Freeze HyperFree and HyperSIGMA versions and licenses. Test zero-shot prototypes, a frozen-encoder linear probe, then controlled fine-tuning. | Reproducible comparisons on the M3 task and test regions, alongside the physical and from-scratch baselines. |
-| 11 | Test M5 lunar adaptation | **Future, gated by M4** | Adapt a selected model on unlabeled calibrated lunar patches. Compare reconstruction and spectral constraints in controlled experiments. | Reproducible adaptation runs evaluated with the same split and task as M4. |
-| 12 | Evaluate M6 science tasks | **Future, gated by M2 corrections, M3 labels, and M4/M5 model validation** | Assess reviewed mineral tasks and thermally corrected 3 µm hydration signals. Keep any water-ice claim separate and require independent ice evidence. | Uncertainty-aware maps and evaluations tied to reviewed labels and independent references. |
+**Step 2. Identified the usable bands.** The IIRS archive document (the SIS, Appendix H) lists, for each mode, which bands are `VALID` and which are invalid, low-confidence (order-sorting filter, OSF) or saturated. E1G2 keeps 222 of 256 bands, including 4.5 to 4.9 µm, which is needed for temperature. E3G2 keeps 127 bands and has no valid band beyond 3.16 µm.
 
-### What the agenda says to do now
+![IIRS band validity by instrument mode.](../results/phase-1/m1-inventory/figures/band_validity_by_mode.svg)
 
-The immediate agenda has four parallel M1 threads: resolve the pixel-mask rules, validate radiance independently, improve geometry controls, and determine real IIRS/M³ coverage while selecting more independent scenes. They meet at the M1 decision gate. Reflectance code can be prototyped, but it must not produce scientific reflectance outputs until the source units, masks, and geometry meet the required checks.
+*What it shows:* which of the 256 bands may be used in each mode. *How to read it:* each row is a mode, and the horizontal axis is band number 1 to 256. Green cells are valid bands and grey cells are not. Only E1G2 has green cells near bands 226 to 248 (4.5 to 4.9 µm), which is why E1G2 is the mode for temperature and heat-removal work.
 
-```mermaid
-flowchart TD
-    A[Current evidence: inventory and pilot audits] --> B[Mask and fill rules]
-    A --> C[Independent radiance validation]
-    A --> D[Better geometry controls]
-    A --> E[Valid reference overlap and more tracks]
-    B --> F{M1 data gate}
-    C --> F
-    D --> F
-    E --> F
-    F -->|Pass| G[M2: validated reflectance patches]
-    G --> H[M3: reviewed labels and geographic split]
-    H --> I[M3: physical, clustering, and from-scratch baselines]
-    I --> J[M4: Earth-trained model transfer]
-    J --> K[M5: lunar adaptation]
-    G --> L[M6: bounded scientific tasks]
-    I --> L
-```
+**Step 3. Checked the calibration lookup table (LUT).** A **LUT** stores, for every band and detector pixel, a **gain** and an **offset**. Radiance is computed as raw count × gain + offset. We applied the E1G2 LUT to a fixed sample of raw counts and compared the result with the calibrated product. The median ratio was **1.004** and the median correlation per band was **0.922**, so the calibrated product follows the LUT closely.
 
-The M1 threads can make progress at the same time. M2 cannot pass its gate until the relevant M1 evidence is ready. M4 cannot start until the M3 baselines use reviewed labels and a defensible test split.
+For the 2020 E3G2 scenes, applying the LUT literally gave values about 5,000 times too large. We found the reason: the E3G2 table holds relative factors near 1, not absolute gains. E3G2 also uses a 10 ms exposure against 1 ms for E1G2. The calibrated E3G2 values equal the E3G2 table output times the E1G2 gain divided by 10, with a median match of **0.944**.
 
-## What we have done so far
+![E1G2 radiance, LUT comparison, and footprint.](../results/phase-1/m1-e1g2-scene/figures/e1g2_radiance_and_footprint.png)
 
-### 1. Matched IIRS observations and checked the files
+*What it shows:* three checks on the E1G2 calibrated product. *How to read it:* the left panel is the median radiance per wavelength. The middle panel is the ratio of calibrated values to the LUT prediction per band; values near 1 mean agreement. The right panel shows where the strip lies on the Moon (longitude against latitude, coloured by scan line).
 
-We matched two 2020 **E3G2** raw/calibrated pairs and one 2026 **E1G2** raw/calibrated pair. The product labels match on key observation details. The E1G2 ZIP archives and their data cubes pass checksum checks.
+**Step 4. Reviewed saturation and missing-pixel rules.** A **saturation mask** flags pixels where the detector hit its maximum, and a **fill value** marks missing data. The supplied saturation table, read in its stated unit, would flag 99.88% of the E1G2 data as saturated. Yet no raw count reaches the detector limit. The table and the data therefore do not agree, and the product label declares no fill value. We did not invent a mask. Instead we use a simple data-driven mask (keep pixels whose values are finite and positive), which keeps 99.61% of pixels.
 
-Think of the checksum as a seal on a package. It helps show that the file matches its label. It does not show that the measurement or calibration is scientifically correct.
+**Step 5. Located every pixel on the Moon (geometry registration).** The product gives coordinates only for a sparse grid of 1,476 points. To check and refine them we matched IIRS images to independent lunar maps:
 
-[Inventory record](../results/phase-1/m1-inventory/summary.md) · [E1G2 pair record](../results/phase-1/m1-e1g2-scene/summary.md)
+- **Image matching with normalized cross-correlation (NCC).** We take a small IIRS image patch and slide it over the reference image. At each shift we compute NCC, a similarity score from -1 to 1 that ignores overall brightness and contrast differences. The shift with the highest score is the best alignment. Each matched patch is a **tie point**.
+- **First reference: the LROC WAC mosaic.** Matches were too uncertain at full resolution (median error 2.24 pixels), because the two images were taken under different lighting.
+- **Second reference: a hillshade from SLDEM2015.** A **hillshade** is a shaded-relief image computed from an elevation model by simulating sunlight from a chosen direction. We rendered it with the same Sun direction as the IIRS observation, so shadows and bright slopes match.
+- **Fitting and testing.** Tie points were split into a **training set** (116 ties), used to fit the correction, and a **held-out set** (34 ties in separate line blocks), used only to test it. The correction is an **affine offset field**: a smooth model in which the offset changes linearly across the image. It was fitted with **Huber weighting**, which reduces the influence of outlier matches.
 
-### 2. Checked which wavelengths each instrument mode can use
+![SLDEM hillshade registration with held-out tie residuals.](../results/phase-1/m1-sldem-hillshade/figures/iirs_sldem_hillshade_tie_residuals.svg)
 
-The official IIRS table marks which wavelength bands are valid in each mode. The 2020 E3G2 scenes do not have valid 4–5 µm bands needed by the selected longwave thermal method. E1G2 has valid bands 226–248, from 4504.1 to 4874.9 nm. This makes E1G2 a candidate for thermal-method testing. It does not prove that the method works on our scene.
+*What it shows:* IIRS band 40 matched to the SLDEM hillshade, and the remaining errors on held-out ties. *How to read it:* the image panels show IIRS and the hillshade side by side; similar shadows mean the comparison is meaningful. The tie map colours each held-out tie by its leftover error. The histogram compares errors with the 1-pixel median and 2-pixel p95 limits. Most errors are well below 1 pixel.
 
-![Official IIRS band validity by instrument mode. Green bands are marked valid in the official workbook.](../results/phase-1/m1-inventory/figures/band_validity_by_mode.svg)
+**Step 6. Searched for M³ comparison data.** M³ (Chandrayaan-1) produced lunar reflectance maps that can check our reflectance scale. Five M³ observations overlap our strip, and one covers 1,033 of the 1,476 IIRS grid points. Its files are on a server whose security certificate fails validation from our machine, so the download is pending.
 
-*Green shows bands the official workbook marks valid. E1G2 has the longwave bands needed for the selected method. E3G2 does not.*
+### Where we reached
 
-[Band table and inventory evidence](../results/phase-1/m1-inventory/summary.md)
+- All files are verified.
+- The usable bands are known for each mode.
+- Both lookup tables are understood.
+- Pixel locations agree with an independent elevation model to a median of **0.375 pixels** (about 30 m), with 95% of held-out ties within **1.49 pixels**. This is a relative alignment: it shows that IIRS and the elevation model line up with each other.
 
-### 3. Compared E1G2 radiance with the official look-up table
+### What comes next
 
-The calibrated E1G2 product contains **radiance**, a physical measure of light arriving from the Moon. It is not reflectance. The official look-up table (**LUT**) provides gain and offset values to convert raw counts into radiance.
+- Obtain a documented saturation and fill rule.
+- Download the M³ files through another route.
+- Add more IIRS observations from other regions.
 
-We applied that table to a fixed sample of raw counts and compared the result with the paired calibrated product. The median calibrated-to-LUT ratio was **1.00375**. The median correlation across bands was **0.922**. This supports internal agreement between the matched product and the table. It does not independently validate the radiance scale because the comparison uses the same observation and instrument data.
+## 6. M2: From signal to surface physics
 
-![E1G2 radiance, look-up-table comparison, and sparse geometry grid.](../results/phase-1/m1-e1g2-scene/figures/e1g2_radiance_and_footprint.png)
+### Where we started
 
-*The middle panel compares radiance with the LUT calculation. The right panel shows a sparse set of lunar coordinates. Neither panel shows reflectance.*
+We had trusted radiance files, but there was a factor-of-1000 doubt about their unit (µW or mW). We had no reflectance and no temperature yet.
 
-[Radiance, mask, and geometry findings](../results/phase-1/m1-e1g2-scene/summary.md) · [Per-band values](../results/phase-1/m1-e1g2-scene/metrics/e1g2_radiance_by_band.csv)
+### What we did
 
-### 4. Found an unresolved rule for missing and saturated pixels
+**Step 1. Settled the unit question with physics.** The product label and the guide disagree. Rather than wait for a reply, we asked which reading gives physically possible values. Two quantities test this:
 
-The official saturation table labels its radiance threshold in µW/cm²/sr/µm and its dynamic-range field in counts. Applied as labeled, **99.878921%** of valid-band calibrated values meet or exceed the saturation threshold, while no raw counts reach the dynamic-range values. This conflicts with the paired observations. The calibrated cube label gives no missing-value constant.
+- **I/F (radiance factor):** I/F = π × radiance ÷ (solar irradiance at the Moon). Solar irradiance is the sunlight arriving per wavelength. We took it from the ASTM G173 standard solar spectrum, corrected for the Sun–Moon distance on the observation date. Real lunar surfaces have I/F of roughly 0.02 to 0.5. A value above 1 is impossible, because the surface would be reflecting more light than it receives.
+- **Brightness temperature:** the temperature a perfect emitter would need to produce the observed heat signal (explained in Step 3).
 
-We do not know how to turn these fields into a reliable pixel mask. We have not guessed. The next step is to get authoritative guidance on how to apply these fields and how to identify invalid pixels. Until then, the threshold comparisons are observations, not a mask.
+Read with the label unit (µW), E1G2 gives I/F = **0.052** and a temperature of **328 K**, both realistic. Read as mW, it gives I/F = 51.5 and 1,207 K, both impossible. The same test on the two 2020 products shows `m65` is in mW and `d18` in µW. **The label unit is correct for every product, and the stored scale differs between products.**
 
-### 5. Compared IIRS image patterns with the WAC lunar map
+![Radiance-unit physical test for E1G2.](../results/phase-1/m2-radiance-unit-physics/figures/e1g2_radiance_unit_physical_test.png)
 
-Before comparing a pixel with another map, we need to know where that pixel is. We acquired a local crop from NASA's Lunar Reconnaissance Orbiter **WAC** map and compared surface patterns with IIRS. Some image patches helped fit the alignment. Other patches were held aside to check it.
+*What it shows:* the two possible unit readings tested against physics. *How to read it:* in the left panel, each line is median I/F per wavelength for one reading. The green band is the realistic lunar range and the dashed line at 1 is a perfect reflector. In the right panel, each line is temperature by latitude, and the dashed line is the temperature physics predicts. Only the blue µW reading falls in the realistic range in both panels.
 
-```mermaid
-flowchart LR
-    A[IIRS coordinate grid] --> C[Place IIRS image on WAC map]
-    B[WAC image of lunar surface] --> C
-    C --> D[Match surface patterns]
-    D --> E[Fit on training patches]
-    E --> F[Measure held-out patch errors]
-    F --> G[Review matches and seek surveyed controls]
-```
+**Step 2. Computed apparent reflectance.** **Apparent reflectance** = I/F ÷ cos(i), where *i* is the solar incidence angle (how far the Sun is from overhead, taken for each image line from the spacecraft orbit file). Dividing by cos(i) corrects for the Sun being low in the sky. "Apparent" means no correction yet for viewing geometry (photometric correction) or local slopes.
 
-The full-resolution band-40 check had **12 held-out image ties in three along-track regions**. Its root mean square error (**RMSE**) was **2.757 IIRS pixels**. RMSE summarizes position differences and gives more weight to large errors. The browse-image check had a smaller residual, but the browse image has lower resolution. The larger full-resolution error is a reason to keep checking.
+![Apparent reflectance strip maps.](../results/phase-1/m2-apparent-reflectance/figures/e1g2_apparent_reflectance_strip_maps.png)
 
-Image ties are matching patterns, not surveyed lunar locations. They test whether two images line up with each other. They do not prove the exact lunar location of each IIRS pixel. WAC can help check geometry, but it cannot validate radiance calibration.
+*What it shows:* the first reflectance product along the whole strip. *How to read it:* latitude runs left to right, and the 18 km strip width is stretched vertically. The top strip shows reflectance at 1.5 µm: dark areas are mare basalt and volcanic ash deposits, and bright areas are highlands and sunlit slopes. The middle strip is a false-colour composite (red 2.1 µm, green 1.5 µm, blue 1.0 µm). Colour differences mean spectral differences, not mineral names. The bottom strip is a ratio that mostly shows spectral slope; its thin horizontal lines are detector stripes.
 
-![Held-out image-alignment errors for IIRS band 40 against WAC.](../results/phase-1/m1-reference-data/figures/iirs_wac_registration_band040_1369nm_residuals.svg)
+![Apparent reflectance spectra.](../results/phase-1/m2-apparent-reflectance/figures/e1g2_apparent_reflectance_spectra.png)
 
-*The plot shows the errors for held-out image matches. Some errors are large, and the matches cover only three parts of one observation.*
+*What it shows:* typical spectra of the darkest and brightest 10% of pixels. *How to read it:* the left panel (0.8 to 2.6 µm) shows that bright terrain reflects about twice as much as dark terrain. Both rise toward longer wavelengths, which is the usual lunar "reddening" caused by space weathering. In the right panel, on a log scale, the steep rise after 3 µm is heat, not reflected light.
 
-[WAC alignment methods and limits](../results/phase-1/m1-reference-data/summary.md) · [Per-match values](../results/phase-1/m1-reference-data/metrics/iirs_wac_registration_band040_1369nm_ties.csv)
+The median reflectance at 1.5 µm is **0.098**, and bright terrain is about **1.9 times** brighter than dark terrain. This matches the contrast between lunar highlands and maria.
 
-### 6. Shortlisted possible M³ comparison data
+**Step 3. Measured surface temperature.** Every warm object emits infrared light according to **Planck's law**, which gives the radiance emitted at each wavelength for a given temperature. Running the law backwards (**Planck inversion**) turns measured radiance into a temperature. We used the 4.5 to 4.9 µm bands, the method used by the ISRO IIRS team. We first subtracted the small reflected-sunlight part (about 6% of the signal), and assumed an **emissivity** of 0.95, meaning the surface emits 95% as efficiently as a perfect emitter. The median temperature is **327.8 K**.
 
-The **Moon Mineralogy Mapper (M³)** flew on Chandrayaan-1 and produced lunar reflectance images. A PDS search found five M³ products whose mapped footprints may overlap the E1G2 scene. We reviewed their labels and counted how many of the 1,476 sparse IIRS coordinate points fell inside each M³ footprint. One product ranked highest.
+For comparison we used a **radiative equilibrium** model: absorbed sunlight equals emitted heat, which gives T = [(1 − A) × S × cos(i) ÷ (ε × σ)]^¼. Here A is the albedo (the fraction of sunlight reflected), S is the solar constant, ε is emissivity and σ is the Stefan–Boltzmann constant. IIRS agrees with this model within about 15 K, depending on which albedo law is assumed.
 
-This is only a shortlist. Point counts do not tell us how much image area overlaps or whether those pixels contain valid data. We have not downloaded an M³ cube or compared spectra. We must check pixel locations and invalid-pixel flags before selecting a product.
+![Brightness temperature and exploratory heat removal.](../results/phase-1/m2-thermal-brightness/figures/e1g2_brightness_temperature_and_thermal_removal.png)
 
-[M³ candidate and WAC reference record](../results/phase-1/m1-reference-data/summary.md) · [Candidate point counts](../results/phase-1/m1-reference-data/metrics/m3_control_grid_overlap.csv)
+*What it shows:* the temperature map and an attempt to remove heat near 3 µm. *How to read it:* in the top strip, yellow is hot (sun-facing slopes) and purple is cool (slopes facing away). The lower-left panel compares the median temperature per degree of latitude with the equilibrium model (dashed). The dip at 18°N is the steep Montes Apenninus range. The lower-right panel shows reflectance from 2.5 to 3.6 µm before (orange) and after (blue) removing the heat signal. A flat blue line means the heat was largely removed.
 
-## Reproduce the main completed checks
+**Step 4. Checked temperature against the terrain.** If the temperature is real, slopes facing the Sun must be warmer. From SLDEM2015 we computed each pixel's slope and its **local incidence angle** (the angle between the Sun and the ground's surface normal). We then compared temperature with cos(local incidence). Two statistics summarize the result:
 
-Run commands from the repository root. Several commands need source archives or derived images from ignored `data/`. The research records list source versions, software, outputs, and limits. Do not commit raw archives or large intermediate cubes.
+- **Pearson correlation (r):** how closely two quantities rise and fall together, from -1 to 1.
+- **R² on held-out data:** the fraction of temperature variation that a straight-line fit, learned on half of the strip, explains on the other half.
 
-**E1G2 radiance and LUT audit:**
+The result is **r = 0.877** across 3 million pixels, with a held-out **R² = 0.78**.
 
-```sh
-uv run --no-project --with numpy --with matplotlib python scripts/analyze_iirs_e1g2_scene.py
-```
+![Temperature against terrain illumination.](../results/phase-1/m2-topographic-validation/figures/e1g2_topographic_validation.png)
 
-This streams the paired raw and calibrated cubes from their archives and recreates the per-band CSV and audit figure.
+*What it shows:* the independent elevation model predicts where IIRS sees hot and cold ground. *How to read it:* the top strip is sunlight on each slope computed from SLDEM2015, and the second strip is IIRS temperature; the patterns match. The lower-left panel plots temperature against slope illumination, and the rising line shows warmer temperatures on better-lit slopes. The lower-right panel shows that correcting reflectance for slope separates dark and bright terrain into two clear peaks.
 
-**Official band-validity figure and values:**
+**Step 5. Checked temperature against another instrument.** **Diviner**, on NASA's Lunar Reconnaissance Orbiter, has mapped lunar temperatures since 2009. Its **Global Cumulative Product** gives average temperature for each 0.5° cell at each quarter hour of lunar local time. We took Diviner values at the same place and the same local time as IIRS (about 08:10). IIRS reads a median **5.0 K warmer** than Diviner. The two latitude profiles correlate at **r = 0.81**. A small warm offset is expected, because a rough surface seen from above shows its hottest sunlit facets more strongly at 4.7 µm.
 
-```sh
-uv run --no-project --with xlrd python scripts/plot_iirs_band_validity.py
-```
+![IIRS against Diviner.](../results/phase-1/m2-diviner-temperature/figures/e1g2_iirs_vs_diviner_temperature.png)
 
-This reads the official workbook under ignored `data/` and recreates the CSV and SVG.
+*What it shows:* IIRS and Diviner temperatures along the strip at matched local time. *How to read it:* in the left panel, latitude runs up the vertical axis. The red line is IIRS and the blue lines are Diviner; lines that move together mean both instruments see the same pattern. The right panel shows the difference per degree of latitude. Points right of zero mean IIRS is warmer, typically by about 5 K.
 
-**Browse-scale WAC registration:**
+**Step 6. Explored the 3 µm water region.** Water and hydroxyl absorb near 2.9 to 3.0 µm, where heat also dominates. We subtracted the modelled heat, using the measured temperature, and measured the **band depth** at 2.9 µm. Band depth is the fractional dip below a straight-line "continuum" drawn across the feature. At single-pixel level this measurement is still dominated by noise. It is kept as an exploratory step, and no water result is reported.
 
-```sh
-uv run --python 3.11 --with numpy --with opencv-python-headless --with matplotlib python scripts/register_iirs_to_wac.py
-```
+### Where we reached
 
-**Full-resolution WAC registration:** this requires the ignored band-40 PNG and metadata described in the [reference-data notes](../results/phase-1/m1-reference-data/notes.md).
+The radiance scale is confirmed. The first IIRS reflectance and temperature products exist for the whole strip. Temperature is supported by two independent references: terrain illumination from an elevation model, and the Diviner instrument. Together these also confirm that the pixel locations are accurate enough to put each pixel on the right slope.
 
-```sh
-uv run --python 3.11 --with numpy --with opencv-python-headless --with matplotlib python scripts/register_iirs_to_wac.py --iirs-image data/reference/lroc_wac_e1g2/e1g2_band040_1369nm.png --iirs-image-metadata data/reference/lroc_wac_e1g2/e1g2_band040_1369nm.json --image-description 'E1G2 calibrated band 40, 1369.6 nm, 1-99 percentile display stretch' --artifact-suffix band040_1369nm --search-radius 16
-```
+### What comes next
 
-The per-tie source values and output figure are linked in the WAC record above. Re-running a command is useful only when its input version and code match the record.
+- **Photometric correction:** adjust for viewing and illumination angles using a lunar light-scattering model (Lommel–Seeliger or Hapke).
+- **Absolute reflectance check:** compare with M³, or with an IIRS scene over the Apollo 16 landing site, whose returned soil samples have known laboratory spectra.
+- **3 µm signal:** average pixels into larger areas and propagate the temperature uncertainty.
 
-## How the current stage moves us toward the goal
+## 7. M3: Reference baselines
 
-The current checks reduce uncertainty before it can contaminate later results:
+### Where we started
 
-- **Pair and checksum checks** show which files belong together and whether they match their labels.
-- **Mode and wavelength checks** prevent us from using bands that the instrument table marks invalid.
-- **The LUT comparison** supports the E1G2 radiance scale internally and gives us a concrete independent-validation question.
-- **The saturation and fill review** prevents us from making up a mask that could hide bad data or remove good data.
-- **The WAC image comparison** measures preliminary alignment and shows that geometry still needs work.
-- **The M³ screen** narrows the search for a comparison scene without claiming that usable overlap is proven.
+We had reflectance, but no labels saying what each area is, no fair way to split the strip into training and test areas, and no reference scores.
 
-These checks do not yet answer whether Earth-trained models transfer to lunar data. They tell us what must be fixed before that answer can be trusted.
+### What we did
 
-## What happens next
+**Step 1. Prepared the spectra.** Four clean-up steps were applied before any model:
 
-The next work should close the M1 blockers in a controlled order:
+- **Slope correction:** reflectance is divided by the local illumination from SLDEM.
+- **Column flat field (destriping):** each detector column is scaled so its median matches the others. This removes vertical stripes caused by small detector differences.
+- **Polishing:** a smooth curve is fitted to the scene-average spectrum. Every spectrum is divided by the ratio between the average and that curve, which removes small steps that appear identically in every pixel.
+- **Despiking:** a band value that jumps far from its neighbouring bands (more than 6 robust standard deviations) is replaced with the neighbours' median. This affected 1.6% of values.
 
-1. Get authoritative rules for E1G2 fill values, saturation, and dynamic-range fields. Define the pixel mask from documented rules.
-2. Validate radiance against an independent reference. The LUT comparison alone is not enough.
-3. Review low-confidence WAC matches, add better-spread controls, and seek absolute location controls. Keep the geometry gate open until the evidence supports closure.
-4. Check M³ pixel locations and valid-pixel rules for the leading candidate. Estimate actual shared valid coverage before acquiring or comparing large cubes.
-5. Select additional non-overlapping IIRS observations and plan geographic train, validation, and test regions.
+**Step 2. Measured mineral-sensitive parameters.** **Integrated band depth (IBD)** is the average depth of an absorption dip below a straight-line continuum across a wavelength window. We computed it near 1 µm (0.85 to 1.58 µm) and near 2 µm (1.58 to 2.45 µm). Higher IBD near 1 µm suggests more iron-bearing minerals or volcanic glass.
 
-When those M1 checks pass, test thermal and photometric correction on E1G2. Compare corrected spectra with suitable independent references and carry temperature and measurement uncertainty forward. Only then produce analysis-ready reflectance patches.
+**Step 3. Found natural spectral groups without labels (unsupervised).**
 
-After M2 passes, review labels and freeze the M3 geographic split before model tuning. Measure physical methods, clustering, and a small model trained from scratch. Save scores with their labels, split, units, uncertainty, code version, values, and figures.
+- **PCA (principal component analysis)** compresses each 83-value spectrum into a few numbers that capture most of the variation between pixels.
+- **k-means clustering** then splits the pixels into k groups, assigning each pixel to the nearest group centre and moving the centres until they settle.
+- We checked stability in two ways, using the **adjusted Rand index (ARI)**, a 0 to 1 score of agreement between two groupings:
+  - repeating the clustering with different random starts;
+  - training separately on alternate halves of the strip.
+- We also used the **silhouette score**, which measures how well separated the groups are.
 
-After M3 passes, compare Earth-trained models on the same task and held-out regions. This lets us ask whether transfer helps beyond the baseline. Later adaptation and science tasks remain gated by those results.
+Six spectral units were stable across random starts (ARI 0.95 or more). The darkest unit, with the strongest 1 µm absorption, falls on the **Rimae Bode dark mantle deposit**, a known field of iron-rich volcanic glass.
 
-## The main limits to remember
+![Spectral parameters and unit spectra.](../results/phase-1/m3-spectral-units/figures/e1g2_spectral_parameters_and_unit_spectra.png)
 
-- Raw counts are not radiance. Radiance is not reflectance.
-- A close LUT match is internal consistency, not independent calibration validation.
-- The saturation and fill comparisons do not define a validated mask.
-- WAC image ties do not establish absolute geolocation accuracy.
-- M³ footprint-point counts do not establish valid-pixel overlap.
-- Geologic map units are broad hints, not proof of each pixel's mineral makeup.
-- No validated IIRS reflectance, mineral map, hydration result, water-ice detection, or model score exists yet.
-- Keep entire orbits or regions separate for training and testing. Neighboring pixels can be so similar that a pixel-random split gives an unrealistically high score.
+*What it shows:* mineral-sensitive maps and the average spectrum of each unit. *How to read it:* the top three strips (latitude left to right) are albedo, 1 µm band depth, and 2 µm band depth. Brighter yellow in the band-depth strips means a stronger absorption. Red dotted lines mark named lunar features. The lower-left panel shows each unit's average spectrum shape. The lower-right panel shows how the stability scores change with the number of units; the red dotted line is the 0.8 target.
 
-## A short explanation to share
+![Spectral unit map.](../results/phase-1/m3-spectral-units/figures/e1g2_spectral_unit_map.png)
 
-We are testing whether models trained on Earth hyperspectral data can help analyze lunar spectra from Chandrayaan-2. First, we need to prove that the IIRS measurements are calibrated, correctly located, and compared fairly. We have matched three raw and calibrated scenes, checked an E1G2 scene against the official calibration table, tested image alignment against LROC WAC imagery, and shortlisted possible M³ reference data. The calibration check is internal, the alignment is preliminary, and the valid overlap is unknown. We are still in the data-quality stage. Reflectance processing and model scoring wait until those gates pass.
+*What it shows:* where each spectral unit lies along the strip. *How to read it:* each colour is one unit, numbered from darkest (1) to brightest (6). Unit 1 (blue) clusters at the Rimae Bode deposit near 10 to 13°N and near Sinus Medii. Units are spectral groups, not mineral names.
 
-## Technical trail and key records
+**Step 4. Built proxy labels from a geologic map.** The **USGS Unified Geologic Map of the Moon** (1:5,000,000 scale) divides the surface into mapped units such as mare basalt and basin deposits. We **rasterized** it: for every IIRS pixel we looked up which map polygon contains it. This gives 14 units in our strip, grouped into five classes:
 
-This README is the single entry point for the guide. Reproducible evidence remains in the research records:
+- basin material: 47.5% of pixels;
+- mare basalt: 27.5%;
+- highland or terra: 13.9%;
+- dark mantle: 6.1%;
+- crater material: 5.0%.
 
-- [M1–M3 plan and quality gates](../docs/m1_m3_plan.md)
-- [Current task plan](../tasks/task_plan.md)
-- [Inventory and mode-validity record](../results/phase-1/m1-inventory/summary.md)
-- [E1G2 radiance and mask record](../results/phase-1/m1-e1g2-scene/summary.md)
-- [WAC geometry and M³ record](../results/phase-1/m1-reference-data/summary.md)
-- [Detailed M1 evidence flowchart](../README.md#m1-workflow-results-and-remaining-gates)
+At this map scale, shifting the map by 2 km changes 21% of labels. We therefore dropped every pixel within 2 km of a unit boundary (a **contact buffer**). These are **proxy labels**: useful for a first benchmark, but not reviewed ground truth.
 
-Each results module also contains findings and notes. Metric records include CSV or JSON values and figures where applicable. Original data remain under ignored `data/` and are not stored in this guide.
+![Proxy geologic labels.](../results/phase-1/m3-geologic-labels/figures/e1g2_geologic_unit_labels_strip.png)
+
+*What it shows:* the geologic map transferred onto the IIRS strip. *How to read it:* latitude runs left to right. The top strip shows the 14 map units, and the bottom strip shows the five classes used for training and testing. The black dark-mantle area near 9 to 13°N is the same place where the darkest spectral unit appears, which is an independent agreement.
+
+**Step 5. Fixed a fair test split.** Neighbouring pixels are nearly identical, so a random split would leak information. We cut the strip into blocks of 250 lines (about 20 km) and assigned them in a repeating pattern: train, train, validation, test. We also dropped 25 lines at each block edge as **guard bands**. The split was fixed before any model was scored. The validation blocks were used only to decide when to stop training the neural network.
+
+**Step 6. Scored five baseline methods.**
+
+- **Majority class:** always predicts the most common class. This is the floor.
+- **Band parameters with nearest centroid:** a physical method. Each pixel is described by four numbers (albedo, IBD at 1 µm, IBD at 2 µm, and a slope ratio) and assigned to the class with the closest average.
+- **Logistic regression:** a linear classifier, applied after PCA reduces each spectrum to 20 numbers.
+- **Random forest:** 300 decision trees, each asking a series of yes-or-no questions about the spectrum. The trees vote on the class.
+- **1D convolutional neural network (CNN), trained from scratch:** small learned filters slide along the spectrum to detect shapes such as dips and slopes. Trained on the GPU.
+
+Two scores were used, both on the held-out test blocks:
+
+- **Macro F1:** for each class, F1 balances precision (how many predicted pixels are right) and recall (how many true pixels are found). Macro F1 averages over classes, so small classes count equally.
+- **Balanced accuracy:** the average recall over classes.
+
+The 95% confidence intervals come from **bootstrap resampling of test blocks**: the scoring is repeated 1,000 times on randomly redrawn sets of blocks.
+
+We also ran a **context control**: the same methods on spectra averaged over a 64 × 64 pixel window (about 5 km). This tests how much the surrounding area helps.
+
+### Where we reached
+
+Macro F1 on the held-out test blocks:
+
+- Majority class: 0.10
+- Physical band parameters: 0.40
+- Logistic regression: 0.46
+- Random forest: 0.50
+- 1D CNN from scratch: 0.49
+- Random forest with 64-pixel context: **0.63**
+
+Every method learns the map units far better than chance. Adding spatial context gives the largest improvement, because the map units are large regions and single-pixel spectra are noisy. The from-scratch CNN performs like the random forest. A wider 64-line guard changed no score by more than 0.04, which shows the split is not leaking.
+
+### What comes next
+
+- Review the labels with a domain expert.
+- Add observations from other lunar regions so tests can use entirely separate scenes.
+- Re-run on photometrically corrected reflectance.
+
+## 8. M4: Earth models on the Moon
+
+### Where we started
+
+The plan was to test Earth foundation models after M3. For the October review we ran an early, exploratory version on the same labels and split, so the results can be compared directly with M3.
+
+### Key ideas
+
+- **Foundation model:** a large neural network pretrained on a very large collection of unlabelled data. What it learns can be reused for new tasks.
+- **Vision Transformer (ViT):** a network that cuts an image into small patches and learns how the patches relate to each other.
+- **Masked autoencoder (MAE) pretraining:** the model learns by hiding parts of the input and predicting them back. No labels are needed.
+- **Frozen encoder and embeddings:** we do not change the model. We pass each IIRS tile through it and keep its output, a list of 768 numbers per pixel called an **embedding**.
+- **Linear probe:** a single linear layer trained on the embeddings to predict the classes. If a simple probe works well, the embeddings already contain the useful information.
+
+### The two models
+
+- **HyperFree** (Li et al., CVPR 2025):
+  - Pretrained on AVIRIS airborne images covering 0.4 to 2.5 µm.
+  - Its key feature is **wavelength awareness**: it builds its input layer from the actual band wavelengths. We could therefore feed it all 83 IIRS bands from 0.85 to 2.46 µm directly.
+- **HyperSIGMA** (Wang et al., IEEE TPAMI 2025):
+  - Pretrained with MAE on Hyperion satellite radiance and GF-5 images.
+  - It has a **spatial encoder**, which looks at 64 × 64 pixel tiles, and a **spectral encoder**, which looks at the band sequence.
+  - It requires exactly 100 bands, so we **interpolated** the IIRS spectrum onto 100 evenly spaced wavelengths over the same range.
+
+Both models were downloaded from the authors' Hugging Face pages and run on an NVIDIA H100 GPU. Each one processed the whole strip in one to two minutes.
+
+### What we did
+
+1. Extracted frozen embeddings for every pixel from HyperFree, the HyperSIGMA spatial encoder, and the HyperSIGMA spectral encoder.
+2. Trained a linear probe on exactly the same training blocks, and scored it on the same test blocks with the same metrics as M3.
+3. Ran two controls:
+   - **Context control:** HyperSIGMA sees 64-pixel tiles, so we compared it with the M3 random forest using the same 64-pixel context, but no pretraining.
+   - **Leakage control:** we widened the guard bands to 64 lines (larger than a tile) and re-ran everything.
+
+![Benchmark of M3 baselines, context controls and M4 probes.](../results/phase-2/m4-transfer/figures/e1g2_m3_m4_benchmark.png)
+
+*What it shows:* every method's score on the same held-out test blocks. *How to read it:* each row is a method, coloured by family (orange rows are the Earth foundation models). The dot is the score and the bar is its 95% confidence interval; further right is better. If two bars overlap, the methods are not reliably different.
+
+### Where we reached
+
+Macro F1 on the same held-out test blocks:
+
+- HyperFree, frozen with a linear probe: 0.54
+- HyperSIGMA spatial, frozen with a linear probe: **0.67** (the highest score)
+- HyperSIGMA spectral, frozen with a linear probe: 0.57
+- For comparison, the context random forest with no pretraining: 0.63
+
+The Earth models produce useful lunar features: all three beat the per-pixel baselines, and HyperSIGMA scores highest. The context control shows that much of HyperSIGMA's lead comes from seeing the surrounding area. A classical method with the same context scores within its confidence interval. Results did not change with wider guard bands. The honest summary for this stage: Earth models transfer and are competitive, and showing a clear benefit from their Earth pretraining needs the next experiments.
+
+### What comes next
+
+- **Zero-shot test:** compare embeddings with laboratory mineral spectra, without any lunar training.
+- **Controlled fine-tuning:** allow the model to adapt with a fixed training budget.
+- **Matched spatial baseline:** a spatial model trained from scratch at the same capacity.
+- **Better labels and data:** reviewed labels, more scenes, and corrected reflectance.
+
+## 9. What it all means
+
+- **The data can be trusted for physical analysis.** Files, bands, units and pixel locations are verified, and two independent references agree with the derived temperatures.
+- **IIRS sees real lunar geology.** Reflectance contrast, temperature patterns, spectral units and the geologic map all line up. The Rimae Bode volcanic deposit stands out in every view.
+- **There is now a fair benchmark.** Simple and learned methods are scored on a fixed geographic split with confidence intervals, and the Earth foundation models were tested on exactly the same setup.
+- **Earth models transfer to lunar data and are competitive.** The next step is to isolate how much their pretraining adds beyond spatial context.
+
+## 10. Limits to keep in mind
+
+- **One scene:** all M2 to M4 results come from one low-latitude strip, so they show feasibility, not general performance across the Moon.
+- **Provisional reflectance:** there is no photometric correction or absolute calibration yet, and a few small spectral steps remain from the instrument.
+- **Proxy labels:** the geologic map is coarse (1:5,000,000), so labels describe broad units, not exact minerals at each pixel.
+- **Relative geometry:** pixel locations agree with an elevation model, not with surveyed ground points.
+- **No water claim:** the 3 µm signal needs more processing and uncertainty analysis before any statement about water or hydroxyl. A 3 µm absorption alone would not show water ice.
+- **Saturation rule:** the saturation and missing-pixel rule still needs documentation from the data provider.
+
+## 11. Glossary
+
+- **Band:** one wavelength channel of the instrument.
+- **Spectrum:** the list of values across all bands for one pixel.
+- **Spectral cube:** the full data set: lines × pixels × bands.
+- **Raw count, radiance, reflectance:** detector number, physical light intensity, and fraction of sunlight reflected. These are three separate products.
+- **I/F:** π × radiance ÷ solar irradiance, a standard way to express reflected light.
+- **Incidence angle (i):** the angle between the Sun direction and the vertical (or the slope's surface normal, for local incidence).
+- **LUT:** a lookup table of gain and offset that converts raw counts to radiance.
+- **Saturation:** when the detector reaches its maximum value and stops recording increases.
+- **Planck's law and brightness temperature:** how warm objects emit infrared light, and the temperature that explains a measured emission.
+- **Emissivity:** how efficiently a surface emits heat compared with a perfect emitter (1.0).
+- **Radiative equilibrium:** the temperature at which absorbed sunlight equals emitted heat.
+- **Albedo:** the fraction of sunlight a surface reflects.
+- **Hillshade:** a shaded-relief image computed from elevation for a chosen Sun direction.
+- **Tie point:** a feature matched in two images, used to align them.
+- **Normalized cross-correlation (NCC):** a similarity score between image patches that ignores brightness and contrast differences.
+- **Held-out data:** data kept aside and used only for testing.
+- **Integrated band depth (IBD):** the average depth of an absorption below a straight-line continuum.
+- **PCA:** principal component analysis, which compresses many correlated values into a few that keep most of the variation.
+- **k-means:** clustering into k groups by distance to group centres.
+- **Adjusted Rand index (ARI):** agreement between two groupings, adjusted for chance (1 = identical).
+- **Macro F1 and balanced accuracy:** class-averaged scores, so small classes count as much as large ones.
+- **Confidence interval (bootstrap):** a range of plausible scores, from re-scoring on many resampled test sets.
+- **Foundation model, embedding, linear probe:** a large pretrained network, its numeric description of an input, and a single trained layer on top of it.
+- **Rasterize:** convert map polygons into a per-pixel label image.
+- **Contact buffer and guard band:** pixels removed near map-unit boundaries and near train/test block edges.
+
+## 12. A short explanation to share
+
+We are testing whether hyperspectral models trained on Earth can help analyse lunar spectra from Chandrayaan-2's IIRS instrument. First, we verified the data: matched files, usable bands, calibration tables, and pixel locations aligned to a lunar elevation model within a fraction of a pixel. A physics test settled the radiance units. We then produced the first reflectance and temperature maps for a 1,000 km strip, and confirmed the temperatures with two independent references: terrain illumination (r = 0.88) and NASA's Diviner instrument (within about 5 K). Using a USGS geologic map as proxy labels and a fixed geographic split, simple classifiers reach 0.50 macro F1, and 0.63 with spatial context. Earth foundation models reach up to 0.67. They transfer well, and our next experiments will isolate how much their Earth pretraining adds, using more scenes and reviewed labels.
+
+## 13. Records and where to find them
+
+- [Main README with all figures and methods](../README.md)
+- [M1–M3 plan and quality gates](../docs/m1_m3_plan.md) · [Current task plan](../tasks/task_plan.md)
+- M1: [inventory](../results/phase-1/m1-inventory/summary.md), [E1G2 scene](../results/phase-1/m1-e1g2-scene/summary.md), [E3G2 lookup tables](../results/phase-1/m1-e3g2-lineage-check/summary.md), [saturation review](../results/phase-1/m1-saturation-sample/summary.md), [SLDEM registration](../results/phase-1/m1-sldem-hillshade/summary.md), [reference data](../results/phase-1/m1-reference-data/summary.md)
+- M2: [unit test](../results/phase-1/m2-radiance-unit-physics/summary.md), [reflectance](../results/phase-1/m2-apparent-reflectance/summary.md), [temperature](../results/phase-1/m2-thermal-brightness/summary.md), [terrain check](../results/phase-1/m2-topographic-validation/summary.md), [Diviner check](../results/phase-1/m2-diviner-temperature/summary.md)
+- M3: [geologic labels](../results/phase-1/m3-geologic-labels/notes.md), [spectral units](../results/phase-1/m3-spectral-units/summary.md), [supervised baselines](../results/phase-1/m3-supervised-baselines/summary.md)
+- M4: [model inventory](../results/phase-2/m4-transfer/model_inventory.md), [transfer results](../results/phase-2/m4-transfer/summary.md)
+
+Each module folder also contains findings and notes, the saved values (CSV or JSON), and the figures. Original data stay in the ignored `data/` folder.
