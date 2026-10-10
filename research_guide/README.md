@@ -51,30 +51,35 @@ Two kinds of light reach the instrument:
 
 The same observation exists at different processing levels, and they must not be confused:
 
-1. **Raw counts:** the numbers the detector recorded. They have no physical unit.
-2. **Calibrated radiance:** the counts converted to physical light intensity, in µW or mW per cm² per steradian per µm. This is what ISRO distributes as "calibrated" (Level 1).
-3. **Reflectance:** radiance divided by the incoming sunlight, so it describes the surface itself. A value of 0.1 means the surface reflects 10% of the light. We compute this in M2.
+| Level | What it is | Unit | Where it comes from |
+| --- | --- | --- | --- |
+| Raw counts | The numbers the detector recorded | None | ISRO raw product (`nri`) |
+| Calibrated radiance | Counts converted to physical light intensity | µW or mW per cm² per steradian per µm | ISRO calibrated product (`nci`, Level 1) |
+| Reflectance | Radiance divided by the incoming sunlight, so it describes the surface itself. A value of 0.1 means the surface reflects 10% of the light | None (fraction) | Computed by us in M2 |
 
 ### Instrument modes
 
 IIRS records in different **exposure and gain modes**. The mode name comes from the product label:
 
-- **E1G2:** 1 ms exposure. Keeps valid bands out to 4.9 µm, which is needed for temperature.
-- **E3G2:** 10 ms exposure. Valid bands stop at 3.16 µm.
+| Mode | Exposure | Valid bands | Longest valid wavelength | Use in this project |
+| --- | --- | ---: | --- | --- |
+| E1G2 | 1 ms | 222 of 256 | 4.9 µm | Main scene; temperature and all M2 to M4 work |
+| E3G2 | 10 ms | 127 of 256 | 3.16 µm | 2020 scenes; calibration and unit checks |
 
 Only bands marked `VALID` for a mode may be used. File suffixes such as `d18` or `m65` name the receiving ground station, not the mode.
 
 ### Our data
 
-- **Main scene:** 2026-02-27, mode E1G2. Raw and calibrated versions.
-- **Two older scenes:** 2020-02-08, mode E3G2. Raw and calibrated versions, used for checks.
-- **Reference data from other missions,** used for independent checks:
-  - SLDEM2015: a lunar elevation model from LRO laser altimetry and Kaguya stereo images.
-  - LROC WAC: an image mosaic from the LRO Wide Angle Camera.
-  - Diviner: LRO's thermal radiometer, which measures surface temperature.
-  - M³: Moon Mineralogy Mapper reflectance from Chandrayaan-1.
-  - The USGS Unified Geologic Map of the Moon.
-  - A standard solar spectrum (ASTM G173).
+| Data | Source | What it is | How we use it |
+| --- | --- | --- | --- |
+| IIRS 2026-02-27 E1G2 | Chandrayaan-2 | Raw and calibrated spectral cube, 12,210 × 250 × 256 | Main scene for M1 to M4 |
+| IIRS 2020-02-08 E3G2 (two scenes) | Chandrayaan-2 | Raw and calibrated spectral cubes | Calibration and unit checks |
+| SLDEM2015 | LRO laser altimetry and Kaguya stereo | Lunar elevation model, about 59 m per pixel | Pixel alignment and slope illumination |
+| LROC WAC | LRO Wide Angle Camera | Image mosaic, 100 m per pixel | First alignment attempt |
+| Diviner | LRO thermal radiometer | Surface temperature by place and local time | Independent temperature check |
+| M³ | Chandrayaan-1 Moon Mineralogy Mapper | Lunar reflectance images | Planned absolute reflectance check |
+| USGS Unified Geologic Map | USGS, 1:5,000,000 | Mapped geologic units | Proxy labels for M3 and M4 |
+| ASTM G173 | Standard solar spectrum | Sunlight per wavelength | Converting radiance to reflectance |
 
 ## 3. The plan: build trust, then test models
 
@@ -98,25 +103,12 @@ Why this order matters:
 
 ## 4. Progress at a glance
 
-- **M1, trusting the data:** mostly complete.
-  - All files are verified, and the usable bands are known.
-  - Pixel locations are aligned to an elevation model to within a fraction of a pixel.
-  - The calibration lookup tables are understood.
-  - Open: a documented rule for saturated and missing pixels, and access to the M³ comparison data.
-- **M2, from signal to surface physics:** a one-scene pilot is complete.
-  - The radiance units are confirmed by physics.
-  - Reflectance and temperature are computed.
-  - Temperature agrees with two independent references: terrain illumination and the Diviner instrument.
-  - Open: absolute reflectance calibration, photometric correction, and the 3 µm water signal.
-- **M3, reference baselines:** exploratory results.
-  - Proxy labels come from a geologic map.
-  - Unsupervised spectral units are mapped.
-  - Five baseline classifiers are scored on a fixed geographic split.
-  - Open: reviewed labels and more scenes.
-- **M4, Earth models on the Moon:** exploratory first test.
-  - Two Earth foundation models run on lunar data.
-  - Their features are scored with the same split, alongside careful controls.
-  - Open: zero-shot and fine-tuning experiments, after M3 is complete.
+| Module | Status | What is done | What is open |
+| --- | --- | --- | --- |
+| M1: Trusting the data | Mostly complete | Files verified; usable bands known; lookup tables understood; pixel locations aligned to an elevation model within a fraction of a pixel | Documented saturation and missing-pixel rule; access to M³ comparison data |
+| M2: From signal to surface physics | One-scene pilot complete | Radiance units confirmed by physics; reflectance and temperature computed; temperature agrees with terrain illumination and the Diviner instrument | Absolute reflectance calibration; photometric correction; the 3 µm water signal |
+| M3: Reference baselines | Exploratory results | Proxy labels from a geologic map; unsupervised spectral units mapped; five classifiers scored on a fixed geographic split | Reviewed labels; more scenes |
+| M4: Earth models on the Moon | Exploratory first test | Two Earth foundation models run on lunar data and scored on the same split, with controls | Zero-shot and fine-tuning experiments, after M3 is complete |
 
 ## 5. M1: Trusting the data
 
@@ -292,11 +284,13 @@ At this map scale, shifting the map by 2 km changes 21% of labels. We therefore 
 
 **Step 6. Scored five baseline methods.**
 
-- **Majority class:** always predicts the most common class. This is the floor.
-- **Band parameters with nearest centroid:** a physical method. Each pixel is described by four numbers (albedo, IBD at 1 µm, IBD at 2 µm, and a slope ratio) and assigned to the class with the closest average.
-- **Logistic regression:** a linear classifier, applied after PCA reduces each spectrum to 20 numbers.
-- **Random forest:** 300 decision trees, each asking a series of yes-or-no questions about the spectrum. The trees vote on the class.
-- **1D convolutional neural network (CNN), trained from scratch:** small learned filters slide along the spectrum to detect shapes such as dips and slopes. Trained on the GPU.
+| Method | Type | How it works |
+| --- | --- | --- |
+| Majority class | Reference floor | Always predicts the most common class |
+| Band parameters with nearest centroid | Physical | Describes each pixel by four numbers (albedo, IBD at 1 µm, IBD at 2 µm, and a slope ratio) and assigns the class with the closest average |
+| Logistic regression | Classical, linear | A linear classifier, applied after PCA reduces each spectrum to 20 numbers |
+| Random forest | Classical, non-linear | 300 decision trees, each asking a series of yes-or-no questions about the spectrum; the trees vote on the class |
+| 1D convolutional neural network (CNN) | Learned, trained from scratch | Small learned filters slide along the spectrum to detect shapes such as dips and slopes; trained on the GPU |
 
 Two scores were used, both on the held-out test blocks:
 
@@ -309,14 +303,17 @@ We also ran a **context control**: the same methods on spectra averaged over a 6
 
 ### Where we reached
 
-Macro F1 on the held-out test blocks:
+Scores on the held-out test blocks (95% interval for macro F1 in brackets):
 
-- Majority class: 0.10
-- Physical band parameters: 0.40
-- Logistic regression: 0.46
-- Random forest: 0.50
-- 1D CNN from scratch: 0.49
-- Random forest with 64-pixel context: **0.63**
+| Method | Macro F1 | Balanced accuracy | Overall accuracy |
+| --- | --- | ---: | ---: |
+| Majority class | 0.10 [0.03 to 0.17] | 0.20 | 31% |
+| Band parameters + nearest centroid | 0.40 [0.31 to 0.51] | 0.45 | 57% |
+| Logistic regression | 0.46 [0.34 to 0.56] | 0.53 | 65% |
+| Random forest | 0.50 [0.35 to 0.62] | 0.57 | 72% |
+| 1D CNN from scratch | 0.49 [0.35 to 0.61] | 0.56 | 70% |
+| Context 64 px + logistic regression | 0.58 [0.43 to 0.69] | 0.59 | 85% |
+| Context 64 px + random forest | **0.63** [0.47 to 0.71] | 0.65 | 87% |
 
 Every method learns the map units far better than chance. Adding spatial context gives the largest improvement, because the map units are large regions and single-pixel spectra are noisy. The from-scratch CNN performs like the random forest. A wider 64-line guard changed no score by more than 0.04, which shows the split is not leaking.
 
@@ -342,13 +339,15 @@ The plan was to test Earth foundation models after M3. For the October review we
 
 ### The two models
 
-- **HyperFree** (Li et al., CVPR 2025):
-  - Pretrained on AVIRIS airborne images covering 0.4 to 2.5 µm.
-  - Its key feature is **wavelength awareness**: it builds its input layer from the actual band wavelengths. We could therefore feed it all 83 IIRS bands from 0.85 to 2.46 µm directly.
-- **HyperSIGMA** (Wang et al., IEEE TPAMI 2025):
-  - Pretrained with MAE on Hyperion satellite radiance and GF-5 images.
-  - It has a **spatial encoder**, which looks at 64 × 64 pixel tiles, and a **spectral encoder**, which looks at the band sequence.
-  - It requires exactly 100 bands, so we **interpolated** the IIRS spectrum onto 100 evenly spaced wavelengths over the same range.
+| | HyperFree | HyperSIGMA |
+| --- | --- | --- |
+| Paper | Li et al., CVPR 2025 | Wang et al., IEEE TPAMI 2025 |
+| Pretraining data | AVIRIS airborne images, 0.4 to 2.5 µm | Hyperion satellite radiance and GF-5 images, pretrained with MAE |
+| Architecture | Vision Transformer (ViT-B) | Two ViT-B encoders: spatial (64 × 64 pixel tiles) and spectral (band sequence) |
+| Key feature | **Wavelength awareness**: builds its input layer from the actual band wavelengths | Combines spatial context and spectral shape |
+| How IIRS was fed in | All 83 IIRS bands from 0.85 to 2.46 µm, directly | IIRS spectrum **interpolated** onto exactly 100 evenly spaced wavelengths over the same range |
+| What it looks at | Each pixel's spectrum | A 64 × 64 pixel neighbourhood (about 5 km) |
+| Output per pixel | 768-number embedding | 768-number embedding |
 
 Both models were downloaded from the authors' Hugging Face pages and run on an NVIDIA H100 GPU. Each one processed the whole strip in one to two minutes.
 
@@ -366,12 +365,15 @@ Both models were downloaded from the authors' Hugging Face pages and run on an N
 
 ### Where we reached
 
-Macro F1 on the same held-out test blocks:
+Scores on the same held-out test blocks:
 
-- HyperFree, frozen with a linear probe: 0.54
-- HyperSIGMA spatial, frozen with a linear probe: **0.67** (the highest score)
-- HyperSIGMA spectral, frozen with a linear probe: 0.57
-- For comparison, the context random forest with no pretraining: 0.63
+| Method | Macro F1 [95% interval] | Balanced accuracy | Overall accuracy |
+| --- | --- | ---: | ---: |
+| HyperFree, frozen + linear probe | 0.54 [0.39 to 0.63] | 0.62 | 73% |
+| HyperSIGMA spatial, frozen + linear probe | **0.67** [0.52 to 0.76] | 0.73 | 87% |
+| HyperSIGMA spectral, frozen + linear probe | 0.57 [0.40 to 0.69] | 0.60 | 82% |
+| For comparison: context 64 px random forest, no pretraining | 0.63 [0.47 to 0.71] | 0.65 | 87% |
+| For comparison: per-pixel random forest | 0.50 [0.35 to 0.62] | 0.57 | 72% |
 
 The Earth models produce useful lunar features: all three beat the per-pixel baselines, and HyperSIGMA scores highest. The context control shows that much of HyperSIGMA's lead comes from seeing the surrounding area. A classical method with the same context scores within its confidence interval. Results did not change with wider guard bands. The honest summary for this stage: Earth models transfer and are competitive, and showing a clear benefit from their Earth pretraining needs the next experiments.
 
@@ -394,14 +396,29 @@ The Earth models produce useful lunar features: all three beat the per-pixel bas
 
 **HyperFree: macro F1 0.54, overall accuracy 73%.** It labels 73 of every 100 test pixels correctly, about the same as the per-pixel random forest (72%). Per class (F1):
 
-- **Mare basalt: 0.82** and **basin material: 0.78.** Good, though a little below HyperSIGMA.
-- **Highland or terra: 0.61.** Better than the per-pixel random forest (0.47).
-- **Dark mantle: 0.44.** It finds 91% of the true dark-mantle pixels, the highest of any method, but with many false alarms.
-- **Crater material: 0.07.** Weak, like the per-pixel methods.
+| Class | Test pixels | F1 | What it means |
+| --- | ---: | ---: | --- |
+| Mare basalt | 144,974 | 0.82 | Good, though a little below HyperSIGMA. |
+| Basin material | 236,387 | 0.78 | Good, similar to the per-pixel random forest. |
+| Highland or terra | 60,514 | 0.61 | Better than the per-pixel random forest (0.47). |
+| Dark mantle (volcanic ash) | 10,209 | 0.44 | It finds 91% of the true dark-mantle pixels, the highest of any method, but with many false alarms. |
+| Crater material | 10,790 | 0.07 | Weak, like the per-pixel methods. |
+| **Average (macro F1)** | | **0.54** | |
 
 **Why the two models differ.** HyperFree looks at each pixel's spectrum on its own, using the real IIRS wavelengths. Its result is therefore close to the best per-pixel classical method, with a gain on highlands and on finding dark mantle. HyperSIGMA's spatial encoder looks at a 64 × 64 pixel neighbourhood (about 5 km), so it also uses texture and surrounding terrain. Because the map classes are large regions, that context helps a lot.
 
-**How this compares with the context control.** The classical random forest given the same 64-pixel neighbourhood also reaches 87% overall accuracy, the same as HyperSIGMA, with a macro F1 of 0.63. The two agree on the large classes: mare 0.96 against 0.97, and basin 0.90 against 0.89. HyperSIGMA's extra 0.04 in macro F1 comes from highlands (0.77 against 0.66) and crater material (0.18 against 0.01). So most of HyperSIGMA's lead over per-pixel methods comes from spatial context. Its pretrained features add a smaller improvement on the harder classes, which is within the confidence interval for now.
+**How this compares with the context control.** The classical random forest given the same 64-pixel neighbourhood also reaches 87% overall accuracy, the same as HyperSIGMA. Per class (F1):
+
+| Class | Per-pixel random forest | Context random forest | HyperFree | HyperSIGMA spatial |
+| --- | ---: | ---: | ---: | ---: |
+| Mare basalt | 0.87 | 0.96 | 0.82 | 0.97 |
+| Basin material | 0.78 | 0.90 | 0.78 | 0.89 |
+| Highland or terra | 0.47 | 0.66 | 0.61 | 0.77 |
+| Dark mantle | 0.33 | 0.63 | 0.44 | 0.56 |
+| Crater material | 0.05 | 0.01 | 0.07 | 0.18 |
+| **Macro F1** | **0.50** | **0.63** | **0.54** | **0.67** |
+
+The context random forest and HyperSIGMA agree on the large classes, mare and basin. HyperSIGMA's extra 0.04 in macro F1 comes from highlands (0.77 against 0.66) and crater material (0.18 against 0.01), while the context random forest is slightly better on dark mantle (0.63 against 0.56). So most of HyperSIGMA's lead over per-pixel methods comes from spatial context. Its pretrained features add a smaller improvement on the harder classes, which is within the confidence interval for now.
 
 **How to say it in one sentence.** "With the Earth model frozen and a single linear layer trained, HyperSIGMA classifies 87% of held-out lunar pixels correctly and almost perfectly separates mare from basin material. HyperFree performs like the best per-pixel classical method. Most of HyperSIGMA's advantage comes from seeing the surrounding terrain, and the pretraining adds a smaller gain on the harder highland and crater classes, which our next experiments will test."
 
@@ -432,31 +449,33 @@ The Earth models produce useful lunar features: all three beat the per-pixel bas
 
 ## 11. Glossary
 
-- **Band:** one wavelength channel of the instrument.
-- **Spectrum:** the list of values across all bands for one pixel.
-- **Spectral cube:** the full data set: lines × pixels × bands.
-- **Raw count, radiance, reflectance:** detector number, physical light intensity, and fraction of sunlight reflected. These are three separate products.
-- **I/F:** π × radiance ÷ solar irradiance, a standard way to express reflected light.
-- **Incidence angle (i):** the angle between the Sun direction and the vertical (or the slope's surface normal, for local incidence).
-- **LUT:** a lookup table of gain and offset that converts raw counts to radiance.
-- **Saturation:** when the detector reaches its maximum value and stops recording increases.
-- **Planck's law and brightness temperature:** how warm objects emit infrared light, and the temperature that explains a measured emission.
-- **Emissivity:** how efficiently a surface emits heat compared with a perfect emitter (1.0).
-- **Radiative equilibrium:** the temperature at which absorbed sunlight equals emitted heat.
-- **Albedo:** the fraction of sunlight a surface reflects.
-- **Hillshade:** a shaded-relief image computed from elevation for a chosen Sun direction.
-- **Tie point:** a feature matched in two images, used to align them.
-- **Normalized cross-correlation (NCC):** a similarity score between image patches that ignores brightness and contrast differences.
-- **Held-out data:** data kept aside and used only for testing.
-- **Integrated band depth (IBD):** the average depth of an absorption below a straight-line continuum.
-- **PCA:** principal component analysis, which compresses many correlated values into a few that keep most of the variation.
-- **k-means:** clustering into k groups by distance to group centres.
-- **Adjusted Rand index (ARI):** agreement between two groupings, adjusted for chance (1 = identical).
-- **Macro F1 and balanced accuracy:** class-averaged scores, so small classes count as much as large ones.
-- **Confidence interval (bootstrap):** a range of plausible scores, from re-scoring on many resampled test sets.
-- **Foundation model, embedding, linear probe:** a large pretrained network, its numeric description of an input, and a single trained layer on top of it.
-- **Rasterize:** convert map polygons into a per-pixel label image.
-- **Contact buffer and guard band:** pixels removed near map-unit boundaries and near train/test block edges.
+| Term | Meaning |
+| --- | --- |
+| Band | One wavelength channel of the instrument. |
+| Spectrum | The list of values across all bands for one pixel. |
+| Spectral cube | The full data set: lines × pixels × bands. |
+| Raw count, radiance, reflectance | Detector number, physical light intensity, and fraction of sunlight reflected. These are three separate products. |
+| I/F | Π × radiance ÷ solar irradiance, a standard way to express reflected light. |
+| Incidence angle (i) | The angle between the Sun direction and the vertical (or the slope's surface normal, for local incidence). |
+| LUT | A lookup table of gain and offset that converts raw counts to radiance. |
+| Saturation | When the detector reaches its maximum value and stops recording increases. |
+| Planck's law and brightness temperature | How warm objects emit infrared light, and the temperature that explains a measured emission. |
+| Emissivity | How efficiently a surface emits heat compared with a perfect emitter (1.0). |
+| Radiative equilibrium | The temperature at which absorbed sunlight equals emitted heat. |
+| Albedo | The fraction of sunlight a surface reflects. |
+| Hillshade | A shaded-relief image computed from elevation for a chosen Sun direction. |
+| Tie point | A feature matched in two images, used to align them. |
+| Normalized cross-correlation (NCC) | A similarity score between image patches that ignores brightness and contrast differences. |
+| Held-out data | Data kept aside and used only for testing. |
+| Integrated band depth (IBD) | The average depth of an absorption below a straight-line continuum. |
+| PCA | Principal component analysis, which compresses many correlated values into a few that keep most of the variation. |
+| k-means | Clustering into k groups by distance to group centres. |
+| Adjusted Rand index (ARI) | Agreement between two groupings, adjusted for chance (1 = identical). |
+| Macro F1 and balanced accuracy | Class-averaged scores, so small classes count as much as large ones. |
+| Confidence interval (bootstrap) | A range of plausible scores, from re-scoring on many resampled test sets. |
+| Foundation model, embedding, linear probe | A large pretrained network, its numeric description of an input, and a single trained layer on top of it. |
+| Rasterize | Convert map polygons into a per-pixel label image. |
+| Contact buffer and guard band | Pixels removed near map-unit boundaries and near train/test block edges. |
 
 ## 12. A short explanation to share
 
