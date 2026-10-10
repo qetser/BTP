@@ -383,11 +383,14 @@ The Earth models produce useful lunar features: all three beat the per-pixel bas
 
 **HyperSIGMA spatial: macro F1 0.67, overall accuracy 87%.** It labels 87 of every 100 test pixels correctly. Per class (F1):
 
-- **Mare basalt: 0.97.** Dark volcanic plains are almost perfectly recognised.
-- **Basin material: 0.89.** Impact basin deposits are reliably separated from mare.
-- **Highland or terra: 0.77.** A large improvement over the per-pixel random forest (0.47).
-- **Dark mantle (volcanic ash): 0.56.** It finds 82% of the true dark-mantle pixels, but also calls some neighbouring dark mare "dark mantle". Both are dark and iron-rich, so this confusion is physically reasonable.
-- **Crater material: 0.18.** The weak class, and the main reason the average is 0.67 rather than about 0.8. In this map, "crater material" is ejecta of a certain age. It looks spectrally like its surroundings and forms small patches at 1:5,000,000 scale, and every method struggles with it.
+| Class | Test pixels | F1 | What it means |
+| --- | ---: | ---: | --- |
+| Mare basalt | 144,974 | 0.97 | Dark volcanic plains are almost perfectly recognised. |
+| Basin material | 236,387 | 0.89 | Impact basin deposits are reliably separated from mare. |
+| Highland or terra | 60,514 | 0.77 | A large improvement over the per-pixel random forest (0.47). |
+| Dark mantle (volcanic ash) | 10,209 | 0.56 | It finds 82% of the true dark-mantle pixels, but also calls some neighbouring dark mare "dark mantle". Both are dark and iron-rich, so this confusion is physically reasonable. |
+| Crater material | 10,790 | 0.18 | The weak class, and the main reason the average is 0.67 rather than about 0.8. In this map, "crater material" is ejecta of a certain age. It looks spectrally like its surroundings and forms small patches at 1:5,000,000 scale, and every method struggles with it. |
+| **Average (macro F1)** | | **0.67** | |
 
 **HyperFree: macro F1 0.54, overall accuracy 73%.** It labels 73 of every 100 test pixels correctly, about the same as the per-pixel random forest (72%). Per class (F1):
 
