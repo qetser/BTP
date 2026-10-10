@@ -1,0 +1,123 @@
+{
+  "labels": "geologic_group_labels.npy",
+  "classes_scored": [
+    0,
+    1,
+    2,
+    3,
+    4
+  ],
+  "test_pixels_by_class": {
+    "0": 144974,
+    "1": 10209,
+    "2": 60514,
+    "3": 10790,
+    "4": 236387
+  },
+  "train_pixels_by_class": {
+    "0": 261584,
+    "1": 72519,
+    "2": 130948,
+    "3": 22239,
+    "4": 474948
+  },
+  "split": {
+    "block_lines": 250,
+    "guard_lines": 25,
+    "pattern": [
+      "train",
+      "train",
+      "val",
+      "test"
+    ],
+    "min_test_pixels": 5000,
+    "max_train_per_class": 20000,
+    "contact_buffer_px": 25
+  },
+  "n_train": 100000,
+  "n_val": 87060,
+  "n_test": 462874,
+  "test_blocks": 12,
+  "results": [
+    {
+      "method": "majority class",
+      "family": "M3 reference",
+      "macro_f1": 0.09540148194943474,
+      "macro_f1_ci95": [
+        0.026207941277194533,
+        0.17432547387795325
+      ],
+      "balanced_accuracy": 0.2,
+      "balanced_accuracy_ci95": [
+        0.2,
+        0.25
+      ],
+      "fit_seconds": 0.0,
+      "note": ""
+    },
+    {
+      "method": "band parameters + nearest centroid",
+      "family": "M3 physical",
+      "macro_f1": 0.39871946238179384,
+      "macro_f1_ci95": [
+        0.3083687097436096,
+        0.509206244638458
+      ],
+      "balanced_accuracy": 0.45298730987316577,
+      "balanced_accuracy_ci95": [
+        0.3756378806581314,
+        0.5632745831394641
+      ],
+      "fit_seconds": 3.5,
+      "note": "log albedo 1.58 \u00b5m, IBD 1 \u00b5m, IBD 2 \u00b5m, R2.4/R1.0"
+    },
+    {
+      "method": "spectra PCA20 + logistic regression",
+      "family": "M3 classical",
+      "macro_f1": 0.4634066963409024,
+      "macro_f1_ci95": [
+        0.3389475082621222,
+        0.5643056723143091
+      ],
+      "balanced_accuracy": 0.5348715219589698,
+      "balanced_accuracy_ci95": [
+        0.4184872876624008,
+        0.5966714093485074
+      ],
+      "fit_seconds": 6.5,
+      "note": ""
+    },
+    {
+      "method": "spectra + random forest",
+      "family": "M3 classical",
+      "macro_f1": 0.4995023731858284,
+      "macro_f1_ci95": [
+        0.35199086133347424,
+        0.6197873818803131
+      ],
+      "balanced_accuracy": 0.568643360599396,
+      "balanced_accuracy_ci95": [
+        0.4340046640121812,
+        0.6948268692536934
+      ],
+      "fit_seconds": 28.8,
+      "note": ""
+    },
+    {
+      "method": "1D spectral CNN (from scratch)",
+      "family": "M3 learned",
+      "macro_f1": 0.49044750805680326,
+      "macro_f1_ci95": [
+        0.3502857803497043,
+        0.6102939787281159
+      ],
+      "balanced_accuracy": 0.5579280084265232,
+      "balanced_accuracy_ci95": [
+        0.44113840805124444,
+        0.7017951410514427
+      ],
+      "fit_seconds": 18.6,
+      "note": "device cuda; stopped after 13 epochs"
+    }
+  ]
+}

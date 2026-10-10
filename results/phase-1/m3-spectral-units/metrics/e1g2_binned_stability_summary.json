@@ -1,0 +1,17 @@
+{
+  "target": "block-split ARI >= 0.8 (unchanged from pixel run)",
+  "best_block_split_ari_by_bin": {
+    "1": 0.6029879160003064,
+    "2": 0.6040464536442336,
+    "4": 0.7091094312236438,
+    "8": 0.5796123070761984
+  },
+  "best_k_by_bin": {
+    "1": 6,
+    "2": 5,
+    "4": 5,
+    "8": 3
+  },
+  "configurations_passing": [],
+  "gate_passed": false
+}

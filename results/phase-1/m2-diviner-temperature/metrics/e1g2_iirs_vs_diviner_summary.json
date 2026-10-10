@@ -1,0 +1,159 @@
+{
+  "iirs_product": "ch2_iir_nci_20260227T1239538758_d_img_d18 (E1G2), 4504-4875 nm brightness temperature, emissivity 0.95, reflected term removed",
+  "reference_product": "Diviner GCP, DATA_SET_ID LRO-L-DLRE-5-GCP-V1.0, files global_cumul_avg_cyl_{10s00s,00n10n,10n20n,20n30n}_002.tab, PDS4 urn:nasa:pds:lro_diviner_derived1:data_derived_gcp, observations 2009-07-05 to 2015-04-01",
+  "reference_sha256": {
+    "10s00s": "b47dd7ee7fe90ade46e376b4aa62bf153e8a9f2aeecd3593a32f3a514d61d981",
+    "00n10n": "d333fc13b605beff4d977bd78299d3dd4c98905ea9008f69f4ee45073d7bedea",
+    "10n20n": "9c3fc386357f082f0c4b9b00e64682475478cf9449430832da684384d1f2c4b5",
+    "20n30n": "e15ea704b50adf16c25210dbc1669b965eb636fa81c90828778c853e8c2e21aa"
+  },
+  "subsolar_lat_deg_range": [
+    -0.013977381918145413,
+    -0.008635384425263952
+  ],
+  "subsolar_lon_east_deg_range": [
+    52.74996371588412,
+    52.81911151971906
+  ],
+  "local_time_h_range_valid_pixels": [
+    8.119433358639466,
+    8.24489292905411
+  ],
+  "latitude_bins": 33,
+  "iirs_minus_tbol_K": {
+    "median": 5.01128291569313,
+    "mean": 5.114676526555649,
+    "std": 2.7384342718934374,
+    "p05": 0.5269714312632005,
+    "iqr": [
+      3.4239057135202984,
+      7.145863103720444
+    ],
+    "p95": 9.669916524646327,
+    "min": 0.27470792601707217,
+    "max": 10.63486282617174,
+    "n_bins": 33
+  },
+  "iirs_minus_tbol_quadfit_K": {
+    "median": 5.017446766281296,
+    "mean": 4.707324062835092,
+    "std": 3.8767931219377916,
+    "p05": -1.1638674532753157,
+    "iqr": [
+      2.803979270654395,
+      7.0023654027245925
+    ],
+    "p95": 10.965748544138853,
+    "min": -6.226013690422519,
+    "max": 13.440620071212038,
+    "n_bins": 33
+  },
+  "iirs_minus_t3_K": {
+    "median": 3.158247969466629,
+    "mean": 2.856310982776065,
+    "std": 2.8253088543464875,
+    "p05": -1.9532986481059877,
+    "iqr": [
+      1.0041758504950167,
+      4.986718275720193
+    ],
+    "p95": 7.44131871803969,
+    "min": -3.0538677590497514,
+    "max": 8.160570237169054,
+    "n_bins": 33
+  },
+  "diviner_t3_minus_tbol_K": {
+    "median": 2.141573271630591,
+    "mean": 2.258365543779584,
+    "std": 0.6408666240190253,
+    "p05": 1.564297592329592,
+    "iqr": [
+      1.8348822624118384,
+      2.6803619595229975
+    ],
+    "p95": 3.2967159047095485,
+    "min": 1.0693821322735744,
+    "max": 4.197408231508803,
+    "n_bins": 33
+  },
+  "diviner_t3_minus_tbol_quadfit_K": {
+    "median": 2.1526079373808784,
+    "mean": 2.33578227021167,
+    "std": 0.795007095306009,
+    "p05": 1.53288393000837,
+    "iqr": [
+      1.8357901662164409,
+      2.7197266709894734
+    ],
+    "p95": 3.745942960402316,
+    "min": 1.3929836963757225,
+    "max": 5.044641566279722,
+    "n_bins": 33
+  },
+  "iirs_eps1_minus_tbol_K": {
+    "median": 3.195097360906516,
+    "mean": 3.3347755200164957,
+    "std": 2.723667196146835,
+    "p05": -1.1558875651806375,
+    "iqr": [
+      1.6265566401702358,
+      5.3743844992357594
+    ],
+    "p95": 7.856666432127247,
+    "min": -1.4461223472887355,
+    "max": 8.854500931914743,
+    "n_bins": 33
+  },
+  "facet_sigma_K": {
+    "median": 45.895366598110485,
+    "mean": 45.68325108936826,
+    "std": 5.433598544894768,
+    "p05": 39.259331595013826,
+    "iqr": [
+      42.560114503652954,
+      48.628508322912964
+    ],
+    "p95": 51.838173726286,
+    "min": 33.049908732208124,
+    "max": 64.08186352964316,
+    "n_bins": 33
+  },
+  "expected_4p7um_minus_tbol_K": {
+    "median": 11.779487381758486,
+    "mean": 11.934823700095809,
+    "std": 2.564806737360549,
+    "p05": 8.999904637061297,
+    "iqr": [
+      10.265897154731363,
+      13.186430920567886
+    ],
+    "p95": 15.40591447886487,
+    "min": 6.502388600820382,
+    "max": 20.433798999067108,
+    "n_bins": 33
+  },
+  "iirs_eps1_minus_expected_K": {
+    "median": -8.155096565755855,
+    "mean": -8.600048180079312,
+    "std": 3.914964395181055,
+    "p05": -16.308388703943695,
+    "iqr": [
+      -10.888995449939443,
+      -5.689919132030639
+    ],
+    "p95": -3.4719809355150355,
+    "min": -17.547835031800957,
+    "max": -1.5944093874876444,
+    "n_bins": 33
+  },
+  "anisothermal_model_note": "Upper-bound style estimate: assumes all of Diviner ch3 minus bolometric is from a Gaussian spread of facet temperatures (emissivity 1); ignores emissivity differences between channels.",
+  "pearson_r_iirs_vs_tbol_bins": 0.8108542069130605,
+  "pearson_r_iirs_vs_tbol_quadfit_bins": 0.6817232674390697,
+  "offset_vs_reflectance_1500nm_excluding_18N": {
+    "pearson_r": -0.5733520644225587,
+    "slope_K_per_unit_reflectance": -75.94591787246144
+  },
+  "saved_table_minus_pixel_bin_iirs_max_abs_K": 0.04862931708828455,
+  "units": "K, hours of lunar local time",
+  "split": "none (single strip, no train/test split)"
+}

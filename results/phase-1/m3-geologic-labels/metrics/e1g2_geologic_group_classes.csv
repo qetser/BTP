@@ -1,0 +1,7 @@
+class_id,group,pixels_all,pixels_quality,share_of_quality_pct,lat_min_deg,lat_p05_deg,lat_median_deg,lat_p95_deg,lat_max_deg,map_polygons_hit,along_track_runs,meets_50k_quality_pixels
+0,mare basalt,837979,835925,27.493,-0.306,0.856,12.109,22.084,22.704,6,5,True
+1,pyroclastic/dark mantle,184361,184171,6.057,8.919,9.213,10.715,13.053,13.306,1,2,True
+2,highland/terra,423892,423121,13.916,-4.904,-4.133,-2.044,23.765,26.511,5,8,True
+3,crater material,152863,152457,5.014,-5.916,-5.625,-4.643,26.657,26.85,7,4,True
+4,basin material,1453405,1444853,47.52,-6.528,-5.699,13.791,25.943,26.857,19,11,True
+5,other,0,0,0.0,,,,,,0,0,False

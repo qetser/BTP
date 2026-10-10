@@ -1,0 +1,44 @@
+{
+  "lut_tables": {
+    "e1g2": {
+      "median_factor": 0.0027956724,
+      "median_offset": 0.0,
+      "identity_table": false
+    },
+    "e2g2": {
+      "median_factor": 1.0273569226500001,
+      "median_offset": 16.489736557,
+      "identity_table": false
+    },
+    "e3g2": {
+      "median_factor": 1.04218197,
+      "median_offset": 141.97558594,
+      "identity_table": false
+    },
+    "e4g2": {
+      "median_factor": 1.0,
+      "median_offset": 0.0,
+      "identity_table": false
+    }
+  },
+  "m65": {
+    "median_fitted_slope_mw_per_stage_unit": 0.00020286208776732105,
+    "median_e1g2_gain_over_10": 0.000219878845,
+    "median_ratio_fitted_over_predicted": 0.9438597953248917,
+    "ratio_p05_p95": [
+      0.5022957209878033,
+      0.9695929848077446
+    ],
+    "median_correlation": 0.8977784999084923
+  },
+  "d18": {
+    "median_fitted_slope_mw_per_stage_unit": 0.00020275019399732783,
+    "median_e1g2_gain_over_10": 0.000219878845,
+    "median_ratio_fitted_over_predicted": 0.9438490176293315,
+    "ratio_p05_p95": [
+      0.5021089248493292,
+      0.9699106652384457
+    ],
+    "median_correlation": 0.9220342206730033
+  }
+}

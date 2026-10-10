@@ -1,0 +1,68 @@
+{
+  "status": "relative geolocation correction candidate; absolute geolocation remains unvalidated",
+  "data_version": "20260227T1239538758",
+  "source_iirs_zip_sha256": "669465771c3b6e092b7da251c5e2c5b5041e57d5578cd25216e4aa818334d5d8",
+  "source_registration_summary": "results/phase-1/m1-sldem-hillshade/metrics/iirs_sldem_hillshade_summary.json",
+  "source_registration_ties": "results/phase-1/m1-sldem-hillshade/metrics/iirs_sldem_hillshade_ties.csv",
+  "split": "Training-fitted 2D affine offset field; validation uses the predeclared held-out morphology ties only.",
+  "units": {
+    "offset": "IIRS image pixels",
+    "coordinates": "degrees east/degrees north",
+    "shift": "approximate lunar metres using a 1,737,400 m sphere"
+  },
+  "method": "Evaluate the saved training-only affine sample/scan offset model at each sparse geometry node, then sample the original dense interpolated geolocation grid at the shifted image coordinate. Source ZIP and coordinates are unchanged.",
+  "model_coefficients_sample_scan": [
+    [
+      -0.02665691464800698,
+      0.14821833398315315
+    ],
+    [
+      -2.2915963116510887,
+      0.10482530728104333
+    ],
+    [
+      -0.8353273660020115,
+      -0.9180271971100996
+    ]
+  ],
+  "sparse_geometry_node_count": 1476,
+  "candidate_shift_summary": {
+    "sample_offset_median_px": -0.029393449835564786,
+    "sample_offset_min_px": -3.1351109950485205,
+    "sample_offset_max_px": 3.1002667630050933,
+    "scan_offset_median_px": 0.14521087387796036,
+    "scan_offset_min_px": -0.8744837974027302,
+    "scan_offset_max_px": 1.1702322359160477,
+    "east_shift_median_abs_m": 98.84662969893267,
+    "east_shift_max_abs_m": 232.47848547720207,
+    "north_shift_median_abs_m": 37.28191453110392,
+    "north_shift_max_abs_m": 99.42870175270762
+  },
+  "heldout_validation": {
+    "tie_count": 34,
+    "median_residual_px": 0.37476734086657415,
+    "p95_residual_px": 1.4872002427986584,
+    "rmse_px": 0.6985474902592936,
+    "max_residual_px": 1.6648071073476594,
+    "saved_residuals_reproduced_within_1e-5_px": true
+  },
+  "outputs": {
+    "csv": "results/phase-1/m1-sldem-correction-candidate/metrics/iirs_sldem_relative_geometry_candidate.csv",
+    "figure": "results/phase-1/m1-sldem-correction-candidate/figures/iirs_sldem_relative_geometry_candidate.svg"
+  },
+  "limits": [
+    "The validation ties are image morphology matches to a DEM-derived hillshade, not surveyed ground controls.",
+    "Held-out checks validate the relative offset model against withheld ties; they do not independently establish absolute position accuracy.",
+    "The result is a separate sparse geolocation candidate and has not been inserted into the IIRS archive or used for reflectance analysis.",
+    "The correction is scene-specific and does not validate radiance, masks, reflectance, or thermal correction."
+  ],
+  "code_base_commit": "304c5e8bc880d754ecab0b75983c8370b73d033e",
+  "working_tree_script": "scripts/apply_sldem_relative_geometry_candidate.py",
+  "script_sha256": "8d1285459efe6a8c8d8efc5b284a496a5e32c52a7ac4b9f13cfd2bab0eab0220",
+  "software": {
+    "python": "3.11.16",
+    "numpy": "2.2.6",
+    "opencv": "4.14.0",
+    "matplotlib": "3.11.2"
+  }
+}

@@ -1,0 +1,52 @@
+{
+  "source_url": "https://asc-astropedia.s3.us-west-2.amazonaws.com/Moon/Geology/Unified_Geologic_Map_of_the_Moon_GIS_v2.zip",
+  "source_zip": "data/reference/usgs_unified_geology/Unified_Geologic_Map_of_the_Moon_GIS_v2.zip",
+  "source_zip_sha256": "f3ec29803c1ad3b8c41a7fff3e9339bd66f9fbb8f63e30f13c52561b8d5559a1",
+  "source_shapefile_sha256": "122559104301f923cb75e48f5fadc87f31c3e1aeb354c499924b256c052770c1",
+  "map_version": "Unified Geologic Map of the Moon 1:5M, GIS v2, 2020-03-02",
+  "map_crs_wkt": "PROJCRS[\"Moon2000_EquidistantCylindrical_clon0\",BASEGEOGCRS[\"GCS_Moon_2000\",DATUM[\"D_Moon_2000\",ELLIPSOID[\"Moon_2000_IAU_IAG\",1737400,0,LENGTHUNIT[\"metre\",1,ID[\"EPSG\",9001]]]],PRIMEM[\"Reference_Meridian\",0,ANGLEUNIT[\"Degree\",0.0174532925199433]]],CONVERSION[\"unnamed\",METHOD[\"Equidistant Cylindrical (Spherical)\",ID[\"EPSG\",1029]],PARAMETER[\"Latitude of 1st standard parallel\",0,ANGLEUNIT[\"Degree\",0.0174532925199433],ID[\"EPSG\",8823]],PARAMETER[\"Longitude of natural origin\",0,ANGLEUNIT[\"Degree\",0.0174532925199433],ID[\"EPSG\",8802]],PARAMETER[\"False easting\",0,LENGTHUNIT[\"metre\",1],ID[\"EPSG\",8806]],PARAMETER[\"False northing\",0,LENGTHUNIT[\"metre\",1],ID[\"EPSG\",8807]]],CS[Cartesian,2],AXIS[\"easting\",east,ORDER[1],LENGTHUNIT[\"metre\",1,ID[\"EPSG\",9001]]],AXIS[\"northing\",north,ORDER[2],LENGTHUNIT[\"metre\",1,ID[\"EPSG\",9001]]]]",
+  "map_lon_convention": "-180..180 (x = R*lon_rad, R = 1737400 m, central meridian 0)",
+  "iirs_lon_convention": "0..360 east, wrapped to -180..180",
+  "polygons_total": 12247,
+  "polygons_in_strip_bbox": 88,
+  "lines": 12210,
+  "samples": 250,
+  "pixels_total": 3052500,
+  "pixels_quality": 3040527,
+  "pixels_quality_unlabeled": 0,
+  "points_in_multiple_polygons": 0,
+  "overlap_rule": "smallest polygon (AREA_GEO) wins",
+  "unit_classes_present": 14,
+  "unit_classes_meeting_50k_quality_pixels": 10,
+  "group_classes_present": 5,
+  "group_classes_meeting_50k_quality_pixels": 5,
+  "boundary_sensitivity": [
+    {
+      "shift_km": 1.0,
+      "directions": 4,
+      "subsample": "every 5th line and sample",
+      "pixels_evaluated": 121736,
+      "unit_label_changed_pct": 11.167,
+      "group_label_changed_pct": 8.705
+    },
+    {
+      "shift_km": 2.0,
+      "directions": 4,
+      "subsample": "every 5th line and sample",
+      "pixels_evaluated": 121736,
+      "unit_label_changed_pct": 21.221,
+      "group_label_changed_pct": 16.394
+    },
+    {
+      "shift_km": 5.0,
+      "directions": 4,
+      "subsample": "every 5th line and sample",
+      "pixels_evaluated": 121736,
+      "unit_label_changed_pct": 41.797,
+      "group_label_changed_pct": 31.385
+    }
+  ],
+  "geometry": "SLDEM relative-corrected candidate (provisional, not absolute geolocation)",
+  "label_status": "proxy labels from 1:5M map, not reviewed ground truth",
+  "script_sha256": "9fce28dd51985fd29b2557476d9aadd0bc611db02548970d54942bdacf2c76c0"
+}

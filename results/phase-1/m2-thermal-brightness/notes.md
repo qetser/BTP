@@ -1,0 +1,7 @@
+# Notes
+
+- Reproduction: same as [the unit-test notes](../m2-radiance-unit-physics/notes.md), steps 1 and 2. Ignored outputs: `data/derived/e1g2/brightness_temperature_K.npy`, `thermally_corrected_reflectance_2450_3650.npy`, and `quality_mask.npy`.
+- Constants: c1 = 1.191042e8 W µm⁴ m⁻² sr⁻¹, c2 = 1.438777e4 µm K, and σ = 5.670374e-8 W m⁻² K⁻⁴.
+- Hayne et al. (2017) use an incidence-dependent albedo A(θ) = A0 + a(θ/45°)³ + b(θ/90°)⁸, with a = 0.06 and b = 0.25. At θ≈57°, that raises A by about 0.13 and lowers the model temperature by about 13 K, to about 320 K. The observed median (327.8 K) would then be about 8 K above the model; the full binned comparison gives +8 to +18 K (see the summary). Sub-pixel roughness, which raises the nadir-view temperature at moderate incidence, is a plausible cause, but it is not tested here. This pilot keeps a constant A = 0.12. The size and sign of the model offset therefore depend on the albedo law, and agreement within about ±15 K is the defensible statement. The incidence-dependent albedo curves were added on 2026-10-10.
+- Local time estimate: the solar azimuth is about 86–106° (sun in the east) and the solar zenith is about 57–62°, which places the strip at about 08:00–08:30 lunar local time.
+- Diviner comparison plan: obtain Diviner Global Cumulative Product bins for 0–27°N, 3–6°W, at local time 08:00–08:30. Compare by 1° latitude bins, with the IIRS pixel distribution against Diviner's bin spread.

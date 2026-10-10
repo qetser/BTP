@@ -1,0 +1,65 @@
+{
+  "source": "NASA PDS Geosciences Node ODE REST",
+  "api_url": "https://oderest.rsl.wustl.edu/live2?query=product&target=moon&ihid=CH1-ORB&iid=M3&pt=REFIMG&pdsid=M3G20090206T010833_V01_RFL&results=fl&output=JSON",
+  "query_date": "2026-10-10T11:38:07.006",
+  "status": "Success",
+  "product": {
+    "pds_product_id": "M3G20090206T010833_V01_RFL",
+    "dataset_id": "CH1-ORB-L-M3-4-L2-REFLECTANCE-V1.0",
+    "observation_start_utc": "2009-02-06T01:08:33",
+    "observation_stop_utc": "2009-02-06T01:55:42",
+    "orbit": "01080",
+    "samples": 304,
+    "lines": 27796,
+    "bands": 85,
+    "sample_type": "PC_REAL",
+    "invalid_constant": -999.0,
+    "thermal_correction_flag": "Y",
+    "source_pixel_location_file": "M3G20090206T010833_V03_LOC.IMG",
+    "ode_product_detail_url": "http://ode.rsl.wustl.edu/moon/indexproductpage.aspx?product_id=M3G20090206T010833_V01_RFL&product_idGeo=13447030",
+    "ode_files_page_url": "http://ode.rsl.wustl.edu/moon/productfiles.aspx?product_id=M3G20090206T010833_V01_RFL&product_idGeo=13447030",
+    "label_payload_url": "https://planetarydata.jpl.nasa.gov/img/data/m3/CH1M3_0004/DATA/20081118_20090214/200902/L2/M3G20090206T010833_V01_L2.LBL"
+  },
+  "product_files": [
+    {
+      "name": "M3G20090206T010833_V01_L2.LBL",
+      "size_kib": 8,
+      "url": "https://planetarydata.jpl.nasa.gov/img/data/m3/CH1M3_0004/DATA/20081118_20090214/200902/L2/M3G20090206T010833_V01_L2.LBL"
+    },
+    {
+      "name": "M3G20090206T010833_V01_RFL.HDR",
+      "size_kib": 38,
+      "url": "https://planetarydata.jpl.nasa.gov/img/data/m3/CH1M3_0004/DATA/20081118_20090214/200902/L2/M3G20090206T010833_V01_RFL.HDR"
+    },
+    {
+      "name": "M3G20090206T010833_V01_RFL.IMG",
+      "size_kib": 2700001,
+      "url": "https://planetarydata.jpl.nasa.gov/img/data/m3/CH1M3_0004/DATA/20081118_20090214/200902/L2/M3G20090206T010833_V01_RFL.IMG"
+    },
+    {
+      "name": "M3G20090206T010833_V01_RFL.IMG.VRT",
+      "size_kib": 49,
+      "url": "https://planetarydata.jpl.nasa.gov/img/data/m3/CH1M3_0004/DATA/20081118_20090214/200902/L2/M3G20090206T010833_V01_RFL.IMG.vrt"
+    },
+    {
+      "name": "M3G20090206T010833_V01_SUP.HDR",
+      "size_kib": 1,
+      "url": "https://planetarydata.jpl.nasa.gov/img/data/m3/CH1M3_0004/DATA/20081118_20090214/200902/L2/M3G20090206T010833_V01_SUP.HDR"
+    },
+    {
+      "name": "M3G20090206T010833_V01_SUP.IMG",
+      "size_kib": 97001,
+      "url": "https://planetarydata.jpl.nasa.gov/img/data/m3/CH1M3_0004/DATA/20081118_20090214/200902/L2/M3G20090206T010833_V01_SUP.IMG"
+    },
+    {
+      "name": "M3G20090206T010833_V01_SUP.IMG.VRT",
+      "size_kib": 2,
+      "url": "https://planetarydata.jpl.nasa.gov/img/data/m3/CH1M3_0004/DATA/20081118_20090214/200902/L2/M3G20090206T010833_V01_SUP.IMG.vrt"
+    }
+  ],
+  "retrieval_status": {
+    "label": "retrieved inline through ODE REST results=fl",
+    "cube": "not retrieved; listed payload URL is on planetarydata.jpl.nasa.gov and strict TLS validation fails in this environment",
+    "overlap": "not calculated; requires pixel-location data and per-pixel reflectance validity from the cube"
+  }
+}

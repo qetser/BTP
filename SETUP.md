@@ -57,4 +57,15 @@ Do not fill these gaps with invented answers. Record each decision in `project.m
 - [ ] Obtain official calibrated IIRS products and product guide for M2.
 - [ ] Set any research schedule, observation metrics, or cross-model review only after specifying cadence and success criteria.
 
+## Local research Python environment
+
+Use Python 3.11 and `uv` to create the ignored project environment and install the pinned research stack:
+
+```sh
+uv venv --python 3.11 .venv
+uv pip install --python .venv/bin/python -r requirements-research.lock
+```
+
+`requirements-research.txt` records supported dependency ranges. The lock file records the exact versions used for the M1 WAC 2D tie-grid diagnostic. Keep `.venv/` local and do not add it to Git.
+
 To enable the Git hook in another checkout, run `git config --local core.hooksPath .githooks`. The ignored instruction, skill, and Codex configuration files exist only in this checkout; recreate them locally in a fresh clone using this setup and the repository's project files. Do not add them to Git.

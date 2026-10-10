@@ -1,0 +1,18 @@
+{
+  "constant A=0.12": {
+    "pixel_weighted_mean_residual_K": -1.3300229077478687,
+    "pixel_weighted_rms_residual_K": 4.951363802755846
+  },
+  "Hayne A0=0.07 (mare)": {
+    "pixel_weighted_mean_residual_K": 7.956292703115874,
+    "pixel_weighted_rms_residual_K": 12.137689244309483
+  },
+  "Hayne A0=0.12 (average)": {
+    "pixel_weighted_mean_residual_K": 13.172103875799948,
+    "pixel_weighted_rms_residual_K": 16.067348773079267
+  },
+  "Hayne A0=0.16 (highland)": {
+    "pixel_weighted_mean_residual_K": 17.54143045915144,
+    "pixel_weighted_rms_residual_K": 19.828592212508656
+  }
+}

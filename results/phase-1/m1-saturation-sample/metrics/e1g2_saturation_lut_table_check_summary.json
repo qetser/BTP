@@ -1,0 +1,27 @@
+{
+  "status": "exploratory internal table check; no mask assigned",
+  "method": "For each E1G2-valid band, apply every sample-column LUT gain/offset to that band's Dynamic_Range count. Compare the median predicted LUT radiance (mW) with the Saturation table number, then show both counterfactual numeric-mW and XML-declared-uW conversions.",
+  "valid_band_count": 222,
+  "lut_sample_entries": 55500,
+  "saturation_xml_unit": "\u00b5W/cm**2/sr/\u00b5m",
+  "lut_output_unit_per_sis": "mW/cm**2/sr/um",
+  "lut_mW_over_saturation_numeric_if_mW": {
+    "median": 1.558800287742075,
+    "q10": 1.0279302789421787,
+    "q90": 1.8563754293249806,
+    "min": 1.0236830076323788,
+    "max": 3.230293143342254
+  },
+  "lut_mW_over_saturation_converted_from_declared_uW": {
+    "median": 1558.800287742075,
+    "q10": 1027.9302789421788,
+    "q90": 1856.3754293249804
+  },
+  "interpretation": "The raw numeric table values are closer in scale to LUT predictions if treated as mW than if treated as the XML-declared uW. The counterfactual mW comparison still differs by band and is not an official unit correction.",
+  "limits": [
+    "The SIS describes LUT output in mW; saturation XML declares uW.",
+    "The comparison is an internal table consistency check, not a validation source.",
+    "Dynamic_Range may have operational meaning beyond a simple LUT input count.",
+    "No pixel-level mask or Level-1 interpretation follows from this ratio."
+  ]
+}

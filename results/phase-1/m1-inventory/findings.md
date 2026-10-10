@@ -1,5 +1,13 @@
 # M1 inventory findings
 
+## 2026-10-03 — Paired E3G2 LUT-stage comparison
+
+- Compared the official E3G2 LUT with paired raw counts and calibrated radiance for both 2020 scenes, using each calibrated product's PDS4 unit before comparing to the SIS LUT in mW.
+- Across the 127 valid bands, archived Level-1/LUT-stage median ratios by band are 0.000200 (`m65`) and 0.0001999 (`d18`). Median per-band correlations are 0.898 and 0.924. The official guide places destriping and post-processing after LUT correction, so this comparison omits required pipeline stages.
+- The stage difference remains unexplained. It does not by itself establish a LUT scale error or validate Level-1 calibration.
+- Only one raw count in each scene reaches `Dynamic_Range`. The saturation threshold as declared in µW flags about 99.9988% of valid band-pixels in both scenes; the numeric-mW counterfactual flags none. These are not masks.
+- The audit and exact values are saved in [`m1-e3g2-lineage-check`](../m1-e3g2-lineage-check/summary.md). Verify indexing and reproduce available downstream steps before interpreting the magnitude difference.
+
 - Four active IIRS ZIP archives and extracted products are available locally under ignored `data/`: two raw and two calibrated products.
 - Each active label describes a 256-band cube with band centers from approximately 712.3 to 5009.7 nm.
 - The two 2020 E3G2 pilot footprints are low latitude, approximately 31.6 degrees south to 1.5 degrees south. None is polar. A separate 2026 E1G2 scene is documented in `../m1-e1g2-scene/`.

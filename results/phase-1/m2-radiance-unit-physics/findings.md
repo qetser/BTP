@@ -1,0 +1,12 @@
+# Findings
+
+- **The label unit is correct for all three local products.** The stored scale differs by product: 2020 `m65` stores mW (median stored value at 1.5 µm is 0.618), while 2020 `d18` and 2026 `d18` store µW (527 and about 515). Code that reads IIRS Level-1 data must apply the unit from each product's label. A single fixed factor is wrong for some products.
+- **The V6 guide's general "mW" statement is wrong for the `d18` products.** Chauhan et al. (2021, Current Science 121(3):391) also describe Level-1 as mW/cm²/µm/sr. The public CH2IIRS code multiplies Level-1 values by 0.01 to get W/m²/sr/µm, which is correct only for µW input. The code therefore implicitly assumes µW, which agrees with these `d18` results.
+- **The earlier "1000× conflict" gate is resolved by physics, not by provider confirmation.** ISSDC has not responded. Record any later provider statement next to this finding.
+- **Consequence for the saturation table.** The physically valid E1G2 radiances exceed the table's per-band saturation radiance in 99.88% of valid band-pixels when the table is read in its declared µW. A real saturation threshold cannot sit below nearly all physically valid data. So the table's declared µW unit is inconsistent with the radiance product. Read as mW, it flags 12 values. This is evidence that the table numbers are in mW for E1G2. It is not a provider rule, and the E3G2 table behaves differently (see `m1-saturation-sample`). No pixel mask is assigned from the table.
+- **Consequence for the E3G2 lineage gap.** Both E3G2 Level-1 products are physically plausible after applying their label units. The roughly 5000× gap between Level-1 and the locally computed LUT stage (`m1-e3g2-lineage-check`) therefore points to the local LUT application or LUT unit convention, not to a scale error in the archived Level-1 radiance.
+- **Expected values used for the plausibility range.** These are research notes from the published sources below. The I/F values for this geometry are estimates, not published values.
+  - Apollo 16 soil 62231 has reflectance 0.178 at 753 nm (i=30°, e=0°; Pieters 1999, LPI 8025).
+  - LOLA 1064 nm normal albedo is about 0.30 for highland and 0.15 for mare (Lucey et al. 2014, doi:10.1002/2013JE004592).
+  - Scaling these to i≈57° gives an estimated I/F at 750 nm of about 0.04–0.06 for mare and 0.10–0.13 for highland. The phase-function factor is uncertain to about 30%.
+  - Lunar spectra are red-sloped, so the expected values at 1.5 µm are slightly higher.

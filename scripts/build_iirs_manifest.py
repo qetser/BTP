@@ -158,6 +158,8 @@ def main() -> int:
 
     rows: list[dict[str, str]] = []
     for zip_path in sorted(args.data_root.rglob("*.zip")):
+        if not re.match(r"^ch2_iir_n[cr]i_\d{8}T\d{10}_d_img_[a-z0-9]+\.zip$", zip_path.name, re.IGNORECASE):
+            continue
         scene_key = re.sub(r"^ch2_iir_n[cr]i_", "", zip_path.stem)
         kind_prefix = "calibrated_" if "_nci_" in zip_path.stem else "raw_"
         matches = sorted(args.extracted_root.glob(f"{kind_prefix}{scene_key}"))

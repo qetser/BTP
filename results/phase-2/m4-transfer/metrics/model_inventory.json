@@ -1,0 +1,218 @@
+{
+ "record": "M4 Earth-to-Moon transfer: foundation model inventory and wrapper selftest",
+ "date": "2026-10-10",
+ "status": "models runnable; no lunar evaluation run; no lunar performance claimed",
+ "repo_commit_at_time_of_record": "304c5e8bc880d754ecab0b75983c8370b73d033e (wrapper script not yet committed)",
+ "wrapper": "scripts/m4_foundation_features.py",
+ "run_command": "/home/anirudhs/.local/bin/uv run --no-project --python 3.11 --with torch==2.5.1 --with torchvision==0.20.1 --with timm==1.0.11 --with einops==0.8.0 --with numpy==1.26.4 python -I scripts/m4_foundation_features.py --selftest",
+ "models": {
+  "HyperFree": {
+   "repo_url": "https://github.com/Jingtao-Li-CVer/HyperFree",
+   "repo_commit": "966f3e3c7deb0fbcff54874924174faaabdf182a",
+   "local_repo": "data/models/hyperfree_repo",
+   "citation": "Li J., Liu Y., Wang X., Peng Y., Sun C., Wang S., Sun Z., Ke T., Jiang X., Lu T., Zhao A., Zhong Y. HyperFree: A Channel-adaptive and Tuning-free Foundation Model for Hyperspectral Remote Sensing Imagery. CVPR 2025. arXiv:2503.21841",
+   "code_license": "MIT (LICENSE in repo, Copyright 2025 Jingtao Li)",
+   "weights_license": "apache-2.0 (Hugging Face model card tag for JingtaoLi/HyperFree)",
+   "checkpoint": {
+    "variant": "HyperFree-b (ViT-B), smallest released",
+    "url": "https://huggingface.co/JingtaoLi/HyperFree/resolve/69fb1d0bfa05f928ae77730c8277ecda5a0fbfd8/Ckpt/HyperFree-b.pth",
+    "hf_revision": "69fb1d0bfa05f928ae77730c8277ecda5a0fbfd8",
+    "local_path": "data/models/hyperfree_ckpt/HyperFree-b.pth",
+    "bytes": 615520591,
+    "sha256": "bf207bf0d6a64e5a5e939cffbb850b0c72e29dda894ef9eda8950958688664c3",
+    "sha256_matches_hf_lfs": true,
+    "loads_with_weights_only_true": true,
+    "other_variants": {
+     "HyperFree-l": "1551618528 bytes",
+     "HyperFree-h": "3058298898 bytes"
+    }
+   },
+   "parameters": {
+    "checkpoint_tensors_total": 153845680,
+    "image_encoder_used": 144870912,
+    "of_which_spectral_weight_dictionaries": 58197504,
+    "prompt_encoder_plus_mask_decoder": 4064560,
+    "note": "checkpoint also holds pos_embed and semantic_blocks/semantic_neck tensors that the released code does not use; the code's contras_modules (1583488 params) are absent from the checkpoint and are not called by the encoder forward"
+   },
+   "pretraining_data": "Hyper-Seg: about 41,900 AVIRIS airborne images, 512x512 px, 224 channels, 400-2500 nm, about 10 nm spectral resolution, 0.6-5 m GSD, with SAM-generated masks; plus fMoW and SpaceNet multispectral images. Radiance or reflectance level of the AVIRIS data is not stated in the paper or repo.",
+   "pretraining_spectral_range_nm": [
+    400,
+    2500
+   ],
+   "overlap_with_800_2500_nm": "full (800-2500 nm lies inside 400-2500 nm); IIRS 845-2460 nm lies fully inside",
+   "input": {
+    "bands": "any number >= 20 (fewer than 20 is treated as multispectral); band centres in nm are passed to the encoder",
+    "wavelength_handling": "learned weight dictionaries build the patch-embedding layer: 85 key wavelengths (400-2500 nm, from multispectral sensors) and a 10 nm grid of 211 entries (400-2500 nm in code; the paper says 221). Each entry takes the first input band within 10 nm. Bands used by the key branch are removed from the grid branch.",
+    "iirs_845_2460_110_band_matching": {
+     "key_entries_matched": 27,
+     "grid_entries_matched": 164,
+     "grid_entries_used_after_removing_key_bands": 134,
+     "input_bands_used": 110
+    },
+    "image_size": "1024x1024 after resizing the long side to 1024 (bilinear, antialiased) and zero-padding",
+    "patch_size": 16,
+    "normalization": "each image (tile) divided by its own maximum (Sam.preprocess); demo scripts optionally rescale to 0-255 first, which the max division makes irrelevant",
+    "gsd": "ground sampling distance in m/pixel feeds a scale-aware sine-cosine position embedding; divided by the resize ratio"
+   },
+   "encoder_output": "list of 5 maps at 64x64 tokens: outputs of blocks 2, 5, 8, 11 (768-d each) and the neck (256-d). The tuning-free classification demo uses index 1 (block 5); the target detection demo uses index 4 (neck).",
+   "wrapper_settings": {
+    "config": "vit_b, image_size 1024, patch 16, global attention blocks [2,5,8,11], merge_indexs None (tuning-free demo setting)",
+    "tile_px": 256,
+    "gsd_m_default": 80.0,
+    "default_stage": 1,
+    "embedding_dim": 768,
+    "embedding_dim_stage4": 256,
+    "pixel_upsampling": "bilinear from 64x64 tokens of the valid tile area"
+   }
+  },
+  "HyperSIGMA": {
+   "repo_url": "https://github.com/WHU-Sigma/HyperSIGMA",
+   "repo_commit": "07e9ea24e3072fcb5c3a92a2bcb8185e43b295b9",
+   "local_repo": "data/models/hypersigma_repo",
+   "citation": "Wang D., Hu M., Jin Y., Miao Y., Yang J., Xu Y., Qin X., Ma J., Sun L., Li C., Fu C., Chen H., Han C., Yokoya N., Zhang J., Xu M., Liu L., Zhang L., Wu C., Du B., Tao D., Zhang L. HyperSIGMA: Hyperspectral Intelligence Comprehension Foundation Model. IEEE TPAMI, 2025 (doi via ieeexplore document 10949864). arXiv:2406.11519",
+   "code_license": "Apache-2.0 (LICENSE in repo)",
+   "weights_license": "apache-2.0 (Hugging Face model card tag for WHU-Sigma/HyperSIGMA)",
+   "checkpoints": [
+    {
+     "variant": "Spatial_MAE ViT-B (smallest released)",
+     "url": "https://huggingface.co/WHU-Sigma/HyperSIGMA/resolve/e0567395fbdfddbae994695baf5fc73358a1ec3c/spat-vit-base-ultra-checkpoint-1599.pth",
+     "local_path": "data/models/hypersigma_ckpt/spat-vit-base-ultra-checkpoint-1599.pth",
+     "bytes": 1436444759,
+     "sha256": "df6584e8124a9916687a21193bad0516439c97ed712ba7a854e1843d3d5fabc7"
+    },
+    {
+     "variant": "Spectral_MAE ViT-B (smallest released)",
+     "url": "https://huggingface.co/WHU-Sigma/HyperSIGMA/resolve/e0567395fbdfddbae994695baf5fc73358a1ec3c/spec-vit-base-ultra-checkpoint-1599.pth",
+     "local_path": "data/models/hypersigma_ckpt/spec-vit-base-ultra-checkpoint-1599.pth",
+     "bytes": 1391770843,
+     "sha256": "662845ed9669c9fc8f39b18b19a10dff61792a9c8700b6bfea439815f7c86d6f"
+    }
+   ],
+   "hf_revision": "e0567395fbdfddbae994695baf5fc73358a1ec3c",
+   "sha256_matches_hf_lfs": true,
+   "checkpoint_loading": "files hold model, optimizer, scaler, epoch (1599) and an argparse.Namespace; pickle globals were listed without unpickling and only argparse.Namespace was allowlisted for torch.load(weights_only=True)",
+   "also_on": "Baidu Drive (same files per README); not used",
+   "parameters": {
+    "spatial_encoder": 89971968,
+    "spectral_encoder": 88202496,
+    "spatial_mae_checkpoint_total": 121311488,
+    "spectral_mae_checkpoint_total": 116046080,
+    "paper_largest_model": "ViT-H + SSA, 1273M"
+   },
+   "pretraining_data": "HyperGlobal-450K: 447,072 patches of 64x64 px. 247,072 EO-1 Hyperion patches (L1Gst radiance, 2011-2017, 175 channels after removing bad and water-vapour bands, nominal 400-2500 nm, 10 nm) and 200,000 GF-5 AHSI patches (L1 DN, 150 bands, 0.4-1.0 um). Each sample: a random window of 100 contiguous channels, divided by 4000. Not reflectance.",
+   "pretraining_spectral_range_nm": {
+    "hyperion": [
+     400,
+     2500
+    ],
+    "gf5_subset": [
+     400,
+     1000
+    ]
+   },
+   "overlap_with_800_2500_nm": "Hyperion part covers 800-2500 nm except the removed water-vapour bands (the exact removed list is not given in the repo). GF-5 part covers only 800-1000 nm. A 100-channel Hyperion window spans roughly 1000 nm, so no single pretraining sample spanned the full 845-2460 nm IIRS range.",
+   "input": {
+    "bands": "exactly 100 channels for the pretrained spatial patch embedding (Conv2d 100->768, 8x8); the spectral branch average-pools any count to 100 tokens. No wavelength input.",
+    "image_size": "64x64 (spectral token map is Linear(4096, 768), so 64x64 is fixed)",
+    "patch_size": "spatial 8 (8x8 tokens per tile); spectral 1 band per token",
+    "normalization": "pretraining: DN or radiance / 4000. Wrapper default: reflectance unchanged (hypersigma_scale=1.0), an untested choice",
+    "position_embedding": "none in the encoder: the released pretraining forward_encoder does not add pos_embed and the checkpoint pos_embed still has std 0.0200 (its trunc_normal init)"
+   },
+   "wavelength_adapter": "linear interpolation per pixel onto 100 equally spaced wavelengths over the overlap of the input range with 400-2500 nm; for IIRS 845-2460 nm: 845.0 to 2460.0 nm, step 16.31 nm. Verified against np.interp (max difference 2.9e-8).",
+   "encoder_output": "spatial: (B, 64 tokens, 768) after final LayerNorm, reshaped to 8x8 and bilinearly upsampled to 64x64 per tile. spectral: (B, 100 tokens, 768); the wrapper averages tokens to one 768-d vector per tile.",
+   "downstream_note": "the authors' fine-tuning notebooks delete patch_embed.proj and pos_embed, apply PCA (for example 20 components) and train a new patch embedding; they also replace most attention blocks with sparse sampling attention whose offset layers are not in the pretrained checkpoint. The wrapper uses the pretrained full-attention MAE encoders instead, which is the only frozen configuration with all weights pretrained."
+  }
+ },
+ "selftest": {
+  "input": "random uniform 0.05-0.35, 64x64x110, wavelengths linspace 845-2460 nm",
+  "gpu": {
+   "device": "NVIDIA H100 PCIe MIG 2g.20gb slice (about 11.7 GB of 21.1 GB free at test time), torch 2.5.1+cu124",
+   "results": {
+    "hyperfree": {
+     "shape": [
+      64,
+      64,
+      768
+     ],
+     "first_call_s_incl_load": 5.478,
+     "warm_call_s_median": 0.2575,
+     "finite": true,
+     "peak_gpu_mem_gb": 3.68
+    },
+    "hypersigma": {
+     "shape": [
+      64,
+      64,
+      768
+     ],
+     "first_call_s_incl_load": 29.688,
+     "warm_call_s_median": 0.0449,
+     "finite": true,
+     "peak_gpu_mem_gb": 3.68
+    },
+    "hypersigma_spec": {
+     "shape": [
+      64,
+      64,
+      768
+     ],
+     "first_call_s_incl_load": 0.065,
+     "warm_call_s_median": 0.045,
+     "finite": true,
+     "peak_gpu_mem_gb": 3.68
+    }
+   }
+  },
+  "cpu": {
+   "device": "CPU, 96 cores, torch default threads",
+   "results": {
+    "hyperfree": {
+     "shape": [
+      64,
+      64,
+      768
+     ],
+     "first_call_s_incl_load": 24.435,
+     "warm_call_s_median": 19.8022,
+     "finite": true,
+     "peak_gpu_mem_gb": NaN
+    },
+    "hypersigma": {
+     "shape": [
+      64,
+      64,
+      768
+     ],
+     "first_call_s_incl_load": 33.73,
+     "warm_call_s_median": 8.5235,
+     "finite": true,
+     "peak_gpu_mem_gb": NaN
+    },
+    "hypersigma_spec": {
+     "shape": [
+      64,
+      64,
+      768
+     ],
+     "first_call_s_incl_load": 8.102,
+     "warm_call_s_median": 7.9322,
+     "finite": true,
+     "peak_gpu_mem_gb": NaN
+    }
+   }
+  },
+  "checks": {
+   "repeat_determinism_max_abs_diff": {
+    "hyperfree": 0.0,
+    "hypersigma": 0.0,
+    "hypersigma_spec": 0.0
+   },
+   "hyperfree_mean_cosine_correct_vs_wavelengths_shifted_minus_400nm": 0.934,
+   "hyperfree_mean_cosine_correct_vs_band_order_permuted_with_matching_wavelengths": 0.998,
+   "hypersigma_spec_max_abs_diff_after_permuting_the_100_bands": 1.9e-06,
+   "hypersigma_spec_max_abs_feature_value": 24.48,
+   "non_tile_multiple_cube_150x300": "all three models return (150, 300, 768); an all-NaN pixel returns a NaN embedding"
+  },
+  "timing_units": "seconds per call for the full 64x64 cube; first call includes checkpoint loading"
+ }
+}

@@ -1,0 +1,32 @@
+{
+  "pixels_used": 3034675,
+  "pixels_excluded_low_or_negative_local_cos_i": 5704,
+  "local_slope_deg_p50_p95": [
+    4.0989532470703125,
+    17.421144104003893
+  ],
+  "pearson_bt_vs_local_cos_i": 0.8773824477921605,
+  "pearson_iof1500_vs_local_cos_i": 0.5478349531689637,
+  "bt_minus_equilibrium_K_p16_p50_p84": [
+    -7.38149092121565,
+    -1.7360994236168494,
+    4.17613308219152
+  ],
+  "linear_fit_bt_vs_cos_even_blocks": {
+    "slope_K": 113.8720741647781,
+    "intercept_K": 267.39586148057464
+  },
+  "heldout_odd_500line_blocks_r2": 0.7835000537349868,
+  "reflectance_1500nm_coefficient_of_variation_flat_vs_local_incidence": [
+    0.2595626413822174,
+    0.24792239367315747
+  ],
+  "model": {
+    "bond_albedo": 0.12,
+    "emissivity": 0.95,
+    "solar_constant": 1361.0,
+    "sun_moon_distance_au": 0.9919287326822674
+  },
+  "dem": "SLDEM2015 512 ppd, tiles 00N_30N_315_360 and 30S_00S_315_360",
+  "dem_crop_nodata": 6718
+}

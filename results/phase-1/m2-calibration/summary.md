@@ -1,7 +1,10 @@
 # M2 calibration summary
 
-**Status:** Not started
-**Gate:** The official SIS and mode validity are available. Validate each pilot cube's numerical unit scale, pixel-level masks, and thermal-correction feasibility before correction. Both current pilots use `E3G2`, with no valid 4–5 µm bands in the official mask.
-**Expected evidence:** Calibrated units, masks, thermal and photometric correction checks, representative spectra, and a quality report.
+**Status:** Pilot started on 2026-10-10. The work is recorded in these modules:
 
-No metric or graph exists yet. Do not interpret raw counts as reflectance.
+- [Radiance-unit physics test](../m2-radiance-unit-physics/summary.md): pass; the label unit is correct for all three products.
+- [Apparent reflectance](../m2-apparent-reflectance/summary.md): provisional.
+- [Brightness temperature and exploratory thermal removal](../m2-thermal-brightness/summary.md): temperature is physically consistent; the 3 µm gate fails.
+- [Topographic validation](../m2-topographic-validation/summary.md): pass, r = 0.877 against SLDEM2015 illumination.
+
+**Open gates:** pixel masks and fill rules, absolute reflectance scale, photometric correction, Diviner temperature comparison, and 3 µm uncertainty.

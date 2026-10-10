@@ -1,0 +1,53 @@
+{
+  "status": "exploratory sample; no mask assigned",
+  "sample_design": {
+    "line_index_base": 0,
+    "line_indices": [
+      0,
+      813,
+      1627,
+      2441,
+      3255,
+      4069,
+      4883,
+      5697,
+      6511,
+      7325,
+      8139,
+      8953,
+      9767,
+      10581,
+      11395,
+      12209
+    ],
+    "samples_per_line": 250,
+    "valid_band_count": 222,
+    "valid_band_pixel_observations": 888000
+  },
+  "units": {
+    "calibrated_cube": "\u00b5W/cm**2/sr/\u00b5m",
+    "saturation_table_xml": "\u00b5W/cm**2/sr/\u00b5m"
+  },
+  "candidate_counts": {
+    "radiance_at_or_above_saturation": 868507,
+    "raw_count_at_or_above_dynamic_range": 0,
+    "both_candidates_flagged": 0,
+    "sampled_valid_band_pixels": 888000
+  },
+  "candidate_fractions": {
+    "radiance_saturation": 0.9780484234234235,
+    "raw_dynamic_range": 0.0
+  },
+  "median_per_band_lut_ratio_median": 1.0013902945635502,
+  "source_pair": {
+    "calibrated_zip": "data/pradan/e1g2_candidate_20260227T1239538758/ch2_iir_nci_20260227T1239538758_d_img_d18.zip",
+    "raw_zip": "data/pradan/e1g2_candidate_20260227T1239538758/ch2_iir_nri_20260227T1239538758_d_img_d18.zip",
+    "official_archive": "data/pradan/iir.zip"
+  },
+  "limits": [
+    "This deterministic sample is not a random or independent sample.",
+    "Threshold flags are diagnostic candidates, not verified saturation labels.",
+    "Finite values or zero values are not classified as valid or fill from this test.",
+    "Agreement with the LUT is internal consistency, not independent calibration validation."
+  ]
+}

@@ -1,0 +1,209 @@
+{
+  "status": "illumination-matched relative registration diagnostic; not absolute geolocation validation",
+  "source": {
+    "iirs_observation": "20260227T1239538758",
+    "iirs_band": 40,
+    "iirs_wavelength_nm": 1369.6,
+    "iirs_image_sha256": "d02dc7a5ff3cdfdb303d61b6085cfb0a73e8ee120e8859391972c06b3fdbc0df",
+    "iirs_sun_azimuth_deg": 96.319246,
+    "iirs_sun_elevation_deg": 31.690699,
+    "sun_angles_scope": "Scene-level Product_Parameters in the calibrated PDS4 label",
+    "dem": "SLDEM2015 512 pixels/degree north/south tile pair",
+    "dem_source_page": "https://pgda.gsfc.nasa.gov/products/54",
+    "dem_tile_index": "https://imbrium.mit.edu/DATA/SLDEM2015/TILES/JP2/",
+    "dem_tiles": {
+      "north_tile": {
+        "decoded_shape_lines_samples": [
+          15360,
+          23040
+        ],
+        "decoded_dtype": "int16",
+        "crop_shape_lines_samples": [
+          14592,
+          3584
+        ],
+        "crop_nodata_count": 3366,
+        "source_sha256": "631ecdf55f281b6fd8cc4c387d0c5042887cff8c59ec980e31384545b3c31ddb"
+      },
+      "south_tile": {
+        "decoded_shape_lines_samples": [
+          15360,
+          23040
+        ],
+        "decoded_dtype": "int16",
+        "crop_shape_lines_samples": [
+          4353,
+          3584
+        ],
+        "crop_nodata_count": 3352,
+        "source_sha256": "810f27b5b4ec51bc1268423eef0cc8af20584e1dffcb0302b7b7d4d959006609"
+      },
+      "projection": "PDS3 simple cylindrical, positive-east longitude",
+      "resolution_pixels_per_degree": 512,
+      "label_map_scale_km_per_pixel": 0.0592252938,
+      "elevation_scale_m_per_stored_count": 0.5,
+      "crop_lon_edges_east_deg": [
+        352.0,
+        359.0
+      ],
+      "crop_lat_edges_deg": [
+        28.5,
+        -8.5
+      ],
+      "crop_pixel_center_top_latitude_deg": 28.4990234375,
+      "crop_pixel_center_left_longitude_east_deg": 352.0009765625,
+      "dem_shape_lines_samples": [
+        18945,
+        3584
+      ],
+      "crop_nodata_total": 6718,
+      "nominal_ground_pixel_spacing_m": {
+        "north_south": 59.225293797166955,
+        "east_west_at_scene_mean_latitude": 58.32552719116211
+      }
+    },
+    "code_base_commit": "304c5e8bc880d754ecab0b75983c8370b73d033e",
+    "working_tree_script": "scripts/register_iirs_to_sldem_hillshade.py"
+  },
+  "method": {
+    "dem_hillshade": "Central-gradient surface normals and Lambertian hillshade; 0.5 m per stored DEM count; elevation ignored in reflectance",
+    "azimuth_hypotheses": {
+      "clockwise_from_north": 96.319246,
+      "reverse_azimuth": 276.319246
+    },
+    "azimuth_selection": "Choose the direction with the higher median training candidate NCC score only",
+    "tie_grid": {
+      "cross_track_centers_iirs_px": [
+        25,
+        75,
+        125,
+        175,
+        225
+      ],
+      "line_step_px": 250,
+      "patch_size_px": [
+        24,
+        100
+      ],
+      "search_radius_px": 12,
+      "subpixel_peak_fit": "Independent parabolic fit around the 2D gradient NCC maximum"
+    },
+    "heldout_ranges_iirs_lines": [
+      [
+        0,
+        1000
+      ],
+      [
+        2250,
+        3000
+      ],
+      [
+        4500,
+        5250
+      ],
+      [
+        9000,
+        9750
+      ]
+    ],
+    "heldout_guard_lines": 150,
+    "heldout_selection_note": "These ranges avoid the earlier WAC held-out line ranges; no held-out scores selected the azimuth or model.",
+    "offset_model": "Huber-reweighted affine 2D offset field fit on training matches only",
+    "threshold_rule": "For the selected azimuth, use training candidate score q25 and apply unchanged to held-out ties"
+  },
+  "orientation_training_comparison": {
+    "clockwise_from_north": {
+      "azimuth_deg": 96.319246,
+      "training_median_ncc": 0.6255025863647461,
+      "training_candidates": 155
+    },
+    "reverse_azimuth": {
+      "azimuth_deg": 276.319246,
+      "training_median_ncc": 0.20334488153457642,
+      "training_candidates": 155
+    }
+  },
+  "selected_azimuth_hypothesis": "clockwise_from_north",
+  "selected_run": {
+    "score_cut": 0.503938615322113,
+    "score_cut_rule": "25th percentile of training candidate NCC scores; applied unchanged to held-out ties",
+    "training_candidates": 155,
+    "heldout_candidates": 40,
+    "training_used": 116,
+    "heldout_used": 34,
+    "heldout_blocks": [
+      0,
+      1,
+      2,
+      3
+    ],
+    "heldout_columns_px": [
+      25,
+      75,
+      125,
+      175,
+      225
+    ],
+    "median_px": 0.37476734086657415,
+    "p90_px": 1.2727086462104134,
+    "p95_px": 1.4872002427986584,
+    "rmse_px": 0.6985474902592936,
+    "max_px": 1.6648071073476594,
+    "approx_10km_bin_medians_px": {
+      "1": 1.0894923368197034,
+      "3": 0.9114218315847908,
+      "19": 0.23513567573886443,
+      "21": 0.1830516508732749,
+      "37": 0.2616935193501922,
+      "39": 0.35996122332877784,
+      "75": 0.7404598820250857
+    },
+    "worst_approx_10km_bin_median_px": 1.0894923368197034,
+    "criteria": {
+      "heldout_median_le_1_iirs_px": true,
+      "heldout_p95_le_2_iirs_px": true,
+      "at_least_3_cross_track_columns": true,
+      "at_least_4_heldout_blocks": true,
+      "all_approx_10km_bins_median_le_1_5_iirs_px": true
+    },
+    "gate_result": "pass",
+    "coefficients": [
+      [
+        -0.02665691464800698,
+        0.14821833398315315
+      ],
+      [
+        -2.2915963116510887,
+        0.10482530728104333
+      ],
+      [
+        -0.8353273660020115,
+        -0.9180271971100996
+      ]
+    ],
+    "training_median_ncc": 0.6255025863647461,
+    "azimuth_deg": 96.319246,
+    "scene_geometry_pixel_coverage_fraction": 1.0
+  },
+  "candidate_acceptance_limits": {
+    "heldout_median_le_1_iirs_px": 1.0,
+    "heldout_p95_le_2_iirs_px": 2.0,
+    "minimum_cross_track_columns": 3,
+    "minimum_heldout_blocks": 4,
+    "approx_10km_bin_median_max_iirs_px": 1.5
+  },
+  "limitations": [
+    "The IIRS label gives a scene-level sun azimuth but does not state its positive direction; both orientations were tested, with selection based on training NCC only.",
+    "Only the selected orientation's held-out residuals evaluate the candidate gate; the other orientation is retained as a training-selected alternative comparison.",
+    "The IIRS geometry table is sparse and its interpolation is the initial map for hillshade sampling.",
+    "These are morphology matches to a DEM-derived hillshade, not surveyed ground controls or absolute geolocation error.",
+    "Only the local 2026 E1G2 strip was tested; the result does not validate radiance, masks, reflectance, or thermal correction.",
+    "The DEM grid is finer than IIRS and may contain different spatial detail; WAC and IIRS image formation also differ."
+  ],
+  "software": {
+    "python": "3.11.16",
+    "numpy": "2.2.6",
+    "opencv": "4.14.0",
+    "matplotlib": "3.11.2"
+  }
+}

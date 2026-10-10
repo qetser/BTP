@@ -1,0 +1,91 @@
+{
+  "labels": "geologic_group_labels.npy",
+  "classes_scored": [
+    0,
+    1,
+    2,
+    3,
+    4
+  ],
+  "test_pixels_by_class": {
+    "0": 144974,
+    "1": 10209,
+    "2": 60514,
+    "3": 10790,
+    "4": 236387
+  },
+  "train_pixels_by_class": {
+    "0": 261584,
+    "1": 72519,
+    "2": 130948,
+    "3": 22239,
+    "4": 474948
+  },
+  "split": {
+    "block_lines": 250,
+    "guard_lines": 25,
+    "pattern": [
+      "train",
+      "train",
+      "val",
+      "test"
+    ],
+    "min_test_pixels": 5000,
+    "max_train_per_class": 20000,
+    "contact_buffer_px": 25
+  },
+  "n_train": 100000,
+  "n_val": 87060,
+  "n_test": 462874,
+  "test_blocks": 12,
+  "results": [
+    {
+      "method": "HyperFree frozen + linear probe",
+      "family": "M4 transfer",
+      "macro_f1": 0.5429645892274984,
+      "macro_f1_ci95": [
+        0.38669694265869325,
+        0.6291866161458012
+      ],
+      "balanced_accuracy": 0.621091244227548,
+      "balanced_accuracy_ci95": [
+        0.4793222000546997,
+        0.6953606108553931
+      ],
+      "fit_seconds": 5.6,
+      "note": "embedding dim 768; device cuda; stopped after 64 epochs"
+    },
+    {
+      "method": "HyperSIGMA spatial frozen + linear probe",
+      "family": "M4 transfer",
+      "macro_f1": 0.6747245225710741,
+      "macro_f1_ci95": [
+        0.515864246553717,
+        0.7647743676951423
+      ],
+      "balanced_accuracy": 0.7305537046183133,
+      "balanced_accuracy_ci95": [
+        0.5753926339863527,
+        0.8632079040809446
+      ],
+      "fit_seconds": 3.5,
+      "note": "embedding dim 768; device cuda; stopped after 22 epochs"
+    },
+    {
+      "method": "HyperSIGMA spectral (tile-level) frozen + linear probe",
+      "family": "M4 transfer",
+      "macro_f1": 0.5729017467970107,
+      "macro_f1_ci95": [
+        0.4001089027811562,
+        0.6929148116461953
+      ],
+      "balanced_accuracy": 0.5991321450120417,
+      "balanced_accuracy_ci95": [
+        0.44208783154901493,
+        0.7614599282936803
+      ],
+      "fit_seconds": 3.0,
+      "note": "embedding dim 768; device cuda; stopped after 10 epochs"
+    }
+  ]
+}

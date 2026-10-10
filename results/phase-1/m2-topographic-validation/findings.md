@@ -1,0 +1,7 @@
+# Findings
+
+- **This is the strongest independent evidence in the project so far.** The IIRS thermal signal correlates with SLDEM-derived illumination at r = 0.877, with held-out R² = 0.78. Three things must hold at once for this to happen: the radiance scale must be correct, the signal at 4.5–4.9 µm must be surface emission, and the geometry must be accurate enough to place each pixel on the right slope.
+- **The provisional geometry works at terrain-feature scale.** Without accurate relative registration, slope-scale correlation would collapse. This supports the earlier SLDEM hillshade registration (held-out median 0.375 px) by an independent physical route. Thermal emission was not used for the registration.
+- **The temperature response is flatter than radiative equilibrium.** The fitted slope is 114 K per unit cos(i), and the equilibrium model is steeper. Likely causes are heat conduction and morning lag, roughness, and pixel smoothing. This is a known lunar thermal behavior, and it limits the use of a pure equilibrium model for thermal removal in steep terrain.
+- **Local-incidence normalization helps reflectance only partly.** The coefficient of variation drops from 0.260 to 0.248, and the albedo histogram becomes two peaks. A Lambert normalization overcorrects steep slopes. A photometric function with local emission angle is needed.
+- **Montes Apenninus (about 18°N)** has the largest temperature departures. This is consistent with steep sun-facing and shadowed scarps. Shadowed pixels (local cos(i) ≤ 0.05) were excluded.

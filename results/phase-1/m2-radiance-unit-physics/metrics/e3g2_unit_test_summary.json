@@ -1,0 +1,30 @@
+{
+  "m65": {
+    "label_unit": "mW/cm**2/sr/\u00b5m",
+    "lines_sampled": 683,
+    "solar_zenith_deg_range": [
+      42.751,
+      50.69289250292063
+    ],
+    "sun_moon_distance_au": 0.9886283750123382,
+    "median_stored_value_1500nm": 0.6184498965740204,
+    "median_iof_1500nm_if_uW": 6.541979396619939e-05,
+    "median_iof_1500nm_if_mW": 0.0654197939661994,
+    "physically_plausible_unit": "mW",
+    "label_unit_matches_physics": true
+  },
+  "d18": {
+    "label_unit": "\u00b5W/cm**2/sr/\u00b5m",
+    "lines_sampled": 683,
+    "solar_zenith_deg_range": [
+      43.342,
+      51.25690249862909
+    ],
+    "sun_moon_distance_au": 0.9887663262118725,
+    "median_stored_value_1500nm": 526.7193298339844,
+    "median_iof_1500nm_if_uW": 0.05573206052793357,
+    "median_iof_1500nm_if_mW": 55.73206052793357,
+    "physically_plausible_unit": "\u00b5W",
+    "label_unit_matches_physics": true
+  }
+}

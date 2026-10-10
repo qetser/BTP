@@ -1,0 +1,4 @@
+method,family,macro_f1,macro_f1_ci_lo,macro_f1_ci_hi,balanced_accuracy,ba_ci_lo,ba_ci_hi,fit_seconds,note
+HyperFree frozen + linear probe,M4 transfer,0.5429645892274984,0.38669694265869325,0.6291866161458012,0.621091244227548,0.4793222000546997,0.6953606108553931,5.6,embedding dim 768; device cuda; stopped after 64 epochs
+HyperSIGMA spatial frozen + linear probe,M4 transfer,0.6747245225710741,0.515864246553717,0.7647743676951423,0.7305537046183133,0.5753926339863527,0.8632079040809446,3.5,embedding dim 768; device cuda; stopped after 22 epochs
+HyperSIGMA spectral (tile-level) frozen + linear probe,M4 transfer,0.5729017467970107,0.4001089027811562,0.6929148116461953,0.5991321450120417,0.44208783154901493,0.7614599282936803,3.0,embedding dim 768; device cuda; stopped after 10 epochs

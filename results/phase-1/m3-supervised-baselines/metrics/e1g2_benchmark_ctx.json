@@ -1,0 +1,93 @@
+{
+  "labels": "geologic_group_labels.npy",
+  "classes_scored": [
+    0,
+    1,
+    2,
+    3,
+    4
+  ],
+  "test_pixels_by_class": {
+    "0": 144974,
+    "1": 10209,
+    "2": 60514,
+    "3": 10790,
+    "4": 236387
+  },
+  "train_pixels_by_class": {
+    "0": 261584,
+    "1": 72519,
+    "2": 130948,
+    "3": 22239,
+    "4": 474948
+  },
+  "split": {
+    "block_lines": 250,
+    "guard_lines": 25,
+    "pattern": [
+      "train",
+      "train",
+      "val",
+      "test"
+    ],
+    "min_test_pixels": 5000,
+    "max_train_per_class": 20000,
+    "contact_buffer_px": 25,
+    "guard_lines_used": 25,
+    "context_window_px": 64
+  },
+  "n_train": 100000,
+  "n_val": 87060,
+  "n_test": 462874,
+  "test_blocks": 12,
+  "results": [
+    {
+      "method": "context 64px band parameters + nearest centroid",
+      "family": "M3 context control",
+      "macro_f1": 0.4751304084198737,
+      "macro_f1_ci95": [
+        0.33346597473037143,
+        0.6327578904384034
+      ],
+      "balanced_accuracy": 0.5096548924882741,
+      "balanced_accuracy_ci95": [
+        0.36433185202724444,
+        0.6945196446095376
+      ],
+      "fit_seconds": 9.3,
+      "note": "same band parameters on window-mean spectra"
+    },
+    {
+      "method": "context 64px spectra PCA20 + logistic regression",
+      "family": "M3 context control",
+      "macro_f1": 0.575318622161177,
+      "macro_f1_ci95": [
+        0.42559340290398584,
+        0.6872905963738154
+      ],
+      "balanced_accuracy": 0.5938628115432664,
+      "balanced_accuracy_ci95": [
+        0.4757261914094485,
+        0.7457891700058283
+      ],
+      "fit_seconds": 40.0,
+      "note": ""
+    },
+    {
+      "method": "context 64px spectra + random forest",
+      "family": "M3 context control",
+      "macro_f1": 0.6302455647606237,
+      "macro_f1_ci95": [
+        0.4651787266109871,
+        0.7110467174064494
+      ],
+      "balanced_accuracy": 0.6515636356408105,
+      "balanced_accuracy_ci95": [
+        0.5128199642793811,
+        0.7847159991227358
+      ],
+      "fit_seconds": 21.7,
+      "note": ""
+    }
+  ]
+}

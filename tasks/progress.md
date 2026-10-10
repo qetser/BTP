@@ -1,4 +1,136 @@
+
+## 2026-10-10 — M3 supervised and M4 exploratory benchmark
+
+- Proxy USGS labels, frozen block split, 2 km buffer. M3 best per pixel: random forest 0.50; with 64 px context: 0.63. M4 HyperSIGMA spatial 0.67; HyperFree 0.54.
+- Context and 64-line guard controls run. No leakage; pretraining gain not demonstrated.
+- Records: `results/phase-1/m3-supervised-baselines/`, `results/phase-2/m4-transfer/`.
+
+## 2026-10-10 — Diviner temperature comparison
+
+- Downloaded four Diviner GCP tiles (10°S–30°N, about 625 MB) from the PDS Geosciences Node with verified TLS; MD5 values match the bundle manifest. Added `scripts/compare_e1g2_diviner_temperature.py` and the `m2-diviner-temperature` module. IIRS − Diviner bolometric: median +5.0 K over 33 bins, r = 0.81.
+
+## 2026-10-10 — M2 pilot and M3 unsupervised reference
+
+- Built an ignored E1G2 working cube (222 VALID bands), per-line OAT geometry, and per-pixel latitude/longitude from the SLDEM-corrected candidate grid.
+- Radiance-unit physics test passed for all three products. The label unit is correct.
+- Recorded E1G2 apparent reflectance, brightness temperature, exploratory thermal removal, SLDEM topographic validation (r = 0.877), and k-means spectral units. See the five new modules under `results/phase-1/`.
+- Failed gates recorded: the 2.9 µm band depth, spectral-unit block-split stability, and IBD 2 µm signal-to-noise ratio.
+- Next: Diviner temperature comparison; absolute reflectance scale; photometric correction.
+
+## 2026-10-08 — Clarify official band validity and audit public processing code
+
+- Read Appendix H of the official SIS V17. It explicitly states that only `VALID` bands are valid, while `SATURATION`, `OSF`, and `INVALID` bands are to be treated as invalid. OSF marks lower-confidence radiance; invalid spectral regions are updated from neighboring bands except bands 1–5. These instructions concern spectral bands, not individual pixel quality.
+- Audited the public CH2IIRS thermal implementation at commit `cd84557b67317aa70cfdd7aa552d701861dc1a7b`. The inspected routines use all-band inputs and longwave bands near 4500–4874 nm, but do not implement explicit per-pixel fill or saturation masks. The code is a method reference, not archive authority.
+- Confirmed the SIS names `.oat`, `.oath`, `.lbr`, and `.spm` as orbit/attitude, orbit/attitude header, lunar libration, and Sun-parameter ancillary data. These are not the sought pixel-quality mask.
+- Saved the source/method review in `results/phase-1/m1-processing-code-audit/`. Existing mode values and figure remain in the inventory module; no metric, mask, or correction was created.
+- Next: use Appendix H to define band selection, while keeping pixel masks, radiance validation, and absolute geometry as independent open gates.
+
 # Progress
+
+## 2026-10-10 — Retrieve M³ candidate through ODE
+
+- Used the official PDS Geosciences Node ODE REST API as an alternate metadata route. It returned the full candidate PDS3 label and file inventory for `M3G20090206T010833_V01_RFL`.
+- Confirmed dimensions 304 samples × 27,796 lines × 85 float32 bands, invalid constant -999.0, thermal-correction flag `Y`, and required source pixel-location file `M3G20090206T010833_V03_LOC.IMG`. The RFL cube is listed as 2,700,001 KiB.
+- ODE's binary URLs resolve to the JPL Imaging Node. Both Python and curl with standard TLS validation reject its certificate chain. No bypass used; cube and LOC file are not downloaded. Actual valid-pixel overlap remains unmeasured.
+- Exa found the documented USGS-hosted PDS4 M3 bundle route; requests to its root and candidate volume paths returned 404. NASA Open Data lists no downloadable resources. P1 is blocked until a valid official binary route or local archive files are available. See [the M1 gate follow-up](../results/phase-1/m1-gate-followup-20261010/summary.md).
+
+## 2026-10-10 — Refresh the M1 clarification and M³ candidate checks
+
+- Re-ran the PDS ODE footprint query. It returned the same five M³ L2 candidates; `M3G20090206T010833_V01_L2` remains the top sparse-grid candidate with 1,033/1,476 geometry nodes (69.99%). This is not a pixel-area or valid-pixel overlap result.
+- Reviewed the official PRADAN FAQ; it refers users to the SIS and guide but does not resolve Level-1 saturation or fill semantics. User reports prior contact attempts received no response. Do not repeat outreach.
+- Tried to fetch the top M³ label from the PDS Imaging Node. TLS verification failed on a self-signed certificate chain, so the label and cube were not retrieved and coverage remains unmeasured. No certificate checks were bypassed.
+- Parsed the supplied V6 product guide (p. 14). It documents post-LUT destriping and radiance post-processing and attributes differences from direct LUT calculations to those steps; it does not quantify the local E3G2 ratio. It states calibrated units as mW, while the matched E1G2 label declares µW, leaving a factor-of-1000 unit conflict open.
+- No scientific gate closed. No mask, radiance correction, reflectance, thermal result, or metric was produced. See `results/phase-1/m1-gate-followup-20261010/`.
+- Next: use published/data-based alternatives and official PDS access sites, as recorded in the latest Exa review below. Keep M2 gated until radiance and mask evidence is sufficient.
+
+## 2026-10-10 — Exa review of alternative M1 validation paths
+
+- IIRS–M³ comparisons normalized at 810 nm support spectral-shape checks only. The 2025 Apollo 16/RELAB 62231 method is an absolute-reflectance route requiring a separate IIRS scene. Diviner temperatures matched by ground control points and acquisition time can check derived E1G2 temperature, not IIRS radiance units.
+- The PDS Imaging Node index lists multiple official M³ access sites. Next data step is to try an official listed site for the current candidate and measure actual valid-pixel overlap.
+- Replaced provider-contact action with these data-based alternatives. Unit conflict, pixel mask/fill semantics, and independent radiance scale remain open. No new metric or reflectance product was created.
+- Evidence: [M1 alternative validation record](../results/phase-1/m1-gate-followup-20261010/summary.md).
+
+## 2026-10-08 — Apply the SLDEM relative geometry candidate
+
+- Applied the saved training-fitted affine offset model to a separate derived copy of the 1,476-node E1G2 sparse geometry grid. Source ZIP and original coordinates are unchanged.
+- Recomputed the 34 held-out tie residuals without refitting. They reproduce the prior result within `1e-5` pixel: median 0.375 px, p95 1.487 px, RMSE 0.699 px.
+- Predicted median absolute shifts are about 98.8 m east-west and 37.3 m north-south. Saved the coordinate CSV, JSON, SVG, script, and module records in `results/phase-1/m1-sldem-correction-candidate/`.
+- This is a relative morphology registration result, not absolute geolocation validation. The ties are not surveyed controls. Radiance, saturation/fill, reflectance, and thermal gates remain open.
+- Next: compare the candidate with independent absolute controls or an independently corrected IIRS geometry product before accepting coordinates.
+
+## 2026-10-08 — Check public guidance on IIRS mask and fill rules
+
+- Checked the public PRADAN IIRS FAQ, ISRO's Chandrayaan-2 processing description, and the primary LPSC 2025 abstract on IIRS Level-0 recalibration.
+- The FAQ directs users to the SIS and product guide. ISRO describes Level 1 as radiance with geometric tagging. Neither public official source specifies the archived Level-1 saturation test or fill encoding.
+- The LPSC abstract uses the LUT, saturation radiance, and detector dynamic range in a separate raw-count recalibration and reports differences from archived Level 1. It does not establish an official Level-1 mask or fill rule.
+- Recorded the failed clarification gate and sources in the literature module, gap matrix, README, and task findings. No metric or figure was produced, and no mask or correction was assigned.
+- Next: obtain authoritative processing guidance and an independent radiance reference. Keep M2 reflectance gated.
+
+## 2026-10-08 — Reconcile the E3G2 audit checklist
+
+- Confirmed that the planned comparison of raw-count distributions and LUT predictions against both 2020 E3G2 calibrated cubes was already completed and recorded with per-band CSV, JSON summary, and figure in `results/phase-1/m1-e3g2-lineage-check/`.
+- Marked the corresponding M1 checklist item complete. This audit compares an intermediate LUT stage with Level 1; it does not reproduce downstream destriping/post-processing or validate radiance independently. No mask or reflectance was produced.
+- The next calibration gate still requires an authoritative field interpretation, independent radiance validation, and a controlled downstream reconstruction if its coefficients are available. Absolute geometry also remains unvalidated; the SLDEM result is relative registration only.
+
+## 2026-10-08 — Test E1G2 registration against an illumination-matched SLDEM2015 hillshade
+
+- Downloaded the two official 512-pixel/degree SLDEM2015 tiles covering the E1G2 scene and saved them under ignored `data/reference/sldem2015_e1g2/`. Their sizes match the official tile index. Decoded signed elevations with Pillow; OpenCV's bundled JPEG2000 decoder rejected the signed component.
+- Added `scripts/register_iirs_to_sldem_hillshade.py` and declared Pillow in the research requirements. The script uses scene-level IIRS sun angles, tests both azimuth directions, chooses the direction and score cutoff from training ties only, and fixes four held-out line blocks with 150-line guards.
+- Added a DEM validity check after discovering 6,718 nodata cells in the local crop. Match patches touching nodata or its one-pixel gradient boundary are excluded. The selected run retained 116 of 155 training candidates and 34 of 40 held-out candidates.
+- The clockwise-from-north hypothesis won on training NCC (median 0.626 versus 0.203). Held-out fit residual median is 0.375 IIRS px, p95 1.487 px, RMSE 0.699 px. All five predeclared relative-registration candidate criteria pass. This is not absolute geolocation validation; the tie fit uses the sparse IIRS geometry as its starting map and corrected coordinates have not been applied to an IIRS cube.
+- Saved the reproducible script, CSV, JSON, SVG figure, and module summary/findings/notes under `results/phase-1/m1-sldem-hillshade/`. Updated README workflow, plan, project charter, and task records. Pillow 12.3.0 is in the exact dependency lock and is now an explicit requirement.
+- Verification: Python bytecode compilation passes; see final diff/path checks before reporting. The result does not close radiance, saturation/fill, reflectance, thermal, or absolute-geometry gates.
+- Next: use the independent ISRO correction output or well-distributed controls to check absolute geometry; separately measure valid M³ overlap inside the IIRS ribbon.
+
+## 2026-10-08 — Run the first full-resolution 2D WAC tie grid
+
+- Added `requirements-research.txt` and an exact-version lock, then created the ignored `.venv/` with Python 3.11.16, NumPy 2.2.6, OpenCV 4.14.0, and Matplotlib 3.11.2.
+- Added a separate reproducible registration script so the earlier one-column script and artifacts remain unchanged. It tests five sample columns, 2D gradient matching with subpixel peak refinement, a score cutoff selected from training candidates only, and a robust affine offset fit on training blocks.
+- Ran `.venv/bin/python scripts/register_iirs_to_wac_grid.py` on E1G2 band 40 and the existing WAC crop. It produced 245 candidate windows, 41 training matches, and 17 held-out matches across five cross-track columns and five spatial blocks.
+- Held-out residual median is 2.236 IIRS pixels, p95 6.343 pixels, and RMSE 3.572 pixels. The candidate limits (median <= 1 px, p95 <= 2 px, and local-bin median <= 1.5 px) fail. The geometry gate remains open; do not tune against this holdout.
+- A second run with the same inputs and environment reproduced the tie CSV and summary JSON byte-for-byte. The locked dependencies reinstall in `.venv/`, and the script passes Python bytecode compilation.
+- Re-ran the saturation-table/LUT diagnostic successfully. Median LUT radiance divided by table value under counterfactual mW interpretation is 1.559 for E1G2 and 5,118 for E3G2. It assigns no mask and does not resolve field semantics.
+- Saved CSV, JSON, SVG, and module records under `results/phase-1/m1-wac-2d-grid/`; updated the scientific plan, project status, README workflow, and results index.
+- Next: test an illumination-matched hillshade or independent geometry tool with fresh validation controls. Continue to defer M³ pixel overlap until geometry and inputs are adequate; mask and independent-radiance gates also remain open.
+
+## 2026-10-03 — Audit both E3G2 raw/LUT/calibrated pairs
+
+- Scanned all pixels in 127 valid bands for the 2020 `m65` and `d18` raw/calibrated pairs; compared LUT output with calibrated radiance on a fixed grid, converting each product by its label unit.
+- Only one raw count per scene reaches `Dynamic_Range`. The XML-declared saturation comparison flags 99.99885% (`m65`) and 99.99877% (`d18`) of valid band-pixels; treating the table numbers as mW flags none.
+- The LUT-stage values track Level 1 variation, with median per-band Level-1/LUT-stage ratios 0.000200 and 0.0001999 and median correlations 0.898 and 0.924. Appendix F places destriping and radiance post-processing after the LUT, so this is an incomplete stage-to-stage comparison, not evidence of a LUT scale error.
+- Saved exact per-band metrics, JSON summary, and figure in `results/phase-1/m1-e3g2-lineage-check/`. No mask or reflectance was produced.
+- Follow-up: Appendix F confirms the raw archive is dark-subtracted, defines the LUT output as an intermediate radiance stage, then applies destriping and post-processing. No destriping coefficients are present in the local official archive. The measured Level-1/LUT-stage ratio is therefore unexplained, not evidence by itself of a LUT error.
+- Next: run a small spectral quality pilot using the matched E1G2 Level-1 radiance cube, without assigning unverified masks. Keep thermal correction gated on fill/saturation semantics, independent radiance validation, and geometry review.
+
+## 2026-10-03 — Probe saturation fields on a small E1G2 sample
+
+- Sampled 16 scan lines spread across the E1G2 scene, all 250 samples, and all 222 valid bands (888,000 band-pixel observations).
+- The saturation threshold as labeled flags 868,507 values (97.8048%); the paired raw count comparison flags zero values at or above `Dynamic_Range`. Raw sample values range 0–8,439.
+- The median per-band sampled calibrated/LUT median ratio is 1.00139, with per-band ratios from 0.9060 to 1.0960. This is internal consistency only.
+- Saved a reproducible per-band CSV, JSON summary, and figure in `results/phase-1/m1-saturation-sample/`. No mask or reflectance was produced.
+- The small sample reproduces the mismatch; it does not establish the field semantics or fill rule. Next: obtain official clarification before creating masks or continuing to M2.
+
+## 2026-10-03 — Check official saturation tables against the LUT by mode
+
+- Applied E1G2 and E3G2 LUTs at each mode-valid band's `Dynamic_Range` count across all 250 sample positions. The median LUT radiance divided by the saturation number is 1.559 for E1G2 and 5,118 for E3G2 if those numbers are treated counterfactually as mW. Both XML files declare µW.
+- The mode difference argues against one simple inferred unit correction. This internal table comparison does not establish official field semantics.
+- Saved reproducible per-band values, JSON, plot, and limitations in `results/phase-1/m1-saturation-sample/`.
+- Next best local action: compare actual raw-count distributions and LUT predictions with the available E3G2 calibrated cubes, preserving m65/d18 units. Keep fill and Level-1 pixel masks unresolved.
+
+## 2026-10-03 — Check papers on IIRS saturation and fill semantics
+
+- Used Exa to search IIRS instrument, thermal-correction, calibration-validation, and reflectance-processing papers for saturation, dynamic-range, fill, and invalid-pixel rules.
+- Found a relevant LPSC 2025 abstract. Laferriere and Bramson use the ISRO LUT, saturation radiance, and CCD dynamic range to convert linearized Level-0 counts to radiance. Their reconstructed radiance differs from ISRO Level 1, partly because they omit order-sorting-filter adjustments and keystone correction.
+- The 2020 instrument paper covers lab saturation-radiance characterization. A 2023 IIRS calibration-validation abstract reports deep-space dark-offset correction. The papers reviewed do not define archived Level-1 fill values or per-pixel saturation masks.
+- Recorded the source-backed findings in the M1 literature module, task findings, gap matrix, scientific plan, and README. No metrics or masks were generated. The scientific quality gates remain open.
+- Next: ask the IIRS team to clarify field application, fill values, and pixel validity. Do not infer a mask from the published recalibration method.
+
+## 2026-10-01 — Review full-resolution WAC tie confidence
+
+- Audited the existing E1G2 band-40 held-out tie rows. All 12 accepted held-out ties have gradient NCC scores from 0.206 to 0.320 (median 0.258); five residuals exceed 2 IIRS pixels and two exceed 3 pixels, with a maximum of 7.021 pixels.
+- Similar NCC scores accompany both small and large residuals. The current acceptance threshold is not a reliable confidence filter. Three blocks contribute four ties each, but these remain image matches, not absolute control points.
+- Updated the M1 reference-data findings, summary, and README. Geometry remains provisional; WAC does not validate radiance, and M1 mask/radiance gates remain open.
+- Next: acquire or identify independent, well-distributed geometry controls, and obtain authoritative guidance on saturation, dynamic-range, and fill semantics before correction work.
 
 ## 2026-09-29 — Acquire WAC reference crop for E1G2 geometry
 

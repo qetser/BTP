@@ -1,4 +1,5 @@
 /data/
+/.venv/
 /AGENTS.md
 /agents.md
 /codex.md
@@ -6,3 +7,7 @@
 /.agents/skills/
 /.codex/
 __pycache__/
+
+# Official ISRO source documents and archives kept locally, not in Git
+docs/*.zip
+docs/*.pdf

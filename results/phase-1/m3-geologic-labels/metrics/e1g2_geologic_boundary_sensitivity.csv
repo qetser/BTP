@@ -1,0 +1,4 @@
+shift_km,directions,subsample,pixels_evaluated,unit_label_changed_pct,group_label_changed_pct
+1.0,4,every 5th line and sample,121736,11.167,8.705
+2.0,4,every 5th line and sample,121736,21.221,16.394
+5.0,4,every 5th line and sample,121736,41.797,31.385

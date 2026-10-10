@@ -1,124 +1,423 @@
-# Chandrayaan-2 IIRS: phase 1 research and baselines
+# Chandrayaan-2 IIRS: lunar hyperspectral foundations (M1–M4)
 
-This repository supports the first phase of **Cross-Domain Transfer of Hyperspectral Foundation Models for Lunar Mineral and Water-Ice Mapping**. The current scope is **M1 data acquisition and gap analysis, M2 calibration and preprocessing, and M3 classical and from-scratch baselines**. Earth-to-Moon foundation-model transfer starts only after these three modules pass their quality gates.
+This repository supports **Cross-Domain Transfer of Hyperspectral Foundation Models for Lunar Mineral and Water-Ice Mapping**. It works with Chandrayaan-2 Imaging Infrared Spectrometer (IIRS) data. The stages are:
 
-For tasks, deliverables, and pass criteria, see [the M1–M3 implementation plan](docs/m1_m3_plan.md). For the project workflow and Codex setup, read [SETUP.md](SETUP.md).
+1. **M1:** verify the products.
+2. **M2:** turn radiance into physically checked reflectance and temperature.
+3. **M3:** build reference baselines.
+4. **M4:** test whether Earth hyperspectral foundation models (HyperFree, HyperSIGMA) transfer to the Moon.
 
-For a plain-language walkthrough of the goal, evidence, workflow, terms, and limits, see the [research guide](research_guide/README.md).
+> **Evidence rule.** Raw counts, calibrated radiance, apparent reflectance, and scientific labels are separate products. Every number below links to saved values (CSV/JSON) and a figure under [`results/`](results/). Results marked **provisional** or **exploratory** are not validated science products. No mineral, hydration, or water-ice result is claimed.
 
-The complete execution roadmap is described below. The repository is currently working on M1. HyperFree and HyperSIGMA are planned comparison backbones for a later phase; they have not been trained or evaluated in this checkout.
+Related documents: [M1–M3 implementation plan](docs/m1_m3_plan.md) · [setup](SETUP.md) · [plain-language research guide](research_guide/README.md) · [results protocol](docs/results_protocol.md) · [gap matrix](docs/gap_matrix.md)
 
-## M1 results at a glance
+## Contents
 
-M1 records which observations and products we have, checks their metadata and file integrity, and tests whether the data are ready for later physical processing. It does not create reflectance or detect minerals, hydration, or ice.
+1. [Status at a glance](#1-status-at-a-glance)
+2. [Headline results](#2-headline-results)
+3. [Workflow](#3-workflow)
+4. [Data and references used](#4-data-and-references-used)
+5. [M1: product verification](#5-m1-product-verification)
+6. [M2: radiance, reflectance, and temperature](#6-m2-radiance-reflectance-and-temperature)
+7. [M3: labels and baselines](#7-m3-labels-and-baselines)
+8. [M4: Earth-to-Moon transfer (exploratory)](#8-m4-earth-to-moon-transfer-exploratory)
+9. [Open gates and next actions](#9-open-gates-and-next-actions)
+10. [Reproduce](#10-reproduce)
+11. [Glossary](#11-glossary)
+12. [Roadmap M1–M7](#12-roadmap-m1m7)
+13. [Data handling and evidence storage](#13-data-handling-and-evidence-storage)
+14. [Primary sources](#14-primary-sources)
+15. [Archive: detailed M1 evidence chart](#15-archive-detailed-m1-evidence-chart)
 
-#### Decode the product names
+## 1. Status at a glance
 
-| Term | Meaning in this project |
-| --- | --- |
-| **IIRS** | Imaging Infrared Spectrometer, a Chandrayaan-2 instrument that records a spectrum at each image location. |
-| **E1G2** | Instrument operating mode from the XML label: exposure setting **E1** and gain setting **G2**. Exposure and gain affect the signal acquisition. The filename suffix `d18` is a receiving-station code. It does not mean E1G2. |
-| **E3G2** | Exposure setting **E3** with gain setting **G2**. The two 2020 pilot pairs use this mode. |
-| **NRI / NCI** | Filename product codes used here for IIRS raw (`nri`) and calibrated (`nci`) products. The XML label gives the authoritative processing level and units. |
-| **Raw count** | The detector's recorded digital value before physical radiance calibration. A raw count is not radiance or reflectance. |
-| **Calibrated radiance** | Instrument signal converted to a physical radiance unit. Our calibrated products are Level 1 radiance, not surface reflectance. |
-| **LUT** | Look-up table. For this E1G2 product, the official table supplies gain and offset coefficients applied to raw counts. We compared that calculation with the paired calibrated cube as an internal consistency check. |
-| **Band / band-pixel** | A spectral band is one wavelength channel. A band-pixel is one spatial sample in one band. Counts summed across bands are not counts of unique surface locations. |
-| **PDS4 label, QUB, CRC, MD5** | The PDS4 XML label describes the product. QUB is the binary image cube. ZIP CRC and label MD5 checks test file integrity. They do not prove scientific calibration accuracy. |
-| **Saturation / fill mask** | A per-pixel flag for measurements that cannot be trusted due to saturation or missing/invalid data. We have not created this mask because the table's declared units are clear but their operational application conflicts with the paired observations, and no cube fill value is declared. |
+Updated 10 October 2026. Legend: ✅ pass or done · 🟡 partial or provisional · ❌ failed gate · 🔴 blocked · ⛔ not started.
 
-#### Work completed, output, and interpretation
+| Phase | Module | Status | Key result | Record |
+|---|---|---|---|---|
+| M1 | Inventory, integrity, band validity | ✅ | 3 matched raw/calibrated pairs verified (CRC, MD5, labels) | [summary](results/phase-1/m1-inventory/summary.md) |
+| M1 | E1G2 scene audit | ✅ | LUT stage vs Level 1: median ratio 1.004 | [summary](results/phase-1/m1-e1g2-scene/summary.md) |
+| M1 | E3G2 LUT lineage | 🟡 | ~5000× gap explained by exposure scaling (median ratio 0.944) | [summary](results/phase-1/m1-e3g2-lineage-check/summary.md) |
+| M1 | Saturation and fill rules | 🟡 | Table unit inconsistent with valid radiance; no mask assigned | [summary](results/phase-1/m1-saturation-sample/summary.md) |
+| M1 | Geometry: WAC grid | ❌ | p95 residual 6.3 px | [summary](results/phase-1/m1-wac-2d-grid/summary.md) |
+| M1 | Geometry: SLDEM hillshade | ✅ | Held-out median 0.375 px, p95 1.49 px | [summary](results/phase-1/m1-sldem-hillshade/summary.md) |
+| M1 | M³ reference download | 🔴 | JPL TLS failure; USGS mirror 404 | [summary](results/phase-1/m1-gate-followup-20261010/summary.md) |
+| M2 | Radiance-unit physics test | ✅ | Label unit correct for all 3 products | [summary](results/phase-1/m2-radiance-unit-physics/summary.md) |
+| M2 | Apparent reflectance | 🟡 | Median 0.098 at 1.5 µm | [summary](results/phase-1/m2-apparent-reflectance/summary.md) |
+| M2 | Brightness temperature | 🟡 | Median 327.8 K | [summary](results/phase-1/m2-thermal-brightness/summary.md) |
+| M2 | Topographic validation (SLDEM) | ✅ | r = 0.877, held-out R² = 0.78 | [summary](results/phase-1/m2-topographic-validation/summary.md) |
+| M2 | Diviner temperature check | ✅ | IIRS − Diviner +5.0 K median, profile r = 0.81 | [summary](results/phase-1/m2-diviner-temperature/summary.md) |
+| M2 | 3 µm thermal removal | ❌ | 2.9 µm band depth noise-dominated | [summary](results/phase-1/m2-thermal-brightness/summary.md) |
+| M3 | Proxy geologic labels | 🟡 | 5 groups from USGS 1:5M map | [summary](results/phase-1/m3-geologic-labels/notes.md) |
+| M3 | Unsupervised spectral units | 🟡 | Seed-stable; geographic stability 0.71 (target 0.8) | [summary](results/phase-1/m3-spectral-units/summary.md) |
+| M3 | Supervised baselines | 🟡 | Macro F1 0.40–0.50 per pixel; 0.63 with 64 px context (majority 0.10) | [summary](results/phase-1/m3-supervised-baselines/summary.md) |
+| M4 | Foundation-model setup | ✅ | HyperFree and HyperSIGMA run on GPU | [inventory](results/phase-2/m4-transfer/model_inventory.md) |
+| M4 | Frozen linear probes | 🟡 | HyperSIGMA 0.67, HyperFree 0.54; matches the context control (0.63) | [summary](results/phase-2/m4-transfer/summary.md) |
+| M4–M6 | Fine-tuning, self-supervised adaptation, science | ⛔ | Waiting on reviewed labels and more scenes | [roadmap](#12-roadmap-m1m7) |
 
-| M1 work | What we did | Result | Supporting evidence and status |
-| --- | --- | --- | --- |
-| Inventory and product documentation | Reviewed three matched raw/calibrated pairs: two 2020 E3G2 observations and one 2026 E1G2 observation. Read their labels and the official IIRS archive/SIS. | The E1G2 pair has observation ID `20260227T1239538758`. Its labels report exposure E1, gain G2, orbit, dimensions, wavelengths, and radiance units. | [E1G2 record](results/phase-1/m1-e1g2-scene/summary.md), [data dictionary](results/phase-1/m1-inventory/data_dictionary.md). **Inventory recorded.** |
-| File integrity and pair matching | Checked ZIP CRCs, compared raw/calibrated label fields, and streamed each QUB to check its label MD5. | The E1G2 pair matches on observation and instrument metadata. Both archive and cube integrity checks pass. These checks show that the files are intact and paired. They do not prove that calibration is scientifically accurate. | [E1G2 findings](results/phase-1/m1-e1g2-scene/findings.md). **Passed for this pair.** |
-| Mode suitability | Read official band-validity flags and compared E3G2 with E1G2. | E3G2 valid bands stop at 3155.9 nm, so these strips lack valid 4–5 µm channels needed by the selected longwave thermal method. E1G2 bands 226–248 are valid from 4504.1 to 4874.9 nm. | [Band-validity figure](results/phase-1/m1-inventory/figures/band_validity_by_mode.svg), [source table](results/phase-1/m1-inventory/metrics/band_validity_by_mode.csv). E1G2 is a **candidate mode**, not yet an approved processing input. |
-| 2020 calibrated-cube scan | Counted finite, zero, negative, and positive values in both E3G2 calibrated cubes. | All scanned values are finite. Across valid bands, `m65` has 2,809 zero and 26 negative band-pixels. `d18` has 3,059 zero and 26 negative band-pixels. Sampled median radiance ranges overlap after we apply each label's unit. The counts do not show whether zeros or negatives mean fill. | [2020 per-band CSV](results/phase-1/m1-inventory/metrics/pilot_radiance_quality_by_band.csv), [scan figure](results/phase-1/m1-inventory/figures/pilot_radiance_quality_by_band.png). **Quality scan complete. Pixel meanings remain open.** |
-| E1G2 full-cube scan | Streamed all 256 calibrated bands and the matching raw-count cube from the ZIPs. | The calibrated cube has 781,440,000 finite values. On its 222 mode-valid bands, it has 4,829 exact zeros and 42,081 negative band-pixels. These are band-pixel counts. They do not count unique spatial pixels, and they are not classified as fill. | [E1G2 per-band CSV](results/phase-1/m1-e1g2-scene/metrics/e1g2_radiance_by_band.csv), [analysis script](scripts/analyze_iirs_e1g2_scene.py). **Scan complete.** |
-| E1G2 radiance-scale cross-check | Applied the official E1G2 gain/offset LUT to sampled raw counts. Compared its output with calibrated values converted from µW to mW. | Across valid bands, median calibrated/LUT ratio is **1.00375** and median per-band correlation is **0.922**. For valid longwave bands 226–248, these values are **0.9952** and **0.899**. A ratio near 1 indicates internal agreement. This comparison is not an independent test of radiometric calibration. | [E1G2 plot, center panel](results/phase-1/m1-e1g2-scene/figures/e1g2_radiance_and_footprint.png), [per-band values](results/phase-1/m1-e1g2-scene/metrics/e1g2_radiance_by_band.csv). **Internal check supports consistency. Independent validation remains open.** |
-| Saturation and fill rules | Compared calibrated radiance with the official saturation table and raw counts with its dynamic-range field. | The table XML explicitly declares µW for saturation radiance and counts for dynamic range. Under those declared units, **676,834,500 / 677,655,000** valid-band values (**99.878921%**) meet or exceed the threshold, while no raw count reaches `dynamic_range`. A counterfactual mW interpretation yields 12 radiance exceedances but is not supported by the table label. The mismatch and pixel-mask application remain unresolved. The calibrated cube label gives no fill constant. | [E1G2 per-band CSV](results/phase-1/m1-e1g2-scene/metrics/e1g2_radiance_by_band.csv), [detailed findings](results/phase-1/m1-e1g2-scene/findings.md). **Open gate. Do not apply these comparisons as a mask.** |
-| Footprint check | Read the calibrated product's sparse geometry table and plotted its points by scan line. | The 250-sample × 12,210-line image has **1,476 points across 246 sampled scan lines**, with six sample positions per scan line, from about **5.47°W to 3.50°W** and **6.53°S to 26.86°N**. It is not per-pixel geometry. Registration accuracy remains unvalidated. | [E1G2 geometry plot, right panel](results/phase-1/m1-e1g2-scene/figures/e1g2_radiance_and_footprint.png), [summary](results/phase-1/m1-e1g2-scene/summary.md). **Coarse coverage checked. Full-resolution geometry remains open.** |
-| Literature and gap review | Reviewed IIRS thermal/reflectance papers and compared their needs with available modes and products. | E1G2 is the next thermal-pilot candidate because it has valid longwave bands. Temperature uncertainty matters to 3 µm interpretation, but no local temperature or reflectance result exists yet. | [Literature summary](results/phase-1/m1-literature/summary.md), [gap matrix](docs/gap_matrix.md). **Targeted review recorded. It is not systematic.** |
+## 2. Headline results
 
-**M1 status:** The M1 records cover product inventory, pair checks, mode review, cube scans, and an initial literature gap review. M1 is still in progress. The saturation-table units are explicitly declared in the official XML, but the table fields do not agree with the paired raw/calibrated values; their pixel-mask use and the cube fill rule still need authoritative clarification. Independent radiance validation, geometry registration, and more geographically independent observations also remain open. M2 reflectance processing and M3 scoring have not started.
+1. **The radiance-unit question is answered by physics.** The guide says mW and two labels say µW. Reading each product with its label unit gives realistic lunar brightness (I/F ≈ 0.05) and temperature (≈ 328 K). The other reading gives impossible values (I/F ≈ 50, 1,207 K). 2020 `m65` stores mW; both `d18` products store µW.
+2. **IIRS temperatures are physically real.** They track independent SLDEM2015 terrain illumination (r = 0.877, held-out R² = 0.78). They agree with LRO Diviner at the same local time within +5 K (median), with a latitude profile correlation of r = 0.81.
+3. **The first IIRS apparent reflectance is plausible.** The median is 0.098 at 1.5 µm, and mare and highland differ by about 1.9×.
+4. **Spectral units match known geology.** The darkest unit, which has the strongest 1 µm band, coincides with the Rimae Bode pyroclastic deposit in the independent USGS map.
+5. **Baselines and Earth foundation models both learn the map units, but pretraining adds no clear gain yet.** On a frozen geographic split with proxy USGS labels: per-pixel classical baselines reach macro F1 0.46–0.50 (majority 0.10). Frozen HyperSIGMA reaches **0.67**. A random forest on 64-pixel context spectra reaches **0.63**, with overlapping confidence intervals. Spatial context explains most of HyperSIGMA's lead (exploratory, pre-gate).
+6. **Held gates.** The 3 µm hydration parameter is noise-dominated (no claim). Saturation and fill semantics remain unresolved. The M³ cross-check is blocked by downloads.
 
-![E1G2 calibrated radiance medians, calibrated-to-LUT consistency by band, and the sparse geolocation grid.](results/phase-1/m1-e1g2-scene/figures/e1g2_radiance_and_footprint.png)
+## 3. Workflow
 
-**Figure: E1G2 radiance, LUT comparison, and geometry audit.** Left: sampled positive median radiance and threshold as labeled in the official table. Center: median calibrated/LUT ratio by valid band after unit conversion. Right: sparse geometry points colored by scan line. The threshold mismatch does not provide a saturation mask. Geometry is coarse, not a full-resolution footprint. We did not compute reflectance or thermal correction.
+```mermaid
+flowchart LR
+    subgraph IN["Inputs"]
+        RAW["IIRS raw + calibrated pairs<br/>2020 E3G2 ×2, 2026 E1G2"]
+        OFF["Official iir.zip<br/>SIS, LUTs, band validity, saturation"]
+        REF["Independent references<br/>SLDEM2015, Diviner GCP,<br/>USGS 1:5M geology, ASTM solar"]
+    end
+    subgraph M1["M1 verification"]
+        V1["Labels, CRC, MD5<br/>✅ 3 pairs"]
+        V2["VALID bands only<br/>222 E1G2, 127 E3G2"]
+        V3["SLDEM registration<br/>✅ 0.375 px median"]
+        V4["Saturation and fill<br/>🟡 open, no mask"]
+        V5["M³ download<br/>🔴 blocked"]
+    end
+    subgraph M2["M2 physics"]
+        U["Unit test<br/>✅ label unit correct"]
+        R["Apparent reflectance<br/>🟡 0.098 at 1.5 µm"]
+        T["Brightness temperature<br/>🟡 327.8 K"]
+        TV["Terrain check ✅ r 0.877<br/>Diviner ✅ +5 K"]
+        H["3 µm band depth<br/>❌ noise"]
+    end
+    subgraph M3["M3 baselines"]
+        L["Proxy labels<br/>5 geologic groups"]
+        SU["Spectral units<br/>❌ geo-stability 0.71"]
+        SB["Supervised baselines<br/>frozen block split"]
+    end
+    subgraph M4["M4 transfer (exploratory)"]
+        FM["HyperFree, HyperSIGMA<br/>frozen embeddings"]
+        LP["Linear probes<br/>+ context and leakage controls"]
+    end
+    RAW --> V1 --> V2 --> U
+    OFF --> V2
+    OFF --> V4
+    RAW --> V3
+    REF --> U
+    U --> R --> SU
+    U --> T --> TV
+    V3 --> TV
+    REF --> TV
+    T --> H
+    R --> SB
+    REF --> L --> SB
+    L --> LP
+    R --> FM --> LP
+    SB --> LP
+    LP --> GATE["Gates before M4 claims:<br/>reviewed labels, more scenes,<br/>absolute reflectance (M³ or Apollo 16)"]
+    V4 --> GATE
+    V5 --> GATE
+    H --> GATE
+```
 
+## 4. Data and references used
 
-## Current state (29 September 2026)
+| Item | What | Role | Local path (ignored) |
+|---|---|---|---|
+| IIRS 2026-02-27 E1G2 `d18` | Raw + calibrated, 12,210 × 250 × 256, 712–5010 nm, 5.5°W–3.5°W, 6.5°S–26.9°N | Main analysis scene | `data/pradan/e1g2_candidate_20260227T1239538758/` |
+| IIRS 2020-02-08 E3G2 `m65`, `d18` | Raw + calibrated, about 10,925 × 250 × 256, 31°S–1.5°S | Audit and unit test | `data/extracted/` |
+| Official `iir.zip` | SIS V17, LUTs, saturation tables, band validity | Product rules | `data/pradan/iir.zip` |
+| SLDEM2015 | 512 px/deg DEM tiles | Registration and terrain illumination | `data/reference/sldem2015_e1g2/` |
+| LRO Diviner GCP v002 | 0.5°, 0.25 h local-time temperatures, 2009–2015 | Independent temperature check | `data/reference/diviner/` |
+| USGS Unified Geologic Map v2 | 1:5M units (Fortezzo et al. 2020) | Proxy labels | `data/reference/usgs_unified_geology/` |
+| ASTM G173-03 AM0 | Solar irradiance 280–4000 nm (pvlib) | I/F and reflectance | `data/reference/solar/` |
+| HyperFree-b, HyperSIGMA ViT-B | Earth hyperspectral foundation models | M4 transfer | `data/models/` |
 
-The repository contains two raw/calibrated pairs from 2020-02-08, a verified raw/calibrated E1G2 pair from 2026-02-27, and the official IIRS `iir.zip` archive under ignored `data/pradan/`. All seven ZIP archives pass integrity checks. The new pair's labels match on identity and both embedded cube MD5 values match. Its calibrated values agree closely with the official LUT after the SIS unit conversion, supporting the numeric scale internally. This is not independent calibration validation. The saturation-table unit fields are explicit, but their observed mismatch against paired values, pixel-mask use, cube fill semantics, and full-resolution geometry remain open. The earlier 2020 radiance scan supports those products' unit prefixes provisionally. Physical calibration, an analysis-ready reflectance dataset, reviewed labels, trained models, and measured baseline scores do not exist yet. The earlier four-scene raw inventory remains as a historical manifest in the M1 results directory, but those old products were removed from `data/` before this pilot selection.
+## 5. M1: product verification
 
-| Initial 2020 pilot observation (UTC, archive suffix) | Raw and calibrated cube, lines × samples × bands | Approximate latitude range from label corners | Local state |
-| --- | ---: | ---: | --- |
-| 2020-02-08 00:57, `m65` | 10,925 × 250 × 256 | 31.4°S–1.5°S | ZIP and extracted; raw plus calibrated |
-| 2020-02-08 12:45, `d18` | 10,927 × 250 × 256 | 31.6°S–1.7°S | ZIP and extracted; raw plus calibrated |
+### 5.1 Inventory and band validity ✅
 
-**E1G2 pair verified:** PRADAN provided `ch2_iir_nri_20260227T1239538758_d_img_d18.zip` and `ch2_iir_nci_20260227T1239538758_d_img_d18.zip`. Both labels confirm exposure `e1`, gain `g2`, the same observation time, job ID, orbit, dimensions, and wavelengths. ZIP CRC and embedded QUB MD5 checks pass. The calibrated label declares `µW/cm**2/sr/µm`. A fixed-grid comparison with the official LUT supports the numeric scale internally. Independent radiometric validation, geometry, and mask checks remain open. See the [E1G2 acquisition record](results/phase-1/m1-e1g2-scene/summary.md).
+Labels, ZIP CRCs, and embedded cube MD5s pass for all three pairs. SIS Appendix H says only `VALID` bands may be used. E1G2 keeps 222 bands, including 4504–4875 nm for thermal work. E3G2 keeps 127 bands and has no valid 4–5 µm band.
 
-![Official calibrated browse image for the 2026-02-27 E1G2 IIRS strip, showing lunar surface texture along the observation track.](results/phase-1/m1-e1g2-scene/figures/20260227_e1g2_calibrated_browse.png)
+![Official IIRS band validity by exposure and gain mode.](results/phase-1/m1-inventory/figures/band_validity_by_mode.svg)
 
-**Figure: E1G2 calibrated-product browse preview.** This is the product's subsampled band 40 browse image, included for visual orientation. It is not a georeferenced footprint map, a thermal band image, or reflectance evidence. The spectral analysis must use the calibrated cube after M1 unit, geometry, and mask gates pass.
+*Band validity by mode (green = `VALID`). Values: [CSV](results/phase-1/m1-inventory/metrics/band_validity_by_mode.csv). Audit of external code: [record](results/phase-1/m1-processing-code-audit/summary.md).*
 
-### Pilot strip browse images
+### 5.2 Radiance quality scans ✅
 
-These previews show the two observations selected for analysis. Each uses the official PNG from its calibrated product's `browse/calibrated/` directory. The source label calls it a **count-calibrated, subsampled browse image**. Its checksum matches the label. The spectral analysis will use the corresponding calibrated `.qub` radiance cube after the M2 quality gate, not pixel values from these display images.
+All calibrated values are finite. On valid bands, the 2020 cubes have 2,809 and 3,059 exact zeros and 26 negatives each. The E1G2 cube has 4,829 zeros and 42,081 negative band-pixels. These are not classified as fill.
 
-| `m65` observation, 00:57 UTC | `d18` observation, 12:45 UTC |
-| --- | --- |
-| ![Four consecutive sections of the m65 IIRS browse strip, showing lunar terrain and craters.](results/phase-1/m1-inventory/figures/calibrated_browse_m65_four_part_preview.png) | ![Four consecutive sections of the d18 IIRS browse strip, showing lunar terrain and craters.](results/phase-1/m1-inventory/figures/calibrated_browse_d18_four_part_preview.png) |
+| 2020 E3G2 scans | E1G2 audit |
+|---|---|
+| ![2020 radiance quality by band](results/phase-1/m1-inventory/figures/pilot_radiance_quality_by_band.png) | ![E1G2 radiance, LUT check, and geometry](results/phase-1/m1-e1g2-scene/figures/e1g2_radiance_and_footprint.png) |
 
-**Figure: complete browse coverage of the two 2020 E3G2 pilot strips.** Each narrow column shows one consecutive quarter of the original strip, with rows increasing downward and columns ordered left to right. Both axes were resized together within each quarter to preserve shape; the printed row ranges refer to the browse PNG, not the 10,925/10,927-line radiance cubes. These are visual orientation aids, not georeferenced maps, reflectance images, or mineral detections. The [preview generation script](scripts/build_iirs_strip_previews.py) and [M1 notes](results/phase-1/m1-inventory/notes.md) record how to reproduce them.
+*Left: zeros, threshold comparisons, and medians ([CSV](results/phase-1/m1-inventory/metrics/pilot_radiance_quality_by_band.csv)). Right: E1G2 medians, LUT ratio (median 1.004, correlation 0.922), and sparse geometry ([CSV](results/phase-1/m1-e1g2-scene/metrics/e1g2_radiance_by_band.csv)).*
 
-The labels list 256 band centers from **712.3 to 5009.7 nm** for the active pilot files. ISRO describes the nominal instrument range as approximately 0.8–5.0 µm; use each product's actual band centers and widths. Raw labels specify `UnsignedLSB2` detector counts. Calibrated labels specify `IEEE754LSBSingle` values, with units that must be read per product: `mW/cm**2/sr/µm` for the `m65` pilot and `µW/cm**2/sr/µm` for the `d18` pilot. The PDS4 XML label remains authoritative for type, axes, wavelength, units, size, and checksum. Both active pilot footprints are low latitude and are **not polar**. The previous four-scene raw inventory is retained as historical evidence in the M1 results directory.
+### 5.3 LUT lineage: the E3G2 "5000×" gap 🟡
 
-### What the official IIRS archive established
+Applying the E3G2 LUT literally gave Level-1/LUT ratios near 0.0002. The E2/E3/E4 LUT tables hold factors near 1, not absolute gains. E1G2 holds absolute gains, and E3 uses a 10 ms exposure against 1 ms for E1. Level 1 ≈ E3G2 LUT stage × (E1G2 gain ÷ 10), with a median fitted-to-predicted ratio of **0.944** for both products. A tail of bands (p05 0.50) is unexplained.
 
-The supplied `iir.zip` passed ZIP integrity checks. Its March 2026 SIS (V17) describes calibrated Level 1 **radiance** produced by dark subtraction, lookup-table correction, destriping, and later radiance adjustments. Thermal and photometric correction belong to the separate Level 2 reflectance process. The ZIP also contains lookup tables, saturation tables, solar flux, and a band-validity workbook; the separate guide PDF is not inside it, but the user supplied V6 guide text for review. The saturation XML declares its units, but neither the SIS nor supplied guide text resolves the observed threshold mismatch or cube fill rule. The archive SHA-256 and product details are in the [M1 data dictionary](results/phase-1/m1-inventory/data_dictionary.md).
+| Original audit | Exposure-scaling test |
+|---|---|
+| ![E3G2 raw-LUT-calibrated diagnostics](results/phase-1/m1-e3g2-lineage-check/figures/e3g2_raw_lut_calibrated_diagnostics.png) | ![E3G2 LUT exposure scaling](results/phase-1/m1-e3g2-lineage-check/figures/e3g2_lut_exposure_scaling_test.png) |
 
-![Official IIRS band validity across E1G2, E2G2, E3G2, and E4G2 modes. Green bands are valid; gray bands are invalid or low confidence.](results/phase-1/m1-inventory/figures/band_validity_by_mode.svg)
+*Values: [audit CSV](results/phase-1/m1-e3g2-lineage-check/metrics/e3g2_raw_lut_calibrated_by_band.csv), [scaling CSV](results/phase-1/m1-e3g2-lineage-check/metrics/e3g2_lut_exposure_scaling_test.csv).*
 
-**Figure: IIRS band validity by exposure and gain mode.** The horizontal axis is band number 1–256. Green marks bands tagged `VALID` in the official workbook; gray includes low-response, order-sorting-filter, and saturation regions. The two initial 2020 pilot scenes use `E3G2`, whose valid bands are 7–28, 35–68, and 76–146. Band 146 is centered at 3155.9 nm, so those scenes have no valid 4–5 µm bands for a thermal fit using that region. The newly verified 2026 E1G2 pair has valid bands 226–248, centered at 4504.1–4874.9 nm. The [source values](results/phase-1/m1-inventory/metrics/band_validity_by_mode.csv) and [generation script](scripts/plot_iirs_band_validity.py) reproduce the figure. This is instrument metadata, not a reflectance or model result.
+### 5.4 Saturation and fill rules 🟡 open
 
-### Pilot radiance quality scan
+Read in its declared µW, the saturation table flags 99.88% of physically valid E1G2 radiance. Read as mW, it flags 12 values. No raw count reaches `Dynamic_Range`. The E3G2 table behaves differently, so no single correction fits. **No pixel mask is assigned.** A data-driven finite-and-positive mask keeps 99.61% of pixels.
 
-We scanned every value in both calibrated cubes across all 256 bands. The scan counted finite, zero, negative, and positive values exactly. It also compared the official E3G2 saturation thresholds under two unit interpretations. Positive-pixel quantiles use a fixed grid that samples every 32nd line and every fifth sample.
+| Fixed-line sample | Table vs LUT by mode |
+|---|---|
+| ![E1G2 sample flags](results/phase-1/m1-saturation-sample/figures/e1g2_saturation_sample_flags.png) | ![Saturation table vs LUT](results/phase-1/m1-saturation-sample/figures/iirs_saturation_lut_table_check.png) |
 
-| Calibrated scene | Pixels per band | Valid E3G2 bands | Exact zeros across valid band-pixels | Negative values across valid band-pixels | Sampled median range after declared unit conversion (mW/cm²/sr/µm) |
-| --- | ---: | ---: | ---: | ---: | ---: |
-| `m65` | 2,731,250 | 127 | 2,809 | 26 | 0.115–1.547 |
-| `d18` | 2,731,750 | 127 | 3,059 | 26 | 0.104–1.199 |
+*Values: [sample CSV](results/phase-1/m1-saturation-sample/metrics/e1g2_saturation_sample_by_band.csv), [table check CSV](results/phase-1/m1-saturation-sample/metrics/iirs_saturation_lut_table_check_by_mode.csv).*
 
-All cube values were finite. The zero and negative counts are summed across valid bands, so they are band-pixel counts, not counts of unique pixels. The scan does not establish that zero or negative values mean fill or saturation. The comparable sampled median ranges support the `mW` unit in the `m65` label and the `µW` unit in the `d18` label as a plausible conversion. This comparison does not independently validate radiometric calibration.
+### 5.5 Geometry registration ✅ relative, absolute open
 
-The saturation-table XML declares its threshold values in `µW/cm²/sr/µm`; its `Dynamic_Range` field is in counts. Applying these declared units to the paired calibrated data flags nearly all valid-band radiance values at or above threshold, while raw counts do not reach the dynamic-range values. The counterfactual mW comparison in the figure is diagnostic only and is not supported by the table XML. The unresolved issue is how these fields are intended to define saturation and a per-pixel mask. The comparisons are not masks.
+The WAC morphology grid failed (median 2.24 px, p95 6.34 px). An illumination-matched SLDEM2015 hillshade passed every predeclared relative-registration criterion on 34 held-out ties: median **0.375 px**, p95 **1.49 px**, RMSE 0.70 px. The fitted offset field was applied to a separate copy of the geometry table. The source product is unchanged.
 
-![Three-panel scan of exact zero and nonfinite fractions, candidate saturation-threshold comparisons, and sampled positive-pixel radiance medians for the m65 and d18 calibrated cubes.](results/phase-1/m1-inventory/figures/pilot_radiance_quality_by_band.png)
+| WAC grid (failed) | SLDEM hillshade (passed) | Corrected geometry candidate |
+|---|---|---|
+| ![WAC residuals](results/phase-1/m1-wac-2d-grid/figures/iirs_wac_2d_grid_residuals.svg) | ![SLDEM residuals](results/phase-1/m1-sldem-hillshade/figures/iirs_sldem_hillshade_tie_residuals.svg) | ![Geometry candidate](results/phase-1/m1-sldem-correction-candidate/figures/iirs_sldem_relative_geometry_candidate.svg) |
 
-**Figure: calibrated pilot radiance quality by band.** The top panel shows exact zeros and nonfinite values. The middle panel compares the two saturation-table unit interpretations. The bottom panel shows fixed-grid medians only on officially valid E3G2 bands. The figure reports Level 1 radiance quality checks. It does not show reflectance, confirmed saturation, or a mineral result. The [machine-readable values](results/phase-1/m1-inventory/metrics/pilot_radiance_quality_by_band.csv), [analysis script](scripts/analyze_iirs_radiance_pilot.py), and [M1 findings](results/phase-1/m1-inventory/findings.md) provide the method and limits.
+*Values: [WAC ties](results/phase-1/m1-wac-2d-grid/metrics/iirs_wac_2d_grid_ties.csv), [SLDEM ties](results/phase-1/m1-sldem-hillshade/metrics/iirs_sldem_hillshade_ties.csv), [candidate coordinates](results/phase-1/m1-sldem-correction-candidate/metrics/iirs_sldem_relative_geometry_candidate.csv).*
 
-### E1G2 radiance and footprint audit
+### 5.6 M³ reference data 🔴 blocked
 
-The full 2026 E1G2 cube scan found finite values throughout the 781,440,000-value cube. The officially valid 222 bands have 4,829 exact zeros and 42,081 negative band-pixels; neither is classified as fill. Fixed-grid sampled positive medians range from 118.218 to 1,305.46 µW/cm²/sr/µm.
+ODE lists five M³ Level-2 candidates. `M3G20090206T010833` contains 70% of the sparse IIRS geometry nodes. Its 2.7 GB reflectance cube and location file are on the JPL host, which fails TLS validation here, and the USGS mirror path returns 404.
 
-The official E1G2 lookup table (LUT) provides an internal radiance-scale check. The SIS says its LUT formula yields mW/cm²/sr/µm, while the product label declares µW/cm²/sr/µm. On a fixed grid, after converting the product values from µW to mW, the median calibrated/LUT ratio is **1.00375** and median per-band correlation is **0.922**. For valid bands 226–248, the median ratio is 0.9952 and median correlation is 0.899. This supports internal consistency, but it is not independent radiometric validation.
+![M³ candidate overlap with the IIRS control grid](results/phase-1/m1-reference-data/figures/m3_control_grid_overlap.svg)
 
-The calibrated label and saturation-table XML both declare µW/cm²/sr/µm. Applying the table thresholds as labeled puts **676,834,500 of 677,655,000 values (99.878921%)** on valid bands at or above threshold. The counterfactual mW calculation yields 12 exceedances, but it is not supported by the table label. No paired raw counts reach the table's `dynamic_range` field on valid bands. The mismatch and operational application remain unresolved, and none of these comparisons defines a mask. The cube label also contains no declared missing-value constant.
+*Values: [overlap CSV](results/phase-1/m1-reference-data/metrics/m3_control_grid_overlap.csv), [ODE metadata](results/phase-1/m1-gate-followup-20261010/m3_candidate_ode_metadata.json).*
 
-The calibrated geometry table declares 1,476 coordinate records with longitude, latitude, pixel, and line fields. The 250-sample × 12,210-line image has six geometry samples at each of 246 scan-line positions spanning lines 0–12,209. It spans about 5.47°W–3.50°W and 6.53°S–26.86°N. It confirms a low-latitude strip, not per-pixel geometry; registration accuracy remains unvalidated. The reproducible [per-band CSV](results/phase-1/m1-e1g2-scene/metrics/e1g2_radiance_by_band.csv) and [analysis script](scripts/analyze_iirs_e1g2_scene.py) preserve exact counts and sampled quantiles.
+## 6. M2: radiance, reflectance, and temperature
 
+All M2 results use the E1G2 strip (local morning, about 08:10, solar zenith 57–62°). Products are **provisional**: there is no photometric correction and no absolute reflectance validation.
 
-### M1 workflow, results, and remaining gates
+### 6.1 Radiance-unit physics test ✅
 
-The chart follows the M1 evidence from product selection to the decisions that control later processing. It shows the 2020 E3G2 scan and the separate 2026 E1G2 audit, with each numerical result tied to its interpretation and next gate.
+| Product | Label unit | I/F at 1.5 µm if µW | if mW | Physically plausible |
+|---|---|---|---|---|
+| 2026 E1G2 `d18` | µW | 0.052 | 51.5 | µW ✅ |
+| 2020 E3G2 `m65` | mW | 0.00007 | 0.065 | mW ✅ |
+| 2020 E3G2 `d18` | µW | 0.056 | 55.7 | µW ✅ |
+
+| E1G2: reflected light and thermal emission | 2020 E3G2: reflected light |
+|---|---|
+| ![E1G2 unit test](results/phase-1/m2-radiance-unit-physics/figures/e1g2_radiance_unit_physical_test.png) | ![E3G2 unit test](results/phase-1/m2-radiance-unit-physics/figures/e3g2_radiance_unit_physical_test.png) |
+
+*Values: [E1G2 CSV](results/phase-1/m2-radiance-unit-physics/metrics/e1g2_iof_by_band_under_unit_hypotheses.csv), [E3G2 CSV](results/phase-1/m2-radiance-unit-physics/metrics/e3g2_iof_by_band_under_unit_hypotheses.csv).*
+
+### 6.2 Apparent reflectance 🟡
+
+I/F ÷ cos(i), with the ASTM G173 solar spectrum. The median at 1.5 µm is **0.098** (p05–p95 0.068–0.150), and dark-to-bright contrast is about 1.9×. Spectra are red-sloped. Steps at 1.16, 1.30, 1.83, 1.99, and 3.4 µm appear in every pixel class and are likely instrument artifacts.
+
+![Apparent reflectance maps along the strip](results/phase-1/m2-apparent-reflectance/figures/e1g2_apparent_reflectance_strip_maps.png)
+
+![Apparent reflectance spectra](results/phase-1/m2-apparent-reflectance/figures/e1g2_apparent_reflectance_spectra.png)
+
+*Latitude runs along x; the 18 km strip is stretched across-track. Values: [spectra CSV](results/phase-1/m2-apparent-reflectance/metrics/e1g2_apparent_reflectance_spectra.csv).*
+
+### 6.3 Brightness temperature 🟡
+
+Planck inversion of 4504–4875 nm with emissivity 0.95, after removing the reflected component (about 6% of the signal). The median is **327.8 K** (p05–p95 304.7–342.0 K). The offset from radiative equilibrium depends on the albedo law: −1.3 K for constant albedo, +8 to +18 K for the Hayne et al. (2017) law.
+
+| Temperature map and exploratory 3 µm thermal removal | Albedo-law comparison |
+|---|---|
+| ![Brightness temperature and thermal removal](results/phase-1/m2-thermal-brightness/figures/e1g2_brightness_temperature_and_thermal_removal.png) | ![Albedo models](results/phase-1/m2-thermal-brightness/figures/e1g2_temperature_vs_albedo_models.png) |
+
+*The 2.9 µm band depth (median 0.045, p05–p95 −0.15 to 0.17) is noise-dominated: ❌, no hydration claim. Values: [latitude CSV](results/phase-1/m2-thermal-brightness/metrics/e1g2_temperature_by_latitude.csv), [albedo models](results/phase-1/m2-thermal-brightness/metrics/e1g2_temperature_vs_albedo_models.csv).*
+
+### 6.4 Independent temperature checks ✅
+
+**Terrain illumination (SLDEM2015).** IIRS temperature follows the local sun angle on each slope: r = **0.877**. A fit on even 500-line blocks predicts odd blocks with R² = **0.784**. This supports the radiance scale, the thermal signal, and the relative geometry together.
+
+**LRO Diviner.** Using the Global Cumulative Product at matched local time (08:07–08:15), IIRS − Diviner bolometric is **+5.0 K** median (IQR +3.4 to +7.1 K) over 33 latitude bins, with profile r = **0.81**. Surface roughness predicts 0 to +12 K for a 4.7 µm measurement. The offset is larger on dark units; the cause is open.
+
+| SLDEM terrain illumination | Diviner at matched local time |
+|---|---|
+| ![Topographic validation](results/phase-1/m2-topographic-validation/figures/e1g2_topographic_validation.png) | ![IIRS vs Diviner](results/phase-1/m2-diviner-temperature/figures/e1g2_iirs_vs_diviner_temperature.png) |
+
+*Values: [terrain JSON](results/phase-1/m2-topographic-validation/metrics/e1g2_topographic_validation_summary.json), [Diviner CSV](results/phase-1/m2-diviner-temperature/metrics/e1g2_iirs_vs_diviner_by_latitude.csv). Diviner is a 2009–2015 climatology at 0.5° bins, not a simultaneous observation.*
+
+## 7. M3: labels and baselines
+
+### 7.1 Proxy geologic labels 🟡
+
+The USGS Unified Geologic Map (1:5M) was rasterized onto every IIRS pixel. It has 14 units in 5 groups: basin 47.5%, mare 27.5%, highland/terra 13.9%, dark mantle 6.1%, and crater 5.0%. Shifting the map by 2 km changes 21% of unit labels, so a **2 km contact buffer** is applied before training or scoring. These are proxy labels, not reviewed ground truth.
+
+![USGS geologic units on the strip](results/phase-1/m3-geologic-labels/figures/e1g2_geologic_unit_labels_strip.png)
+
+*Values: [group classes](results/phase-1/m3-geologic-labels/metrics/e1g2_geologic_group_classes.csv), [boundary sensitivity](results/phase-1/m3-geologic-labels/metrics/e1g2_geologic_boundary_sensitivity.csv).*
+
+### 7.2 Unsupervised spectral units 🟡
+
+Processing: topography-normalized, destriped, polished, and despiked reflectance (845–2460 nm). Then 1 µm and 2 µm integrated band depth, PCA, and k-means. Six units are seed-stable (ARI ≥ 0.95), and the darkest coincides with the Rimae Bode deposit. **Geographic stability fails:** the best even/odd block ARI is 0.60 per pixel and 0.71 with 4×4 binning, against a target of 0.8.
+
+![Spectral parameters, unit spectra, model selection](results/phase-1/m3-spectral-units/figures/e1g2_spectral_parameters_and_unit_spectra.png)
+
+| Spectral-unit map | Binned stability re-test |
+|---|---|
+| ![Spectral units](results/phase-1/m3-spectral-units/figures/e1g2_spectral_unit_map.png) | ![Binned stability](results/phase-1/m3-spectral-units/figures/e1g2_binned_stability.png) |
+
+*Values: [model selection](results/phase-1/m3-spectral-units/metrics/e1g2_kmeans_model_selection.csv), [binned stability](results/phase-1/m3-spectral-units/metrics/e1g2_binned_stability.csv).*
+
+### 7.3 Supervised baselines (exploratory) 🟡
+
+Five baselines were trained on one **frozen geographic split** of the strip. Lines are cut into 250-line blocks in the order train, train, val, test, with 25-line guards and a 2 km contact buffer. Metrics are macro F1 and balanced accuracy, with 95% intervals from 1,000 resamples of test blocks. Three **context controls** use the same methods on spectra averaged over a 64 × 64 px window. Widening the guard to 64 lines changes no method by more than 0.04, so there is no sign of split leakage.
+
+| Method | Family | Macro F1 [95% CI] | Balanced acc. |
+|---|---|---|---|
+| Majority class | reference | 0.10 [0.03, 0.17] | 0.20 |
+| Band parameters + nearest centroid | physical | 0.40 [0.31, 0.51] | 0.45 |
+| Spectra PCA20 + logistic regression | classical | 0.46 [0.34, 0.56] | 0.53 |
+| Spectra + random forest | classical | 0.50 [0.35, 0.62] | 0.57 |
+| 1D spectral CNN, from scratch (GPU) | learned | 0.49 [0.35, 0.61] | 0.56 |
+| 64 px context + logistic regression | context control | 0.58 [0.43, 0.69] | 0.59 |
+| 64 px context + random forest | context control | **0.63** [0.47, 0.71] | 0.65 |
+
+*Values: [M3 CSV](results/phase-1/m3-supervised-baselines/metrics/e1g2_benchmark_m3.csv), [context CSV](results/phase-1/m3-supervised-baselines/metrics/e1g2_benchmark_ctx.csv), [64-line guard CSV](results/phase-2/m4-transfer/metrics/e1g2_benchmark_m3_ctx_m4_guard64.csv). Record: [summary](results/phase-1/m3-supervised-baselines/summary.md). Labels are 1:5M proxy units in one scene; differences below about 0.1 are within the intervals.*
+
+## 8. M4: Earth-to-Moon transfer (exploratory)
+
+> M4 normally starts only after M3 passes its gates. For the October review it was run early as an **exploratory, pre-gate** study on the same proxy labels and split. Results measure transfer on coarse map units in one scene. They are not lunar-readiness claims.
+
+### 8.1 Models
+
+| | HyperFree | HyperSIGMA |
+|---|---|---|
+| Paper | Li et al., CVPR 2025 | Wang et al., IEEE TPAMI 2025 |
+| Weights | `HyperFree-b.pth` (ViT-B), Apache-2.0 | spatial + spectral ViT-B, Apache-2.0 |
+| Pretraining | AVIRIS, 400–2500 nm | Hyperion radiance + GF-5 DN |
+| Wavelength handling | Native (wavelength-indexed weights); all 83 IIRS bands used | Interpolated to 100 bands, 845–2460 nm |
+| Embedding | 768-d per pixel | 768-d spatial (per pixel); spectral (per 64 px tile) |
+| Caveats | Tile normalized by its maximum | Spectral encoder is band-order blind; never saw reflectance |
+
+*Full inventory with hashes and licences: [model inventory](results/phase-2/m4-transfer/model_inventory.md).*
+
+### 8.2 Linear probes and controls
+
+Frozen embeddings for the whole strip (768-d) took 1–2 minutes per model on the GPU. A single linear layer was trained on the **same split, labels, and metrics** as M3.
+
+| Method | Macro F1 [95% CI] | Balanced acc. | Macro F1, 64-line guard |
+|---|---|---|---|
+| HyperFree frozen + linear probe | 0.54 [0.39, 0.63] | 0.62 | 0.52 |
+| HyperSIGMA spatial frozen + linear probe | **0.67** [0.52, 0.76] | 0.73 | 0.67 |
+| HyperSIGMA spectral (tile-level) + linear probe | 0.57 [0.40, 0.69] | 0.60 | 0.61 |
+| *Control: 64 px context + random forest (no pretraining)* | *0.63 [0.47, 0.71]* | *0.65* | *0.66* |
+
+![M3 and M4 benchmark with confidence intervals](results/phase-2/m4-transfer/figures/e1g2_m3_m4_benchmark.png)
+
+**Reading the result:**
+
+- Frozen Earth features beat per-pixel spectral baselines.
+- A context-matched classical control comes within the confidence interval of HyperSIGMA, so the **pretraining benefit is not demonstrated** on these labels.
+- HyperFree's per-pixel gain (+0.04) is within probe-training variance; a CPU rerun scored 0.48.
+- Zero-shot and fine-tuning were not run.
+
+*Values: [M4 CSV](results/phase-2/m4-transfer/metrics/e1g2_benchmark_m4.csv). Record: [summary](results/phase-2/m4-transfer/summary.md), [findings](results/phase-2/m4-transfer/findings.md).*
+
+## 9. Open gates and next actions
+
+| Gate | Status | What closes it |
+|---|---|---|
+| Saturation and fill semantics | 🟡 open | Provider rule. ISSDC has not replied; record any reply |
+| Absolute reflectance scale | 🔴 blocked | M³ RFL and LOC files (manual browser download) or an Apollo 16 IIRS scene |
+| Photometric correction | ⛔ | Lommel–Seeliger or Hapke with SLDEM incidence and emission |
+| 3 µm hydration parameter | ❌ | Spatial binning plus temperature-uncertainty propagation; report as an upper limit if no detection |
+| Reviewed labels and more scenes | ⛔ | Additional E1G2 scenes from other provinces, plus label review |
+| Spectral-unit geographic stability | ❌ | More scenes; supervised labels are the better test |
+| Spectral junction steps | 🟡 | Instrument documentation on filter boundaries |
+
+**Next actions**
+
+- **P1 (recommended first):** Download the two M³ files in a browser to unblock the absolute reflectance check.
+- **P2:** Acquire 2–3 more E1G2 scenes from other provinces through PRADAN, so splits can be scene-independent.
+- **P3:** Apply photometric correction, then re-run M3 and M4 on the corrected reflectance.
+
+## 10. Reproduce
+
+Large intermediates go to the ignored `data/derived/e1g2/`. Run from the repository root. Exact `uv` commands and script SHA-256 values are in each module's `notes.md`.
+
+| Step | Script | Output module |
+|---|---|---|
+| 1 | `scripts/build_e1g2_working_cube.py` | working cube, geometry |
+| 2 | `scripts/run_e1g2_m2_physical_pilot.py` | unit test, reflectance, temperature |
+| 3 | `scripts/run_e3g2_radiance_unit_physics.py` | E3G2 unit test |
+| 4 | `scripts/run_e1g2_topographic_validation.py` | terrain check |
+| 5 | `scripts/compare_e1g2_temperature_albedo_models.py` | albedo models |
+| 6 | `scripts/compare_e1g2_diviner_temperature.py` | Diviner check |
+| 7 | `scripts/test_e3g2_lut_exposure_scaling.py` | LUT lineage |
+| 8 | `scripts/run_e1g2_m3_spectral_units.py`, then `run_e1g2_m3_binned_stability.py` | spectral units |
+| 9 | `scripts/build_e1g2_geologic_labels.py` | proxy labels |
+| 10 | `scripts/m4_foundation_features.py --selftest`, then `extract_e1g2_foundation_embeddings.py` | M4 embeddings |
+| 11 | `scripts/run_e1g2_m3_m4_benchmark.py` (`--methods m3`, `ctx`, `m4`; `--guard 64`), then `plot_e1g2_benchmark.py` | M3/M4 benchmark |
+
+The GPU runs need `torch==2.5.1` (CUDA 12.4). Newer default wheels target CUDA 13 and fall back to the CPU on this machine's 12.5 driver.
+
+## 11. Glossary
+
+| Term | Meaning |
+|---|---|
+| **IIRS** | Chandrayaan-2 Imaging Infrared Spectrometer; one spectrum (about 0.7–5 µm) per pixel |
+| **E1G2, E3G2** | Exposure and gain modes from the label (E1 = 1 ms, E3 = 10 ms). `d18` and `m65` are station codes, not modes |
+| **NRI / NCI** | Raw (`nri`) and calibrated (`nci`) product codes |
+| **Raw count / radiance / reflectance** | Detector number / physical radiance / fraction of sunlight reflected. Three separate products |
+| **I/F** | Radiance factor π·L / (solar irradiance). Apparent reflectance = I/F ÷ cos(incidence) |
+| **LUT** | Look-up table converting counts to an intermediate radiance stage |
+| **VALID band** | A band marked usable in SIS Appendix H for that mode |
+| **Brightness temperature** | Temperature of a blackbody giving the observed 4.5–4.9 µm emission |
+| **IBD** | Integrated band depth (1 µm, 2 µm): strength of mafic mineral absorptions |
+| **ARI** | Adjusted Rand index: agreement between two clusterings (1 = identical) |
+| **Macro F1 / balanced accuracy** | Class-averaged scores, so small classes count equally |
+| **Linear probe** | Frozen pretrained encoder plus one trained linear layer |
+| **Block split, guard, contact buffer** | Train/val/test by 250-line blocks; dropped lines at block edges; dropped pixels near map-unit boundaries |
+
+## 12. Roadmap M1–M7
+
+| Stage | Goal | Status |
+|---|---|---|
+| **M1** acquisition and inventory | Verified products, units, geometry, gap review | 🟡 mostly done; masks and M³ open |
+| **M2** calibration and preprocessing | Validated reflectance with masks, thermal and photometric correction | 🟡 pilot done; absolute scale and photometry open |
+| **M3** baselines | Physical, clustering, and from-scratch models on frozen geographic splits with reviewed labels | 🟡 exploratory on proxy labels |
+| **M4** foundation-model transfer | HyperFree and HyperSIGMA: zero-shot, linear probe, controlled fine-tuning; wavelength-aware adapter | 🟡 exploratory linear probes only |
+| **M5** lunar self-supervised adaptation | Masked spectral reconstruction on unlabeled IIRS | ⛔ |
+| **M6** science tasks | Mineral classes and thermally corrected 3 µm index; no water-ice claim without indirect-light and thermal checks | ⛔ |
+| **M7** reporting and release | Ablations, limits, checkpoints, reproducibility | ⛔ |
+
+Scope constraints:
+
+- The USGS map gives **1:5M geologic units**, not pixel mineralogy.
+- A 3 µm absorption alone is **not** a water-ice detection.
+- The current scenes are low-latitude and non-polar.
+
+## 13. Data handling and evidence storage
+
+1. Keep the original ZIPs and labels unchanged. Verify SHA-256, CRC, and label MD5.
+2. Read each product's PDS4 label for type, axes, wavelengths, and **units** before opening a cube. Units differ by product.
+3. Keep raw counts, radiance, reflectance, masks, embeddings, and tiles in separate directories under the ignored `data/`.
+4. Split by geography before fitting normalization or tuning. Report metrics only with saved values and a figure.
+
+Every module has `summary.md`, `findings.md`, and `notes.md` under `results/<phase>/<module>/`, with metrics in `metrics/` and figures in `figures/`. See the [results protocol](docs/results_protocol.md).
+
+## 14. Primary sources
+
+- [ISRO PRADAN Chandrayaan-2 archive](https://pradan.issdc.gov.in/ch2/) and [IIRS FAQ](https://pradan.issdc.gov.in/ch2/faq.xhtml)
+- [Chauhan et al. 2025, IIRS Level-2 reflectance](https://doi.org/10.1111/maps.70037) · [Chauhan et al. 2021, OH/H₂O from IIRS](https://doi.org/10.18520/cs/v121/i3/391-401) · [Verma et al. 2022, Icarus](https://doi.org/10.1016/j.icarus.2022.115075) · [Bose et al. 2024, photometric correction](https://doi.org/10.1016/j.asr.2023.12.019) · [Gou et al. 2026](https://doi.org/10.1016/j.asr.2026.06.090)
+- [SLDEM2015, NASA PGDA](https://pgda.gsfc.nasa.gov/products/54) · [Diviner GCP, Williams et al. 2017, PDS Geosciences](https://pds-geosciences.wustl.edu/) · [Hayne et al. 2017, JGR](https://arxiv.org/abs/1711.00977)
+- [USGS Unified Geologic Map of the Moon](https://astrogeology.usgs.gov/search/map/Moon/Geology/Unified_Geologic_Map_of_the_Moon_GIS_v2/) · [NASA PDS M³ Level-2](https://pds.nasa.gov/ds-view/pds/viewProfile.jsp?dsid=CH1-ORB-L-M3-4-L2-REFLECTANCE-V1.0)
+- [HyperFree (Li et al. 2025)](https://arxiv.org/abs/2503.21841) · [HyperSIGMA (Wang et al. 2025)](https://arxiv.org/abs/2406.11519)
+- [Li et al. 2018, polar surface ice from M³](https://pmc.ncbi.nlm.nih.gov/articles/PMC6130389/)
+
+## 15. Archive: detailed M1 evidence chart
+
+<details>
+<summary>Expand the original step-by-step M1 evidence chart (kept for traceability)</summary>
 
 ```mermaid
 flowchart LR
     A["Three matched raw/calibrated pairs<br/>Two 2020 E3G2 and one 2026 E1G2"] --> B["Read PDS4 labels<br/>Match time, orbit, mode, axes, and bands"]
-    C["Official iir.zip<br/>SIS, LUT, band validity, saturation tables"] --> D["Set mode-valid bands and calibration references"]
+    C["Official iir.zip<br/>SIS, LUT, band validity, saturation tables"] --> D["SIS Appendix H: retain VALID bands only<br/>222 E1G2; 127 E3G2"]
+    D --> D2["Band-level rule confirmed<br/>Per-pixel fill/saturation mask still open"]
+    D2 --> Q
     B --> E["Check ZIP CRC and QUB MD5"]
     E --> F["E1G2 pair passes identity and integrity<br/>20260227T1239538758"]
     D --> G["Review exposure/gain mode validity"]
@@ -126,6 +425,13 @@ flowchart LR
     G --> H["2020 E3G2<br/>127 valid bands; no valid 4–5 µm bands"]
     H --> I["Scan two calibrated cubes<br/>All values finite<br/>Zeros: 2809 and 3059<br/>Negatives: 26 and 26 band-pixels"]
     I --> J["Save 2020 per-band CSV and quality plot"]
+    I --> I2["Compare both E3G2 raw/LUT/calibrated pairs"]
+    I2 --> I3["Only 1 Dynamic_Range hit per scene<br/>XML µW threshold flags ~99.9988%"]
+    I2 --> I4["Median Level-1/LUT-stage ratio ~0.0002<br/>Correlation ~0.90; downstream steps omitted"]
+    I3 --> I5["Threshold mask unresolved"]
+    I4 --> I6["Guide documents downstream cause<br/>Exact ratio not reproduced"]
+    I5 --> W
+    I6 --> W
 
     LT["Published IIRS thermal method uses E1G2"] --> K["2026 E1G2<br/>222 valid bands<br/>Bands 226–248 span 4504.1–4874.9 nm"]
     G --> K
@@ -135,128 +441,68 @@ flowchart LR
     L --> N["Apply official gain/offset LUT<br/>Convert calibrated µW values to mW"]
     N --> O["Median ratio: 1.00375<br/>Median per-band correlation: 0.922"]
     O --> P["Across valid bands: median ratio 1.00375<br/>Median per-band correlation 0.922"]
-    P --> P2["Internal consistency supported<br/>Independent calibration validation remains open"]
+    P --> P2["Near-unity only after label unit conversion<br/>Guide/label unit conflict remains open"]
 
     L --> Q["Compare saturation and raw dynamic-range fields"]
+    LP["2025 LPSC abstract<br/>Uses LUT, saturation radiance, and CCD range for raw-count recalibration"] --> Q
+    OF["Public PRADAN FAQ and ISRO processing description checked<br/>No Level-1 mask or fill rule found"] --> Q
     Q --> R["Valid bands: 99.878921% meet threshold as labeled<br/>Counterfactual mW: 12 exceed<br/>Raw counts at/above dynamic_range: 0"]
     R --> S["Declared units known; field application and fill rule unresolved<br/>Do not create a pixel mask"]
+    S --> S2["Published alternatives identified<br/>No source resolves local mask or unit conflict"]
+    S2 --> M3X["Official PDS M3 access sites<br/>Measure actual valid-pixel overlap"]
+    S2 --> AP16["Apollo 16 + RELAB 62231<br/>Separate-scene absolute reflectance route"]
+    S2 --> DIV["Diviner matched by GCP and local time<br/>Temperature check only, after E1G2 gates"]
+    M3X --> SHAPE["M3 comparison normalized at 810 nm<br/>Spectral shape only, not absolute scale"]
+    R --> Q2["Fixed-line sample: 888,000 band-pixels<br/>97.8048% radiance flags; 0 raw-count flags"]
+    Q2 --> Q3["Median per-band LUT ratio: 1.00139<br/>Per-band ratios: 0.906–1.096"]
+    Q3 --> S
+    C --> Q4["Compare LUT at Dynamic_Range with saturation table"]
+    Q4 --> Q5["Counterfactual mW ratios<br/>E1G2 1.559; E3G2 5,118<br/>No single correction supported"]
+    Q5 --> S
 
     L --> T["Inspect sparse calibrated geometry"]
     T --> U["1,476 points across 246 scan lines<br/>5.47°W–3.50°W<br/>6.53°S–26.86°N"]
     U --> V["Low-latitude strip only<br/>Sparse grid; register against independent reference"]
+    V --> V1["SLDEM relative tie grid passes candidate criteria<br/>34 held-out ties; median 0.375 px"]
+    V1 --> V2["Apply training fit to separate sparse geometry candidate<br/>Held-out residuals reproduced"]
+    V2 --> V3["Absolute geolocation remains open<br/>Independent controls or correction product needed"]
 
     M --> W["Save per-band CSV, audit figure, and findings"]
+    Q3 --> W
+    Q5 --> W
     P2 --> W
+    P2 --> PU["Physical unit test, 10 Oct<br/>Label unit correct for all 3 products<br/>See M2 pilot chart"]
+    PU --> Y
     S --> W
+    S2 --> W
+    M3X --> W
+    AP16 --> W
+    DIV --> W
+    SHAPE --> W
     V --> W
+    V3 --> W
     J --> W
     W --> X["M1 outputs: verified inventory, QA evidence, and gap review"]
-    X --> Y["M2 gate: resolve masks, independent radiance validation, and full geometry"]
+    X --> Y["M2 gate: resolve masks, independent radiance validation, and absolute geometry"]
     Y --> Z["Then validate thermal correction and reflectance"]
     LT --> Z
     Z --> AA["M3 gate: add independent tracks, reviewed labels, and fixed split"]
     U --> AB["WAC crop acquired<br/>824 x 10230 px, 100 m/px"]
+    DEM["SLDEM2015 north/south tiles<br/>512 pixels/degree"] --> HS["Render hillshade at scene sun angles<br/>choose azimuth by training NCC only"]
+    U --> HS
+    HS --> HG["34 held-out ties<br/>median 0.375 px; p95 1.487 px<br/>relative candidate limits pass"]
+    HG --> ABS["Absolute geolocation provisional<br/>sparse starting geometry; no surveyed controls"]
+    ABS --> Y
     AB --> AB2["Initial geowarp plus 23 training image ties"]
     AB2 --> AC["8 held-out ties in 2 blocks<br/>RMSE 0.781 IIRS pixel equivalents"]
     AC --> AC2["Full-resolution band 40<br/>30 train, 12 held-out ties in 3 blocks"]
     AC2 --> AC3["Held-out RMSE 2.757 IIRS pixels<br/>p95 5.317 pixels; geometry gate open"]
-    Z --> AD["Review five PDS M3 L2 candidates<br/>Compare corrected reflectance only"]
+    AC3 --> AC4["2D subpixel grid<br/>41 train; 17 held-out across 5 columns and blocks"]
+    AC4 --> AC5["Median 2.236 px; p95 6.343 px<br/>WAC relative candidate limits fail"]
+    Z --> AD["ODE returned selected M3 label and file list<br/>RFL 2.7 GB; source LOC identified"]
+    AD --> AD2["JPL binary host fails strict TLS here<br/>USGS mirror path returns 404"]
+    AD2 --> AD3["P1 blocked: no cube or LOC<br/>Valid-pixel overlap unknown"]
+    AD3 --> AD4["Compare reflectance shape only<br/>After IIRS gates pass"]
 ```
 
-The original E3G2 scan did not produce reflectance or a saturation mask, and those products remain unsuitable for thermal fitting that requires 4–5 µm. The matched E1G2 pair passes identity and checksum checks, and its LUT comparison supports the numeric radiance scale internally. The official table's units are explicit, but its threshold and raw dynamic-range values remain inconsistent with this observation, so no mask is assigned. Obtain authoritative clarification of field application and fill rules, validate the geometry against an independent lunar reference, and seek independent radiometric validation before thermal correction. The published Verma et al. method uses the extended IIRS spectrum for surface-temperature retrieval and thermal-emission removal, so E1G2 remains a candidate mode rather than an approved processing input ([paper](https://doi.org/10.1016/j.icarus.2022.115075)).
-
-### Independent reference-data path
-
-The E1G2 footprint has a spatial reference in the [LROC WAC global morphologic map](https://data.lroc.im-ldi.com/lroc/view_rdr_product/WAC_GLOBAL_O000N0000_100M), listed at 100 m/pixel. A footprint-sized crop has been assembled from 164 TIFF tiles using byte-range requests: 824 x 10,230 grayscale pixels with a 20 km margin. The acquisition transferred 10,747,904 raster bytes from the 1.62 GB pyramid. The ignored raster is `data/reference/lroc_wac_e1g2/e1g2_wac_crop.pgm`; its [source/version and georeferencing metadata](results/phase-1/m1-reference-data/wac_crop_metadata.json) and [acquisition script](scripts/fetch_wac_reference_crop.py) are recorded. The E1G2 image is 250 samples x 12,210 lines; its geometry table has six coordinate samples at each of 246 scan-line positions. At browse scale, gradient matching used 23 training patches and 8 held-out patches across two blocks. RMSE was **0.781 IIRS cube-pixel equivalents** (57.4 WAC projected map metres); p95 was 1.075 pixels (78.0 projected map metres). See the [browse summary JSON](results/phase-1/m1-reference-data/metrics/iirs_wac_registration_browse_summary.json), [per-patch CSV](results/phase-1/m1-reference-data/metrics/iirs_wac_registration_browse_ties.csv), and [residual plot](results/phase-1/m1-reference-data/figures/iirs_wac_registration_browse_residuals.svg).
-
-The full-resolution check used E1G2 band 40 at 1,369.6 nm, marked valid in the official mode table and display-stretched only for morphology matching. It used 30 training ties and 12 held-out ties across three blocks. Held-out RMSE was **2.757 IIRS pixels** (198.2 WAC projected map metres); p95 was 5.317 pixels (382.7 projected map metres). See the [full-resolution summary JSON](results/phase-1/m1-reference-data/metrics/iirs_wac_registration_band040_1369nm_summary.json), [tie CSV](results/phase-1/m1-reference-data/metrics/iirs_wac_registration_band040_1369nm_ties.csv), and [residual plot](results/phase-1/m1-reference-data/figures/iirs_wac_registration_band040_1369nm_residuals.svg). The band image was generated by [extract_iirs_registration_band.py](scripts/extract_iirs_registration_band.py). Residual map metres use the local geolocation Jacobian and represent projected map distance, not lunar surface ground distance. Both checks are provisional image alignment, not surveyed absolute geolocation accuracy. The small held-out set and variable tie residuals keep the geometry gate open. Review tie confidence and seek better distributed controls before treating geometry as validated. This work does not validate radiance calibration. A recent SIFT registration preprint is a method lead, not independent validation evidence.
-
-The [PDS M³ Level-2 archive](https://pds.nasa.gov/ds-view/pds/viewProfile.jsp?dsid=CH1-ORB-L-M3-4-L2-REFLECTANCE-V1.0) provides pixel-located reflectance products. A [PDS ODE REST footprint-intersection query](https://oderest.rsl.wustl.edu/) returned five candidate labels from orbit 1080, observed on 2009-02-05/06. Their labels report thermal correction applied, 85 bands, and a special-pixel value of -999.0. See the [candidate metadata](results/phase-1/m1-reference-data/m3_overlap_candidates.csv) and [label review](results/phase-1/m1-reference-data/m3_label_review.csv). A sparse-grid screen places 1,033 of 1,476 IIRS geometry points (69.99%) inside candidate `M3G20090206T010833_V01_L2`, the highest of the five. The [values](results/phase-1/m1-reference-data/metrics/m3_control_grid_overlap.csv) and [SVG figure](results/phase-1/m1-reference-data/figures/m3_control_grid_overlap.svg) are a candidate-ranking diagnostic, not a common valid-pixel fraction. The analysis is reproducible with [analyze_m3_control_grid_overlap.py](scripts/analyze_m3_control_grid_overlap.py); the ODE footprint query uses [query_m3_overlap.py](scripts/query_m3_overlap.py). Compare spectra only after IIRS masks, radiance validation, geometry, and reflectance correction pass. Account for wavelength response, spatial support, and observation geometry. No M³ image cube or reflectance comparison is available yet. The provisional WAC tie residuals do not establish absolute geolocation accuracy. See the [M1 reference-data record](results/phase-1/m1-reference-data/summary.md).
-
-### What IIRS papers tell us to do next
-
-| Paper | Evidence relevant to this project | Use and limit |
-| --- | --- | --- |
-| [Verma et al. (2022), Icarus](https://doi.org/10.1016/j.icarus.2022.115075) | The study used E1G2 Level 1 radiance and the 2.5–5 µm range for thermal correction. | Acquire an E1G2 pair. Audit its assumptions and masks before reproducing the method. |
-| [Chauhan et al. (2025), Meteoritics & Planetary Science](https://doi.org/10.1111/maps.70037) | Describes thermal correction, apparent reflectance, empirical-line adjustment, standard geometry, an output range of 0.8–3.3 µm, and comparison with same-region M³. | Use as the main Level-2 processing reference. It does not remove the need to validate our own data and masks. |
-| [Gou et al. (2026), Advances in Space Research](https://doi.org/10.1016/j.asr.2026.06.090) | Reports more stable temperature estimates at 4504–4875 nm. Its sensitivity example gives a 14.39% reflectance difference at 3156 nm for a 4 K temperature difference. | Preserve the E1G2 longwave bands and propagate temperature uncertainty into 3 µm reflectance. This result is from the paper, not our cubes. |
-| [Bose et al. (2024), Advances in Space Research](https://doi.org/10.1016/j.asr.2023.12.019) | Studies IIRS photometric correction over 0.8–2.0 µm and compares the derived reflectance with M³. | Informs the shortwave photometric step. It does not validate thermal correction near 3 µm. |
-| [Chauhan et al. (2021), Current Science](https://doi.org/10.18520/cs/v121/i3/391-401) | Reports a physics-based thermal correction using co-located temperature measurements. | A possible independent comparison. It does not show that E3G2 alone supports longwave temperature fitting. |
-
-The live [PRADAN Browse and Download route](https://pradan.issdc.gov.in/ch2/protected/payload.xhtml) redirects unauthenticated visitors to sign-in; the scene table and IIRS filters require an authorized session. That session was used to select and verify the E1G2 pair listed above. Remaining M1 work is to resolve threshold and pixel-mask semantics, validate full-resolution geometry and radiance scale against an independent reference, and add independent tracks before thermal processing or M3 scoring. The [initial gap matrix](docs/gap_matrix.md), [literature findings](results/phase-1/m1-literature/findings.md), and [M1 task plan](tasks/task_plan.md) track these gates. The matrix is an initial targeted review, not a systematic review or a novelty claim.
-
-## Scientific scope and constraints
-
-- **M1:** Build a documented, diverse IIRS corpus. Obtain the matching calibrated product when available and record its processing level and units. Collect a small set of overlapping Chandrayaan-1 M³ Level-2 reflectance scenes and a geologic reference layer for comparison. Track observation, orbit, footprint, incidence/emission/phase geometry, product version, and checksums.
-- **M2:** Turn calibrated radiance into validated reflectance. Follow the product guide and the published IIRS Level-2 processing chain: quality masking, thermal-emission correction beyond approximately 2.5 µm, solar normalization, and lunar photometric correction. Record every correction and its uncertainty. Compare with official calibrated/Level-2 products and overlapping M³ spectra where possible. A learned denoiser is optional and must be assessed against an untouched validation set.
-- **M3:** Establish reproducible physical and machine-learning references on the **same held-out observations**: diagnostic mineral band parameters or spectral-library matching, a classical 3 µm continuum-depth index, unsupervised clustering, and a modest spectral-spatial CNN trained from random initialization. Report metrics only where independent labels exist; clustering and hydration-index maps without ground truth are descriptive, not accuracy results.
-
-Two proposal assumptions need an explicit feasibility gate. First, the [USGS unified geologic map](https://astrogeology.usgs.gov/search/map/Moon/Geology/Unified_Geologic_Map_of_the_Moon_GIS_v2/) provides **geologic units at 1:5,000,000**, not pixel-level mineral abundances; unit polygons may supply coarse labels after boundary exclusion and manual review. Second, a 3 µm reflectance feature in a permanently shadowed region requires enough **indirect light** and signal to noise to measure it. M³ has demonstrated this under specific conditions, but the current IIRS scenes are not polar and do not establish IIRS feasibility there. A 3 µm absorption alone must not be called a water-ice detection.
-
-## Full research roadmap
-
-The project is deliberately staged. Each stage must pass its scientific gate before the next stage can produce a defensible result.
-
-### Phase 1: IIRS foundations, M1–M3
-
-This is the current phase.
-
-**M1, acquisition and inventory** establishes exactly what each IIRS product contains. We parse the PDS4 labels, verify dimensions, byte counts, archive and extracted checksums, wavelengths, geometry, footprints, and processing levels. The active set now has two verified 2020 pairs and one verified 2026 E1G2 pair, plus the official archive/SIS, a data dictionary, and an initial literature gap matrix. Independent radiance-scale validation and mask validation, geometry review, a scene-coverage report, and independent tracks remain open. The current strips do not support a polar or independent generalization claim, so additional tracks and provinces must be selected before the final split is frozen.
-
-**M2, calibration and preprocessing** converts an official calibrated product, or a documented raw-to-calibrated chain, into analysis-ready reflectance. It includes invalid and saturated-pixel masks, thermal-emission correction beyond approximately 2.5 µm, solar normalization, and lunar photometric correction. A pilot scene is validated first using representative spectra, quality fractions, correction residuals, and cross-instrument comparisons. Large-scale processing starts only after the pilot quality gate passes.
-
-**M3, baselines and evaluation** freezes reviewed labels and orbit or province splits. It runs diagnostic mineral spectral methods, a thermally corrected 3 µm index where the signal supports it, unsupervised clustering, and a small CNN trained from random initialization. Held-out accuracy, macro-F1, balanced accuracy, IoU, class support, uncertainty, and failure cases are reported only when the labels support those metrics.
-
-### Phase 2: Earth-to-Moon foundation-model transfer, M4
-
-M4 begins only after M1–M3 pass. Its purpose is to measure how much general hyperspectral representation learned from Earth survives on lunar IIRS data.
-
-The two planned comparison backbones are:
-
-- **HyperFree:** the channel-adaptive Earth hyperspectral foundation model.
-- **HyperSIGMA:** the two-stream spectral and spatial Earth hyperspectral foundation model.
-
-For each backbone, the same corrected IIRS inputs, labels, masks, and held-out split are used in three conditions:
-
-1. **Frozen zero-shot transfer:** use the released encoder without lunar training and classify against projected laboratory reference spectra or nearest-centroid prototypes.
-2. **Linear probe:** keep the encoder frozen and train only a small lunar task head.
-3. **Controlled fine-tuning:** allow encoder adaptation under a fixed training budget and the same evaluation protocol.
-
-Because IIRS wavelengths and band spacing do not exactly match the Earth pretraining sensors, M4 first uses a continuous wavelength-aware adapter. It evaluates a comparable SWIR range before testing the extended 0.8–5.0 µm range. The backbone checkpoint, license, preprocessing, adapter version, split, seed, and code revision are recorded for every run.
-
-M4 outputs a quantified Earth-to-Moon transfer gap, not a claim that either model is already lunar-ready.
-
-### Phase 2: Lunar self-supervised adaptation, M5
-
-M5 continues pretraining the selected backbone on unlabeled calibrated IIRS patches. The main objective masks spectral tokens and reconstructs them. Ablations test spectral derivative consistency and band-ratio consistency so that adaptation does not smooth away narrow mineral or hydration absorptions. The adapted encoder is then evaluated with the same few-shot and held-out protocol as M4.
-
-### Phase 2: Downstream scientific tasks, M6
-
-M6 applies the validated representations to reviewed mineral classes or abundance proxies and to a thermally corrected apparent hydroxyl or water-equivalent 3 µm absorption index. Polar water-ice interpretation remains conditional on indirect-light signal, thermal stability, independent references, and uncertainty checks. A 3 µm anomaly is not reported as definitive water ice without those checks.
-
-### Phase 2: Reporting and release, M7
-
-M7 consolidates ablations, limitations, reproducibility checks, checkpoints, processed products, figures, and code. It records which quality gates passed or failed and separates measured results from unresolved research questions.
-
-## Research results and evidence storage
-
-Every phase and module has a concise record under [`results/`](results/). Each module contains a summary, findings, and notes. When a metric or graph is computed, its source values are saved as CSV or JSON in `metrics/`, and the corresponding PNG or SVG is saved in `figures/`. The summary records the data version, split, units, code revision, generation command, and figure path. If no metric or graph exists, the result remains a text record and no artificial plot is created. See the [results protocol](docs/results_protocol.md).
-
-## Data handling
-
-1. Retain the original ZIP archives and XML labels as immutable inputs. Record SHA-256 for each ZIP and verify each extracted `.qub` against the label's MD5 and byte count.
-2. Read the extracted `data/extracted/*/data/{raw,calibrated}/.../*.xml` label before opening a cube. The active pilot raw products are `(bands=256, lines=10925 or 10927, samples=250)` little-endian unsigned 16-bit; the calibrated products are IEEE 32-bit floating point. Stream or memory-map large cubes; do not load the whole archive into memory for a quick look.
-3. Keep raw counts, calibrated radiance, corrected reflectance, masks, and model-ready tiles in distinct directories. Store wavelengths, units, coordinate convention, source product IDs, correction versions, and split IDs with every derived artifact.
-4. Split by orbital track and geologic province before fitting normalization, selecting thresholds, or tuning models. The two low-latitude pilot strips are insufficient for a defensible independent transfer benchmark; acquire more distinct scenes before claiming generalization.
-
-## Primary sources
-
-- [ISRO PRADAN Chandrayaan-2 archive](https://pradan.issdc.gov.in/ch2/) and [IIRS product FAQ](https://pradan.issdc.gov.in/ch2/faq.xhtml): instrument overview, raw/calibrated product types, XML labels, and location of the IIRS archive and user guides (`Other Downloads` → `iir.zip`).
-- [ISRO Chandrayaan-2 science page](https://www.isro.gov.in/Chandrayaan2_science.html): IIRS observation and hydration objectives.
-- [Chauhan et al., 2025, Level-2 IIRS reflectance processing](https://onlinelibrary.wiley.com/doi/abs/10.1111/maps.70037): thermal correction, apparent reflectance, and spectral correction. Use the full paper and official product guide when implementing numerical details.
-- [IIRS photometric correction study](https://www.sciencedirect.com/science/article/pii/S0273117723009754): lunar photometric normalization and comparison with M³.
-- [NASA PDS M³ Level-2 reflectance archive](https://pds.nasa.gov/ds-view/pds/viewProfile.jsp?dsid=CH1-ORB-L-M3-4-L2-REFLECTANCE-V1.0): cross-instrument comparison data.
-- [USGS Unified Geologic Map of the Moon](https://astrogeology.usgs.gov/search/map/Moon/Geology/Unified_Geologic_Map_of_the_Moon_GIS_v2/) and [USGS Spectral Library v7](https://www.usgs.gov/labs/spectroscopy-lab/usgs-spectral-library): coarse geologic context and candidate mineral reference spectra.
-- [Li et al., 2018, polar surface ice from M³](https://pmc.ncbi.nlm.nih.gov/articles/PMC6130389/): demonstrates the need to account for indirect illumination in permanently shadowed terrain.
-
-Research and inventory are documented here; the methods and results will be added as they are implemented and validated.
+</details>

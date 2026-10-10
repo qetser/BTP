@@ -1,0 +1,81 @@
+{
+  "status": "exploratory paired-product QA; no mask assigned",
+  "data_version": "2020-02-08 paired E3G2 products; identities, archive hashes, and embedded QUB MD5 values from current M1 inventory",
+  "method": "Full-cube exact counts by valid band for finite/zero/negative calibrated values and raw Dynamic_Range exceedances; two candidate saturation comparisons; fixed-grid raw/LUT-stage/Level-1 comparison every 32nd line and every fifth sample. Appendix F defines the LUT output as an intermediate radiance stage; later destriping and post-processing are omitted here.",
+  "split": "Not applicable: single-scene product QA, not model evaluation.",
+  "units": {
+    "lut": "mW/cm**2/sr/\u00b5m",
+    "saturation_xml": "\u00b5W/cm**2/sr/\u00b5m",
+    "calibrated_products": {
+      "m65": "mW/cm**2/sr/\u00b5m",
+      "d18": "\u00b5W/cm**2/sr/\u00b5m"
+    }
+  },
+  "scene_summaries": {
+    "m65": {
+      "raw_product_id": "urn:isro:isda:ch2_cho.iir:data_raw:ch2_iir_nri_20200208t0057589143_d_img_m65",
+      "calibrated_product_id": "urn:isro:isda:ch2_cho.iir:data_calibrated:ch2_iir_nci_20200208t0057589143_d_img_m65",
+      "raw_archive_sha256": "fee0c77f0f4254e7b5fae9109f7738ead81234cf36eeb8a84b5adbbd9381a25a",
+      "calibrated_archive_sha256": "e1ddc892613a6f8433213dd4b5fa891e6298c4183f82c62ffc9c81cae7e87177",
+      "raw_cube_md5": "2b2978806e455e54fd40d6684aae9ff3",
+      "calibrated_cube_md5": "f1773d3d8a8e8e1ff1ea423e2e4239c2",
+      "cube_unit": "mW/cm**2/sr/\u00b5m",
+      "dimensions_bands_lines_samples": [
+        256,
+        10925,
+        250
+      ],
+      "valid_band_count": 127,
+      "finite_calibrated_fraction_over_valid_bands": 1.0,
+      "zero_calibrated_band_pixels": 2809,
+      "negative_calibrated_band_pixels": 26,
+      "maximum_raw_count_on_valid_bands": 9533,
+      "raw_dynamic_range_hits_over_valid_band_pixels": 1,
+      "raw_dynamic_range_fraction_over_valid_band_pixels": 2.8829348276545524e-09,
+      "declared_uW_saturation_candidate_hits": 346864751,
+      "declared_uW_saturation_candidate_fraction": 0.9999884711436242,
+      "numeric_mW_saturation_candidate_hits": 0,
+      "numeric_mW_saturation_candidate_fraction": 0.0,
+      "median_of_per_band_sampled_level1_over_lut_stage_ratios": 0.00020006807474123864,
+      "per_band_sampled_level1_over_lut_stage_ratio_min": 0.00010464296254182343,
+      "per_band_sampled_level1_over_lut_stage_ratio_max": 0.004139975329402076,
+      "median_of_per_band_sampled_level1_lut_stage_correlations": 0.8979573953165234
+    },
+    "d18": {
+      "raw_product_id": "urn:isro:isda:ch2_cho.iir:data_raw:ch2_iir_nri_20200208t1245274109_d_img_d18",
+      "calibrated_product_id": "urn:isro:isda:ch2_cho.iir:data_calibrated:ch2_iir_nci_20200208t1245274109_d_img_d18",
+      "raw_archive_sha256": "5f257d0c23803d0a836d5824a2fb4039ea4a1536f6b068e197487fe8c18779f3",
+      "calibrated_archive_sha256": "6eaa82a2f0826125562b883e3e12f5cc8f69390dcddecec130fb63e284af42bc",
+      "raw_cube_md5": "658f683d6586742a27dcd4ca620d7126",
+      "calibrated_cube_md5": "bc6110637a96ba536cddd0edbcd604f9",
+      "cube_unit": "\u00b5W/cm**2/sr/\u00b5m",
+      "dimensions_bands_lines_samples": [
+        256,
+        10927,
+        250
+      ],
+      "valid_band_count": 127,
+      "finite_calibrated_fraction_over_valid_bands": 1.0,
+      "zero_calibrated_band_pixels": 3059,
+      "negative_calibrated_band_pixels": 26,
+      "maximum_raw_count_on_valid_bands": 9367,
+      "raw_dynamic_range_hits_over_valid_band_pixels": 1,
+      "raw_dynamic_range_fraction_over_valid_band_pixels": 2.882407155864005e-09,
+      "declared_uW_saturation_candidate_hits": 346927984,
+      "declared_uW_saturation_candidate_fraction": 0.999987703651073,
+      "numeric_mW_saturation_candidate_hits": 0,
+      "numeric_mW_saturation_candidate_fraction": 0.0,
+      "median_of_per_band_sampled_level1_over_lut_stage_ratios": 0.00019991223292633927,
+      "per_band_sampled_level1_over_lut_stage_ratio_min": 0.00010473684602944543,
+      "per_band_sampled_level1_over_lut_stage_ratio_max": 0.004136976782006229,
+      "median_of_per_band_sampled_level1_lut_stage_correlations": 0.9236455966627446
+    }
+  },
+  "limits": [
+    "Saturation and Dynamic_Range comparisons are candidate flags, not validated detector masks.",
+    "The XML-declared and counterfactual numeric-mW thresholds are both diagnostic scenarios.",
+    "The LUT-stage to Level-1 comparison omits documented destriping and radiance post-processing and is not a complete reconstruction or independent calibration validation.",
+    "Finite, zero, and negative values are not assigned fill or validity meanings here.",
+    "No reflectance, thermal correction, or scientific retrieval was computed."
+  ]
+}

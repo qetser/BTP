@@ -1,0 +1,46 @@
+{
+  "data": "ch2_iir_nci_20260227T1239538758_d_img_d18 (E1G2), 222 SIS VALID bands",
+  "code_commit_base": "304c5e8",
+  "sun_moon_distance_au": 0.9919287326822674,
+  "sun_earth_distance_au": 0.9903566960015355,
+  "solar_zenith_range_deg": [
+    56.79,
+    61.6871
+  ],
+  "pixels_total": 3052500,
+  "pixels_all_valid_bands_finite_positive": 3040527,
+  "pixels_with_brightness_temperature": 3040527,
+  "iof_median_1500nm_label_uW": 0.051504865288734436,
+  "reflectance_1500nm_p05_p50_p95": [
+    0.06810263991355896,
+    0.09817063063383102,
+    0.1499443620443344
+  ],
+  "reflectance_813nm_median": 0.0698973536491394,
+  "reflectance_1500nm_darkest10_brightest10_thresholds": [
+    0.07359963357448579,
+    0.13817084729671478
+  ],
+  "across_track_column_relative_std_1500nm": 0.01419009454548359,
+  "bt_flat_K_p05_p50_p95": [
+    304.7310558368683,
+    327.7583076291913,
+    342.045602100119
+  ],
+  "bt_slope_minus_flat_K_median": -0.7428003987436114,
+  "bt_if_guide_mW_K_median": 1206.904730316082,
+  "equilibrium_model_K_range": [
+    321.752042428149,
+    333.54056275124174
+  ],
+  "model_parameters": {
+    "bond_albedo": 0.12,
+    "emissivity": 0.95,
+    "solar_constant_W_m2": 1361.0
+  },
+  "bd2900_exploratory_p05_p50_p95": [
+    -0.1460637092590332,
+    0.045442283153533936,
+    0.17201435565948486
+  ]
+}

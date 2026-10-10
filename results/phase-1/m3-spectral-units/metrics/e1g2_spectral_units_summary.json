@@ -1,0 +1,38 @@
+{
+  "spike_screen": {
+    "pixels_before": 3011220,
+    "pixels_flagged_spike": 8183,
+    "band_values_replaced": 548786,
+    "columns_dropped": []
+  },
+  "polishing_coefficient_min_max": [
+    0.9488210307902919,
+    1.0528381108319966
+  ],
+  "input": "E1G2 apparent reflectance / SLDEM local incidence, 845-2460 nm, column flat-fielded, polished, despiked, 3-band smoothed",
+  "pixels_clustered": 3003037,
+  "column_stripe_relative_std_median_before_after": [
+    0.019602129235863686,
+    3.953724814209636e-08
+  ],
+  "pca_explained_variance_ratio": [
+    0.5204728245735168,
+    0.184976726770401,
+    0.037995848804712296,
+    0.022653890773653984
+  ],
+  "selected_k": 6,
+  "selection_rule": "no k reached block-model ARI 0.8; fallback to the k with the highest block-model ARI",
+  "stability_gate_ari_0p8_passed": false,
+  "ibd_1um_p05_p50_p95": [
+    -0.0053853672098469075,
+    0.018737507833016885,
+    0.047895302643647046
+  ],
+  "ibd_2um_p05_p50_p95": [
+    -0.010238354073630438,
+    0.012238583299848768,
+    0.03477179103427462
+  ],
+  "pearson_ibd1_vs_ibd2": 0.020925024290625524
+}

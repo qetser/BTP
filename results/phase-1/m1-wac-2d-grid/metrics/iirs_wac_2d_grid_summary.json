@@ -1,0 +1,96 @@
+{
+  "status": "relative image-registration diagnostic; not absolute geolocation validation",
+  "source": {
+    "iirs_image": "/home/anirudhs/Suraj/BTP/data/reference/lroc_wac_e1g2/e1g2_band040_1369nm.png",
+    "iirs_image_sha256": "d02dc7a5ff3cdfdb303d61b6085cfb0a73e8ee120e8859391972c06b3fdbc0df",
+    "iirs_band": 40,
+    "wavelength_nm": 1369.6,
+    "wac_image": "/home/anirudhs/Suraj/BTP/data/reference/lroc_wac_e1g2/e1g2_wac_crop.pgm",
+    "wac_source_etag": "\"e2137517b2bb1afa7232c407ebbd1ada\"",
+    "iirs_geometry_records": 1476
+  },
+  "method": {
+    "cross_track_centers_iirs_px": [
+      25.0,
+      75.0,
+      125.0,
+      175.0,
+      225.0
+    ],
+    "row_step_px": 250,
+    "patch_size_px": [
+      32,
+      100
+    ],
+    "search_radius_px": 8,
+    "subpixel_refinement": "Independent parabolic fit around the 2D normalized-correlation peak",
+    "score_threshold": 0.2260938584804535,
+    "score_threshold_rule": "25th percentile of training candidate scores only; applied unchanged to held-out ties",
+    "fit": "Huber-reweighted affine x/y offset field in normalized sample and line coordinates, fit on training blocks only",
+    "heldout_split": "750-line blocks; block index modulo 3 equals 2; 150-line boundary guard"
+  },
+  "tie_counts": {
+    "candidate_total": 245,
+    "training_candidates": 55,
+    "heldout_candidates": 25,
+    "training_used": 41,
+    "heldout_used": 17,
+    "heldout_cross_track_columns": [
+      25.0,
+      75.0,
+      125.0,
+      175.0,
+      225.0
+    ],
+    "heldout_spatial_blocks": [
+      2,
+      5,
+      8,
+      11,
+      14
+    ]
+  },
+  "heldout_residual_iirs_px": {
+    "median": 2.236364266851017,
+    "p90": 5.360970512777694,
+    "p95": 6.342915919131966,
+    "rmse": 3.572054469099402,
+    "maximum": 9.237074702391194,
+    "median_by_750_line_block": {
+      "2": 2.438546093495764,
+      "5": 3.0705596777384825,
+      "8": 1.0151403721630299,
+      "11": 5.619376223317162,
+      "14": 1.450726580110158
+    },
+    "median_by_approx_10km_bin_with_minimum_3_ties": {
+      "15": 2.438546093495764,
+      "33": 3.0705596777384825,
+      "69": 5.619376223317162,
+      "87": 1.450726580110158
+    },
+    "worst_approx_10km_bin_median": 5.619376223317162
+  },
+  "predeclared_candidate_criteria": {
+    "heldout_median_le_1_iirs_px": false,
+    "heldout_p95_le_2_iirs_px": false,
+    "at_least_3_heldout_cross_track_columns": true,
+    "at_least_4_heldout_spatial_blocks": true,
+    "all_10km_bins_with_3plus_ties_median_le_1_5_iirs_px": false
+  },
+  "candidate_gate_result": "fail",
+  "limitations": [
+    "Only 17 held-out matches remain after applying the training-only score cutoff; tail quantiles are uncertain at this sample size.",
+    "WAC and IIRS morphology ties are not surveyed ground-control points.",
+    "The affine offset model is a first diagnostic, not the final correction model.",
+    "WAC 100 m pixels and IIRS 80 m pixels differ in spatial response.",
+    "Residuals measure held-out consistency relative to this WAC warp, not absolute selenographic error.",
+    "A poor match can reflect illumination and morphology differences as well as geolocation error."
+  ],
+  "software": {
+    "python": "3.11.16",
+    "numpy": "2.2.6",
+    "opencv": "4.14.0",
+    "matplotlib": "3.11.2"
+  }
+}
